@@ -17,7 +17,15 @@ in a single session.
 ## Step 0: Install the skill
 
 ```bash
-git clone https://github.com/markpolyak/course-maker ~/.claude/skills/course-maker
+# Clone the repository
+git clone https://github.com/your-username/course-maker
+
+# Option A — symlink (recommended for development and staying up to date)
+# git pull in the repo will automatically update the skill
+ln -s $(pwd)/course-maker/skill ~/.claude/skills/course-maker
+
+# Option B — copy (simpler, but requires re-copying after updates)
+cp -r course-maker/skill ~/.claude/skills/course-maker
 ```
 
 The skill lives in `~/.claude/skills/` and is available in all your Claude Code projects.

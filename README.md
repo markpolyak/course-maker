@@ -32,19 +32,26 @@ and each new lecture benefits from lessons learned in previous ones.
 **Requirements:** Claude Code, git.
 
 ```bash
-# 1. Clone the skill
-git clone https://github.com/markpolyak/course-maker ~/.claude/skills/course-maker
+# 1. Clone the repository
+git clone https://github.com/markpolyak/course-maker
 
-# 2. Create a new course repository
+# 2. Install the skill
+# Option A — symlink (recommended: git pull automatically updates the skill)
+ln -s $(pwd)/course-maker/skill ~/.claude/skills/course-maker
+
+# Option B — copy (if you don't plan to modify the skill)
+cp -r course-maker/skill ~/.claude/skills/course-maker
+
+# 3. Create a new course repository
 mkdir my-course && cd my-course && git init
 
-# 3. Copy the course template
+# 4. Copy the course template
 cp ~/.claude/skills/course-maker/COURSE_CLAUDE_TEMPLATE.md CLAUDE.md
 
-# 4. Add your course plan
+# 5. Add your course plan
 cp /path/to/your/course_plan.md .
 
-# 5. Open in Claude Code and initialize
+# 6. Open in Claude Code and initialize
 claude
 > /course-maker course init
 ```
