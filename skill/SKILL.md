@@ -26,9 +26,9 @@ State is stored in Markdown files — no database needed, works with git.
 | `/lecture visuals N` | Step 2 — list of visualizations, TikZ feasibility |
 | `/lecture figures N` | Step 3 — Python script to generate PNG figures |
 | `/lecture slides N` | Step 4 — LaTeX/Beamer, chunk 0 (preamble + title) |
-| `/lecture slides N next` | Step 4 — следующий блок из 5 слайдов |
-| `/lecture notes N` | Step 5 — speaker notes, chunk 0 (слайды 1–5) |
-| `/lecture notes N next` | Step 5 — следующий блок из 5 слайдов |
+| `/lecture slides N next` | Step 4 — next block of 5 slides |
+| `/lecture notes N` | Step 5 — speaker notes, chunk 0 (slides 1–5) |
+| `/lecture notes N next` | Step 5 — next block of 5 slides |
 | `/lecture status N` | Show state + history summary for lecture N |
 
 When the user types one of these commands, read this skill and execute the
