@@ -58,6 +58,24 @@ or "Slides and speaker notes in Japanese. No language restrictions on figures."]
 
 ---
 
+## Lab context
+
+<!-- Fill this in when running /lab course-init. Used by all /lab commands. -->
+
+**GitHub org:** [org-name]
+**GHC classroom org:** [classroom-org]
+**GHC repo naming:** [classroom-org]/[prefix]-[lab-slug]
+  # Example: cs-classroom/sp2026-lab1-eda
+  # Used by /lab publish to sync via gh API
+
+**Starter repos:**
+| Lab | Slug | Starter repo URL |
+|-----|------|-----------------|
+| 1 | lab1-[slug] | https://github.com/[org]/lab1-[slug] |
+| 2 | lab2-[slug] | https://github.com/[org]/lab2-[slug] |
+
+---
+
 ## Notes from past lectures
 
 <!-- Claude appends observations here as lectures are completed. -->

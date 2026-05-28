@@ -221,6 +221,48 @@ need to be reviewed.
 
 ---
 
+---
+
+## Creating lab assignments
+
+Lab assignments use a separate pipeline with `/lab *` commands.
+Full workflow for a single lab:
+
+```
+/lab course-init                                            # one-time: create labs/shared/ with templates
+/lab init 1 https://github.com/org/lab1-backprop lab1-backprop  # scaffold lab 1 in labs/lab1-backprop/
+
+/lab plan 1        # Stage 1a: iterate until plan is approved
+/lab notebook 1    # Stage 1b: generate exercises.ipynb
+/lab spec 1        # Stage 1b: generate lab_spec.md (instructor-only)
+/lab datasets 1    # Stage 1b: generate datasets_info.md (optional)
+
+/lab tests 1       # Stage 2: generate tests.py, conftest.py, requirements.txt, README
+
+/lab validate 1 7  # Stage 3: validate as student 7 (new session recommended)
+
+/lab publish 1     # push to starter repo + sync GitHub Classroom repo via gh API
+```
+
+For labs that already have a notebook but no spec:
+```
+/lab reverse-spec 1   # generate lab_spec.md from existing exercises.ipynb
+/lab tests 1          # then continue normally
+```
+
+After post-release fixes:
+```
+/lab update 1      # fix → re-validate → re-publish
+```
+
+**Before running `/lab course-init`:** fill in `## Lab context` in `CLAUDE.md` with
+your GitHub org, GitHub Classroom org, and starter repo URLs.
+
+**Before running `/lab init N`:** create the starter repo on GitHub and copy in your
+`conftest.py` and `tests.yaml` to `skill/templates/` (these are not auto-generated).
+
+---
+
 ## Tips for fewer iterations
 
 - **Fill in course context thoroughly.** Vague context → vague output → more rounds.

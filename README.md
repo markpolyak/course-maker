@@ -37,6 +37,7 @@ git clone https://github.com/markpolyak/course-maker
 
 # 2. Install the skill
 # Option A — symlink (recommended: git pull automatically updates the skill)
+# Run this from the PARENT directory of the cloned repo (not from inside course-maker/)
 ln -s $(pwd)/course-maker/skill ~/.claude/skills/course-maker
 
 # Option B — copy (if you don't plan to modify the skill)
@@ -139,7 +140,7 @@ for lectures 1–2: `plan.md`, `visuals.md`, `slides.tex`, `speaker_notes.md`.
 - [x] Claude Code skill (`.claude/skills/`)
 - [x] Chunked generation for slides and speaker notes
 - [x] State tracking (`COURSE_STATE.md` + `history.md`)
-- [ ] Lab assignment pipeline (`/lab-pipeline`)
+- [x] Lab assignment pipeline (`/lab *` commands)
 - [ ] Syllabus auto-generation
 - [ ] pptx output (in addition to Beamer)
 - [ ] Overleaf integration

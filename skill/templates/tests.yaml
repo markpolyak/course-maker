@@ -1,0 +1,30 @@
+# tests.yaml — GitHub Actions CI workflow template.
+#
+# IMPORTANT: Replace this placeholder with the actual tests.yaml from Lab 1.
+# Path to obtain it: ask the professor for the current .github/workflows/tests.yaml
+# from any real lab's starter repo.
+#
+# This file is copied verbatim to:
+#   labs/labN/starter/.github/workflows/tests.yaml
+#
+# NEVER modify this file after putting the real content here.
+# The CI workflow is shared across all labs. Changes break CI for all students.
+#
+# ─────────────────────────────────────────────────────────────
+# PLACEHOLDER — paste full tests.yaml content below this line.
+# ─────────────────────────────────────────────────────────────
+
+name: Run Tests (PLACEHOLDER — replace with real workflow)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: PLACEHOLDER
+        run: echo "Replace this file with the real tests.yaml from Lab 1"
