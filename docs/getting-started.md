@@ -17,7 +17,7 @@ in a single session.
 ## Step 0: Install the skill
 
 ```bash
-git clone https://github.com/your-username/course-maker ~/.claude/skills/course-maker
+git clone https://github.com/markpolyak/course-maker ~/.claude/skills/course-maker
 ```
 
 The skill lives in `~/.claude/skills/` and is available in all your Claude Code projects.

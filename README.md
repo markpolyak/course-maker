@@ -33,7 +33,7 @@ and each new lecture benefits from lessons learned in previous ones.
 
 ```bash
 # 1. Clone the skill
-git clone https://github.com/your-username/course-maker ~/.claude/skills/course-maker
+git clone https://github.com/markpolyak/course-maker ~/.claude/skills/course-maker
 
 # 2. Create a new course repository
 mkdir my-course && cd my-course && git init
