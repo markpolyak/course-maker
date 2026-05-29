@@ -225,40 +225,40 @@ need to be reviewed.
 
 ## Creating lab assignments
 
-Lab assignments use a separate pipeline with `/lab *` commands.
+Lab assignments use a separate pipeline with `/course-maker lab *` commands.
 Full workflow for a single lab:
 
 ```
-/lab course-init                                            # one-time: create labs/shared/ with templates
-/lab init 1 https://github.com/org/lab1-backprop lab1-backprop  # scaffold lab 1 in labs/lab1-backprop/
+/course-maker lab course-init                                            # one-time: create labs/shared/ with templates
+/course-maker lab init 1 https://github.com/org/lab1-backprop lab1-backprop  # scaffold lab 1 in labs/lab1-backprop/
 
-/lab plan 1        # Stage 1a: iterate until plan is approved
-/lab notebook 1    # Stage 1b: generate exercises.ipynb
-/lab spec 1        # Stage 1b: generate lab_spec.md (instructor-only)
-/lab datasets 1    # Stage 1b: generate datasets_info.md (optional)
+/course-maker lab plan 1        # Stage 1a: iterate until plan is approved
+/course-maker lab notebook 1    # Stage 1b: generate exercises.ipynb
+/course-maker lab spec 1        # Stage 1b: generate lab_spec.md (instructor-only)
+/course-maker lab datasets 1    # Stage 1b: generate datasets_info.md (optional)
 
-/lab tests 1       # Stage 2: generate tests.py, conftest.py, requirements.txt, README
+/course-maker lab tests 1       # Stage 2: generate tests.py, conftest.py, requirements.txt, README
 
-/lab validate 1 7  # Stage 3: validate as student 7 (new session recommended)
+/course-maker lab validate 1 7  # Stage 3: validate as student 7 (new session recommended)
 
-/lab publish 1     # push to starter repo + sync GitHub Classroom repo via gh API
+/course-maker lab publish 1     # push to starter repo + sync GitHub Classroom repo via gh API
 ```
 
 For labs that already have a notebook but no spec:
 ```
-/lab reverse-spec 1   # generate lab_spec.md from existing exercises.ipynb
-/lab tests 1          # then continue normally
+/course-maker lab reverse-spec 1   # generate lab_spec.md from existing exercises.ipynb
+/course-maker lab tests 1          # then continue normally
 ```
 
 After post-release fixes:
 ```
-/lab update 1      # fix → re-validate → re-publish
+/course-maker lab update 1      # fix → re-validate → re-publish
 ```
 
-**Before running `/lab course-init`:** fill in `## Lab context` in `CLAUDE.md` with
+**Before running `/course-maker lab course-init`:** fill in `## Lab context` in `CLAUDE.md` with
 your GitHub org, GitHub Classroom org, and starter repo URLs.
 
-**Before running `/lab init N`:** create the starter repo on GitHub and copy in your
+**Before running `/course-maker lab init N`:** create the starter repo on GitHub and copy in your
 `conftest.py` and `tests.yaml` to `skill/templates/` (these are not auto-generated).
 
 ---

@@ -124,6 +124,14 @@ my-course/
 | `/course-maker notes N` | Step 5: speaker notes, slides 1–5 |
 | `/course-maker notes N next` | Step 5: next chunk of 5 slides |
 | `/course-maker status N` | State + history summary for lecture N |
+| `/course-maker lab course-init` | One-time setup: create labs/shared/ with templates |
+| `/course-maker lab init N <url> [slug]` | Scaffold lab N |
+| `/course-maker lab plan N` | Lab Step 1a: interactive planning |
+| `/course-maker lab notebook N` | Lab Step 1b: generate exercises.ipynb |
+| `/course-maker lab spec N` | Lab Step 1b: generate lab_spec.md |
+| `/course-maker lab tests N` | Lab Step 2: tests.py, conftest.py, README |
+| `/course-maker lab validate N <id>` | Lab Step 3: validate as student |
+| `/course-maker lab publish N` | Push to starter repo + sync GitHub Classroom |
 
 ---
 
