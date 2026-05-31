@@ -18,17 +18,17 @@ Ask the user for any missing parameters (mandatory points, bonus points, additio
 if they were not provided with the command.
 
 Then start an iterative planning conversation. Produce a numbered task list in the following
-format. For each task:
+format. For each task (translate all field labels and values into the course language):
 
 ```
-### Задание N.M — <Название>
-- Что делает студент: <одна фраза — реализует функцию / определяет переменную / реализует класс>
-- Обоснование: <почему это задание включено — что именно студент поймёт или научится делать;
-  не "развивает навыки", а конкретно: "студент вручную реализует X и увидит Y">
-- Интерфейс: <сигнатура функции или имя и тип переменной или название класса с методами>
-- Что проверяется: <2–4 конкретных проверки — тип, размерность, диапазон значений, связь с другими переменными>
-- Баллы: <число>
-- Бонус: <да / нет>
+### Task N.M — <Title>
+- Student action: <one phrase — implements a function / defines a variable / implements a class>
+- Rationale: <why this task is included — what the student will understand or learn to do;
+  not "builds skills", but specifically: "the student manually implements X and sees Y">
+- Interface: <function signature, or variable name and type, or class name with methods>
+- What is tested: <2–4 specific checks — type, shape, value range, relationship with other variables>
+- Points: <number>
+- Bonus: <yes / no>
 ```
 
 **Requirements for the plan:**
@@ -46,7 +46,8 @@ After the task list, add:
 - Summary scoring table (block — task — points — bonus)
 - Variable list for the self-check cell: `required_vars` and `bonus_vars`
 
-**Do NOT generate notebook code until the user writes "план утверждён".**
+**Do NOT generate notebook code until the user approves the plan**
+(e.g. "approved" or any clear confirmation in any language).
 Present the plan, wait for feedback, iterate.
 
 ---

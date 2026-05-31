@@ -82,10 +82,28 @@ if __name__ == '__main__':
 - Minimum dependencies: `numpy`, `matplotlib`, `scipy`, `statsmodels`
   Do not add other packages without noting it to the user
 
+## Execution and verification
+
+After saving `figures.py`, always run it:
+```bash
+cd lectures/NN && python figures/figures.py
+```
+
+The script is considered unverified until it has been run at least once without errors.
+**Never mark the figures step ✅ without a successful run.**
+
+If the run fails:
+- Show the full traceback to the user
+- Fix the offending function only (don't rewrite the whole script)
+- Re-run until clean
+
+After a clean run, list the generated PNG files so the user can confirm the output looks right.
+
 ## Iteration handling
 
 When the user gives visual feedback ("make the font larger", "remove the legend",
-"the x-axis label overlaps"), update only the affected function.
+"the x-axis label overlaps"), update only the affected function, re-run the script,
+confirm the PNG was regenerated.
 Append to history.md what was changed and why.
 
 ## Common mistakes to avoid

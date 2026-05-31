@@ -22,7 +22,7 @@
 
 **Course name:** [Full course name]
 **Slug:** [course-slug]
-**Semester / programme:** [e.g. Магистратура, 2 семестр, Математические технологии системного анализа]
+**Semester / programme:** [e.g. Master's, semester 2, Mathematical Methods for Systems Analysis]
 
 ### Audience
 

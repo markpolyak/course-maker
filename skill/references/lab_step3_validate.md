@@ -2,23 +2,47 @@
 
 ---
 
-## IMPORTANT: Run in a New Isolated Claude Code Session
+## IMPORTANT: Pre-validation checklist
+
+Before anything else, run:
+```bash
+git status <LAB_DIR>starter/
+```
+
+If there are **uncommitted changes** in `<LAB_DIR>starter/`, **stop immediately** and show:
+```
+Cannot start validation: labs/<dir>/starter/ has uncommitted changes.
+Commit them first — otherwise the clean notebook will be lost after validation.
+
+  git add <LAB_DIR>starter/
+  git commit -m "lab N: ..."
+
+After committing, run validation again.
+```
+
+Do not proceed until the working tree for `<LAB_DIR>starter/` is clean.
+
+---
+
+## IMPORTANT: Clear context before validation
 
 This step simulates a student solving the lab. Claude must not have access to `lab_spec.md`
-or the test files before completing all tasks.
+or the test files before completing all tasks. The current session likely has all of that
+in context from the preceding steps.
 
-When the user runs `/lab validate N <student_id>`, show this message first:
+When the user runs `/course-maker lab validate N <student_id>`, show this message first
+and **stop — do not proceed until the user confirms**:
 ```
-Этап валидации рекомендуется запускать в новой изолированной сессии Claude Code.
-Откройте новую сессию, перейдите в корень курсового репо,
-и запустите команду снова.
+Context must be cleared before validation — otherwise Claude will know the contents of
+lab_spec.md and tests.py and cannot objectively simulate a student.
 
-Это обязательно, чтобы Claude не имел доступа к lab_spec.md,
-tests.py и conftest.py до завершения всех заданий.
+Run /clear in this chat, then run the command again:
+  /course-maker lab validate N <student_id>
+
+Or open a new Claude Code session at the course repo root and run the command there.
 ```
 
-If the user confirms they want to run in the current session, proceed with strict enforcement
-of the file access rules below.
+Only proceed after the user has confirmed they ran `/clear` or opened a new session.
 
 ---
 
@@ -65,7 +89,7 @@ Your task is to complete all tasks for variant `Student_ID = <provided number>`.
 - Complete ALL tasks from the notebook — not just those checked by tests
 - Do not skip tasks even if they seem optional or decorative
 - Text comments (string variables) must be filled substantively, not with stubs like
-  "комментарий" or "TODO"
+  "TODO", "comment", or any equivalent placeholder in the course language
 - Do not reverse-engineer results to match expected values manually — computations must
   follow from the data
 
@@ -97,6 +121,31 @@ pytest tests.py -v
 ---
 
 ## After Validation
+
+**Step 1 — offer to save the solution:**
+
+Ask the user:
+```
+Validation complete. Save the solution to a separate branch?
+Enter a branch name (e.g. validate-lab1-student7) or press Enter to skip.
+```
+
+If the user provides a branch name:
+```bash
+git checkout -b <branch-name>
+git add <LAB_DIR>starter/exercises.ipynb
+git commit -m "lab N: validation solution Student_ID=<id>"
+git checkout -
+```
+Confirm to the user: "Solution saved to branch `<branch-name>`. Back on previous branch."
+
+**Step 2 — restore the notebook to its clean state:**
+```bash
+git restore <LAB_DIR>starter/exercises.ipynb
+```
+
+This removes the student's solutions from the working copy.
+The validation results are preserved in `history.md` — the notebook itself must not be committed with student solutions on the main branch.
 
 Append to `labs/labN/history.md`:
 ```markdown

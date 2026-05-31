@@ -1,5 +1,61 @@
 # Changelog
 
+## [2026-05-31]
+
+### Fixed
+
+**lab validate: no /clear prompt before validation** (`skill/references/lab_step3_validate.md`, `skill/SKILL.md`)
+
+The current session context contains `lab_spec.md`, `tests.py`, and `conftest.py` from
+prior steps, which would compromise the student simulation. The skill now shows a blocking
+message asking the user to run `/clear` (or open a new session) and re-run the command.
+Validation does not proceed until the user confirms the context has been cleared.
+
+**lab validate: no guard against uncommitted changes, notebook not restored after validation** (`skill/SKILL.md`, `skill/references/lab_step3_validate.md`)
+
+Validation simulates a student solving `exercises.ipynb`, which modifies the file.
+If the notebook wasn't committed before validation, the clean version was lost permanently.
+After validation the notebook was left with student solutions in the working tree.
+
+Now the workflow:
+- Runs `git status <LAB_DIR>starter/` before starting; stops with an error message if there
+  are uncommitted changes, asking the user to commit first
+- After validation completes, runs `git restore <LAB_DIR>starter/exercises.ipynb` to remove
+  student solutions from the working copy
+
+**figures step marked ✅ without running the script** (`skill/SKILL.md`, `skill/references/step3_figures.md`)
+
+After generating `figures.py` and getting user approval, the skill saved the file and
+immediately marked the step done — without running the script or verifying that PNG files
+were created. Code that has never been run must be treated as unverified.
+
+Now the workflow after approval:
+1. Saves `figures.py`
+2. Runs `python figures/figures.py` from the lecture directory
+3. If errors: shows traceback, fixes the script, re-runs until clean
+4. After clean run: lists generated PNGs for the user to confirm
+5. Only then marks figures → ✅
+
+### Changed
+
+**Skill reference files made language-agnostic** (`skill/references/step4_slides.md`, `skill/references/step5_notes.md`)
+
+Russian strings in the lecture pipeline reference files were replaced with English equivalents
+and annotated with "translate to course language" instructions. The skill now works with any
+course language; the output language is determined at generation time from the course context
+in CLAUDE.md.
+
+Changes:
+- `step4_slides.md`: `\subtitle{Лекция N. [Title]}` → annotated placeholder that reads
+  the course-language word for "Lecture" at generation time; outline frame title
+  `План лекции` likewise replaced with a language-neutral placeholder
+- `step5_notes.md`: entire output template translated from Russian to English;
+  all Russian section headers, table headers, stage directions, and example speech replaced
+  with English equivalents; each heading annotated "(translate to course language)" so the
+  generated notes are still produced in the correct course language
+
+---
+
 ## [2026-05-29]
 
 ### Fixed

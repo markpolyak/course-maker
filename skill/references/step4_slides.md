@@ -37,7 +37,7 @@
 
 % ── Title info ──────────────────────────────────────────────────────────────
 \title{[Course name]}
-\subtitle{Лекция N. [Title]}
+\subtitle{[course-language word for "Lecture"] N. [Title]}  % translate to course language
 \author{[Author]}
 \institute{[Institution]}
 \date{[Date]}
@@ -139,8 +139,14 @@ Before finalizing, mentally check each slide:
 
 Always include:
 - Title slide: `\begin{frame}\titlepage\end{frame}`
-- Outline slide after title: `\begin{frame}{План лекции}\tableofcontents\end{frame}`
-- Closing slide: summary of key takeaways + "what's next"
+- Outline slide after title: `\begin{frame}{<outline title in course language>}\tableofcontents\end{frame}`
+  (e.g. "Outline" in English, "План лекции" in Russian — translate to course language)
+- Closing slide: summary of key takeaways. A single mention of the next lecture topic is allowed here if it flows naturally — but not required.
+
+## Forward reference rules (strictly enforced)
+
+- **No forward references within the presentation.** Do not write "we will cover this later", "see slide X for details", "more on this ahead" on any slide except the closing one.
+- **Next-lecture references: maximum 1 per entire presentation.** Allowed only on the closing slide. Omit entirely if there is no compelling reason to mention it. Three or more mentions anywhere in the deck is a hard error.
 
 ## Iteration logging
 

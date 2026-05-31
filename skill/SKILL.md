@@ -21,6 +21,8 @@ State is stored in Markdown files — no database needed, works with git.
 
 | Command | What it does |
 |---|---|
+| `/course-maker` | Show project status (all lectures + labs) |
+| `/course-maker help` | Show this command reference |
 | `/course-maker course init` | Scaffold a new course repository |
 | `/course-maker course status` | Show status of all lectures/labs |
 | `/course-maker course update` | Update course_plan.md and flag affected lectures |
@@ -53,6 +55,13 @@ State is stored in Markdown files — no database needed, works with git.
 When the user types one of these commands, read this skill and execute the
 corresponding workflow below. Always read `COURSE_STATE.md` and the relevant
 `lectures/NN/history.md` before starting any step.
+
+**If invoked with no arguments** (`/course-maker` alone): show project status —
+read `COURSE_STATE.md` and print a summary of all lectures and labs with their
+current step statuses (✅ / 🔄 / ❌ / ⚠️). End with one line:
+"Run `/course-maker help` for available commands."
+
+**`/course-maker help`**: print the Quick reference tables above and stop.
 
 ---
 
@@ -248,10 +257,20 @@ generates all non-TikZ figures as PNG files.
 **Then write the script.** See `references/step3_figures.md` for coding
 standards, style rules, and file naming conventions.
 
-After approval:
-- Save to `lectures/NN/figures/figures.py`
-- Append to `history.md`
-- Update `COURSE_STATE.md` (figures → ✅ or 🔄 if user is still iterating)
+After the user approves the script:
+1. Save to `lectures/NN/figures/figures.py`
+2. Run the script:
+   ```bash
+   cd lectures/NN && python figures/figures.py
+   ```
+3. **If the script fails:** show the error, fix the script, save again, re-run.
+   Repeat until it runs without errors. Do not mark the step done until it runs cleanly.
+4. **After a clean run:** verify that the expected PNG files were created in `lectures/NN/figures/`.
+   List them to the user.
+5. Append to `history.md`
+6. Update `COURSE_STATE.md`:
+   - figures → ✅ if all expected PNGs were generated
+   - figures → 🔄 if the user wants to iterate on the visuals further
 
 ---
 
@@ -268,32 +287,29 @@ timeouts. Always split into preamble + blocks of 5 slides.
 2. Read `lectures/NN/visuals.md`.
 3. List files in `lectures/NN/figures/` — use only PNG files that exist.
 4. Read `lectures/NN/history.md` — note any layout issues from prior iterations.
-5. Read `references/step4_slides.md` — Beamer template and anti-overfull rules.
+5. Read `## Course context` from `CLAUDE.md` — language for all slide text and frame titles.
+6. Read `references/step4_slides.md` — Beamer template and anti-overfull rules.
 
-**Chunked generation protocol:**
+**Chunked generation protocol — fully automatic, no confirmation between chunks:**
 
 **Chunk 0 — Preamble + title slide (always first):**
-Generate and show to user:
-```latex
-\documentclass[...]{beamer}
-% packages, colors, title info
-\begin{document}
-\begin{frame}\titlepage\end{frame}
-\begin{frame}{План лекции}\tableofcontents\end{frame}
-```
-Wait for approval. Then create `lectures/NN/slides.tex` with this content.
+Generate, immediately write to `lectures/NN/slides.tex`, then proceed to Chunk 1
+without pausing.
 
 **Chunk K — slides [5K-4 … 5K] (K = 1, 2, …):**
-Generate 5 slides, show to user. After approval, **append** to `slides.tex`.
-Tell the user: "Chunk K/M done. Type `/course-maker slides N next` to continue,
-or give feedback to revise this chunk first."
+Generate 5 slides, immediately **append** to `slides.tex`, then proceed to the
+next chunk automatically.
 
 **Chunk last — closing slide + `\end{document}`:**
-Generate final summary slide + `\end{document}`. Append after approval.
+Generate final summary slide + `\end{document}`, append immediately.
+
+After the last chunk print one summary line:
+"Done: slides.tex, M slides."
 
 **Resuming after a break:**
 If the user runs `/course-maker slides N next` and `slides.tex` already exists,
-read the file to find the last completed slide number, then continue from there.
+read the file to find the last completed slide number, then continue from there
+(auto-chain the remaining chunks).
 
 **Revising a specific chunk:**
 If the user says "fix slide 7", identify which chunk it belongs to,
@@ -324,33 +340,26 @@ blocks of 5 slides to avoid timeouts.
 4. Read `## Course context` from `CLAUDE.md` — tone, audience, language.
 5. Read `references/step5_notes.md` — format and tone rules.
 
-**Chunked generation protocol:**
+**Chunked generation protocol — fully automatic, no confirmation between chunks:**
 
 **Chunk 0 — Header + slides 1–5:**
-Generate and show to user:
-```markdown
-# Лекция N — Текст для лектора
-**Общее время:** 85–90 мин
----
-## Слайд 1 — [Title]
-...
-## Слайд 5 — [Title]
-...
-```
-Wait for approval. Create `lectures/NN/speaker_notes.md` with this content.
+Generate, immediately write to `lectures/NN/speaker_notes.md`, then proceed to
+Chunk 1 without pausing.
 
 **Chunk K — slides [5K-4 … min(5K, total)] (K = 1, 2, …):**
-Generate 5 slides of notes, show to user. After approval, **append** to
-`speaker_notes.md`. Tell the user: "Chunk K/M done. Type
-`/course-maker notes N next` to continue, or give feedback to revise this chunk."
+Generate 5 slides of notes, immediately **append** to `speaker_notes.md`, then
+proceed to the next chunk automatically.
 
 **Chunk last — timing table + cut candidates:**
-Generate the timing table and "что можно сократить" section from
-`references/step5_notes.md`. Append after approval.
+Generate the timing table and "what can be cut" section, append immediately.
+
+After the last chunk print one summary line:
+"Done: speaker_notes.md, N slides."
 
 **Resuming after a break:**
 If the user runs `/course-maker notes N next` and `speaker_notes.md` already exists,
-read the file to find the last completed slide, then continue from there.
+read the file to find the last completed slide, then continue from there
+(auto-chain the remaining chunks).
 
 After all chunks are done:
 - Append to `history.md`
@@ -584,8 +593,18 @@ git commit -m "lab N: add tests and conftest"
 
 Read: `references/lab_step3_validate.md`.
 
-Show the isolation warning first. Recommend running in a new Claude Code session.
+**Before starting:** check `git status <LAB_DIR>starter/` — if there are uncommitted changes,
+stop and ask the user to commit first. The notebook will be modified during validation;
+without a clean commit there is no way to restore the original.
+
+Show the isolation warning and stop: ask the user to run `/clear` (or open a new session)
+before proceeding, since the current context contains lab_spec.md and tests.py from prior steps.
 If proceeding: simulate student solving `<LAB_DIR>starter/exercises.ipynb` for `Student_ID = <student_id>`.
+
+**After validation:**
+1. Ask the user whether to save the solution — if yes, create a new branch, commit the
+   solved notebook there, then return to the previous branch (`git checkout -`).
+2. Run `git restore <LAB_DIR>starter/exercises.ipynb` to remove student solutions from the working copy.
 State: update `<LAB_DIR>history.md`, `COURSE_STATE.md` validated → ✅ or ⚠️.
 
 ---

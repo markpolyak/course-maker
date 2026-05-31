@@ -19,76 +19,82 @@ Not a repetition of slide content.
 
 ## Output format: `lectures/NN/speaker_notes.md`
 
+**Generate all text in the course language** (from CLAUDE.md → Course context).
+The examples below show format and tone — produce the actual notes in the course language.
+
 ````markdown
-# Лекция N — Текст для лектора
+# Lecture N — Speaker notes   ← translate heading to course language
 
-**Общее время:** 85–90 мин
-
----
-
-## Слайд 1 — [Title]
-
-Добрый день. Сегодня мы разбираемся с тем, почему...
-
-[*Указать на заголовок слайда. Пауза 3–5 секунд.*]
-
-Прежде чем перейти к формулам, давайте договоримся о том, что...
-
-**Ключевой термин** — это не просто математическое определение, это...
+**Total time:** 85–90 min   ← translate label to course language
 
 ---
 
-## Слайд 2 — [Title]
+## Slide 1 — [Title]   ← translate "Slide" to course language
 
-⏱ *Контрольная точка: ~8 мин от начала*
+Good morning. Today we are working out why...
+
+[*Point to the slide title. Pause 3–5 seconds.*]
+
+Before we get to the formulas, let's agree on what...
+
+**Key term** — this is not just a mathematical definition, it's...
+
+---
+
+## Slide 2 — [Title]
+
+⏱ *Checkpoint: ~8 min from the start*   ← translate label to course language
 
 ...
 
 ---
 
-## Слайд N — Итоги
+## Slide N — Summary   ← translate "Slide" and "Summary" to course language
 
-Итак, сегодня мы разобрали три вещи...
+So today we covered three things...
 
-[*Не торопиться. Дать студентам записать.*]
+[*Don't rush. Give students time to write.*]
 
-На следующей лекции мы используем этот результат для...
+<!-- A reference to the next lecture is allowed only here, on the closing slide,
+     and at most once per presentation. Omit if there is no compelling reason. -->
 
 ---
 
-## Таблица тайминга
+## Timing table   ← translate heading to course language
 
-| Блок | Слайды | Время |
-|------|--------|-------|
-| Вводная часть | 1–3 | 10 мин |
+| Block | Slides | Time |   ← translate column headers to course language
+|-------|--------|------|
+| Introduction | 1–3 | 10 min |
 | ... | ... | ... |
-| **Итого** | | **87 мин** |
+| **Total** | | **87 min** |
 
-## Что можно сократить
+## What can be cut   ← translate heading to course language
 
-Если времени не хватает, слайд X можно пропустить без потери логики:
-объявить, что эта тема выходит за рамки, и дать ссылку.
+If time is short, slide X can be skipped without breaking the logical flow:
+announce that the topic is out of scope and give a reference.
 ````
 
 ## Formatting conventions
 
-- `[*Ремарка в скобках курсивом*]` — режиссёрская пометка:
-  куда указать, какой темп, пауза, вопрос к аудитории
-- `**Жирный**` — термин, который нужно выделить голосом
-- `⏱ Контрольная точка` — после каждого смыслового блока
-  с накопленным временем от начала
-- Plain text — то, что говорить
+- `[*Stage direction in italic brackets*]` — director's note: where to point,
+  pacing, pause, audience question. Write stage directions in course language.
+- `**Bold**` — term to emphasize verbally
+- `⏱ Checkpoint` — after each content block, with cumulative time from the start.
+  Write the label in course language.
+- Plain text — what to say
 
 ## Tone rules (read Course context first)
 
 - Intuition before formula: explain the meaning before showing the equation.
   "What does λ₂ tell us physically? It's the mean-square bandwidth of the
   spectrum — essentially, how spread out the signal's energy is. Now the formula:"
-- Ask questions where natural: "Как вы думаете, что произойдёт если...?"
+- Ask questions where natural: "What do you think will happen if...?"
   but don't over-do it — max 1–2 per block.
-- Pacing cues are not optional: at least one `[*Пауза*]` or
-  `[*Дать записать*]` per complex derivation.
-- Academic but alive: no "таким образом, можно заключить что" stiffness.
+- No forward references to later slides ("we will return to this", "see slide X") — forbidden except on the closing slide.
+- Next-lecture mentions: **maximum 1 per entire set of notes**, only on the closing slide, omit if not necessary.
+- Pacing cues are not optional: at least one `[*Pause*]` or
+  `[*Let them write*]` per complex derivation. Write cues in course language.
+- Academic but alive: no "thus it can be concluded that" stiffness.
 
 ## Iteration handling
 

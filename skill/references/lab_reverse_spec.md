@@ -57,12 +57,14 @@ function/method where they apply.
 
 ### Step 3: Note Deviations from Current Standards
 
-After the spec, add a section `## Расхождения с текущими стандартами`.
+After the spec, add a section `## Deviations from Current Standards`
+(translate the heading into the course language).
 
 For each deviation note:
 - What exactly does not conform (notebook structure, task formatting, terminology,
   missing goal, non-standard Block 0, etc.)
-- Severity: `критично` (blocks tests or unification) / `желательно` (quality)
+- Severity: `critical` / `recommended` — use course-language equivalents
+  (`critical` = blocks tests or unification; `recommended` = quality improvement)
 - What needs to be fixed and where (notebook, `conftest.py`, `README.md`)
 
 This section helps decide whether to fix the notebook before Stage 2 or generate tests

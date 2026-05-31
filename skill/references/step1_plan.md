@@ -76,5 +76,7 @@ without breaking the logical flow:]
 
 - Overloading slides 1–3 with definitions (students tune out)
 - Putting too many formulas on one slide
-- Forgetting a "what we learned / what's next" closing slide
+- Forgetting a "what we learned" closing slide
 - Not specifying which slides are "announce-only" when the plan says so
+- Forward references to later slides ("we will cover this on slide X", "more detail in the next section") — forbidden on any slide except the closing one
+- References to the next lecture: **maximum 1 per entire lecture**, only on the closing slide, and only if genuinely useful; omitting them entirely is preferred
