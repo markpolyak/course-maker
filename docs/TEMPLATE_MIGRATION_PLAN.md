@@ -310,17 +310,14 @@ For each, add to "Context to gather before writing":
 
 ### SKILL.md updates
 
-#### `course init` workflow — add after collecting course language:
+#### `course init` workflow — make idempotent (Phase 1–4 structure):
 
-```
-After the user confirms course language:
-- Determine which template variant to use: `ru` for Russian, `en` for English,
-  or `en` as default if the language is unsupported.
-- Copy `skill/templates/course_conventions_{lang}.md` → `course_conventions.md`
-  in the course root.
-- Confirm to user: "course_conventions.md created for {language}. 
-  Review and edit the terminology dictionary before starting labs."
-```
+`course init` is now fully idempotent — safe to re-run on an existing course.
+Phase 1 auto-detects existing state; Phase 2 asks only what's missing;
+Phase 3 creates only missing files (CLAUDE.md, course_conventions.md, COURSE_STATE.md,
+directories); Phase 4 prints a summary.
+`course_conventions.md` is created in Phase 3 using the language from the dialog or
+from the existing CLAUDE.md.
 
 #### `lab course-init` wizard — add to Phase 5 (Summary) or new Phase 2.5:
 
@@ -357,22 +354,22 @@ Add a note below the existing fields:
 
 ## Execution order
 
-1. **[DONE in this chat]** Group A — `step4_slides.md` two annotations
-2. Group D — `step5_notes.md` full translation (standalone, no dependencies)
-3. Create `skill/templates/` directory
-4. Create `skill/templates/lab_templates_ru.md` (copy from lab_context.md + add scoring strings)
-5. Create `skill/templates/lab_templates_en.md` (English equivalents — full list in Step B2)
-6. Create `skill/templates/course_conventions_ru.md` (copy from lab_context.md Language section)
-7. Create `skill/templates/course_conventions_en.md` (English equivalent)
-8. Update `lab_context.md` (remove moved sections, add required reading block)
-9. Update `lab_step1b_notebook.md`
-10. Update `lab_step2_tests.md`
-11. Update `lab_step1b_datasets.md`
-12. Update `lab_step1a_plan.md` (add context reads)
-13. Update `lab_step1b_spec.md`, `lab_reverse_spec.md` (add context reads)
-14. Update `step1_plan.md`, `step4_slides.md`, `step5_notes.md` (add course_conventions.md read)
-15. Update `SKILL.md` (course init + lab course-init + repo layout)
-16. Update `COURSE_CLAUDE_TEMPLATE.md`
+1. **[DONE]** Group A — `step4_slides.md` two annotations
+2. **[DONE]** Group D — `step5_notes.md` full translation
+3. **[DONE]** Create `skill/templates/` directory
+4. **[DONE]** Create `skill/templates/lab_templates_ru.md`
+5. **[DONE]** Create `skill/templates/lab_templates_en.md`
+6. **[DONE]** Create `skill/templates/course_conventions_ru.md`
+7. **[DONE]** Create `skill/templates/course_conventions_en.md`
+8. **[DONE]** Update `lab_context.md` (remove moved sections, add required reading block)
+9. **[DONE]** Update `lab_step1b_notebook.md`
+10. **[DONE]** Update `lab_step2_tests.md`
+11. **[DONE]** Update `lab_step1b_datasets.md`
+12. **[DONE]** Update `lab_step1a_plan.md` (add context reads)
+13. **[DONE]** Update `lab_step1b_spec.md`, `lab_reverse_spec.md` (add context reads)
+14. **[DONE]** Update `step1_plan.md`, `step4_slides.md`, `step5_notes.md` (add course_conventions.md read)
+15. **[DONE]** Update `SKILL.md` (course init + lab course-init + repo layout)
+16. **[DONE]** Update `COURSE_CLAUDE_TEMPLATE.md`
 
 ## Verification
 

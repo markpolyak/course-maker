@@ -54,6 +54,80 @@ Changes:
   with English equivalents; each heading annotated "(translate to course language)" so the
   generated notes are still produced in the correct course language
 
+### Added
+
+**Language-specific template files** (`skill/templates/`)
+
+Four new source files that serve as the language-specific content layer for each course:
+
+- `lab_templates_ru.md` / `lab_templates_en.md` — notebook header cell, Block 0 cells
+  (tasks 0.1–0.3 with code), final checklist cell, self-check cell, function/variable stub
+  format, task title format, hint format, bonus marker, conftest scoring block marker,
+  grade output string, datasets_info section title
+- `course_conventions_ru.md` / `course_conventions_en.md` — language rule, terminology
+  dictionary (English ↔ course language), "never use" list, lab goal writing rule with
+  bad/good examples
+
+These files are copied to the course root by the init wizards and edited by the professor
+to match the course. The skill references read from the course-root copies, not from
+`skill/templates/` directly.
+
+### Changed
+
+**Skill reference files made fully language-agnostic** (all `skill/references/lab_*.md`,
+`skill/references/step1_plan.md`, `skill/references/step4_slides.md`,
+`skill/references/step5_notes.md`, `skill/SKILL.md`, `skill/COURSE_CLAUDE_TEMPLATE.md`)
+
+All language-specific content (Russian notebook templates, terminology dictionary,
+docstring format, TODO comment style, scoring strings, section titles) has been moved
+out of skill reference files into the new `skill/templates/` source files. Reference
+files now point to `course_conventions.md` and `lab_templates.md` in the course root
+instead of embedding the content directly.
+
+Specific changes:
+- `lab_context.md`: removed "Language and Terminology", "Notebook Structure", and
+  "Notebook Task Formatting" sections; added "Required reading" block directing the
+  skill to read `course_conventions.md` and `lab_templates.md` before any lab command;
+  "What NOT to do" examples now reference `course_conventions.md` instead of hardcoding
+  Russian examples
+- `lab_step1b_notebook.md`, `lab_step2_tests.md`, `lab_step1b_datasets.md`,
+  `lab_step1a_plan.md`, `lab_step1b_spec.md`, `lab_reverse_spec.md`: added
+  `course_conventions.md` and/or `lab_templates.md` to "Context to Read" lists;
+  replaced hardcoded Russian strings with references to the template files
+- `step1_plan.md`, `step4_slides.md`, `step5_notes.md`: added `course_conventions.md`
+  to "Context to gather before writing"
+
+**`/course-maker course init` is now idempotent** (`skill/SKILL.md`)
+
+The command can be safely re-run on an existing course — to recover missing files or
+after accidental re-invocation. Restructured into four phases mirroring `lab course-init`:
+
+- Phase 1: auto-detects `CLAUDE.md` (missing / placeholder / filled), `COURSE_STATE.md`,
+  `course_conventions.md`, and directory structure
+- Phase 2: asks only the questions whose answers are not already in `CLAUDE.md`
+- Phase 3: creates only the files that are missing; never overwrites existing files
+- Phase 4: prints a summary of what existed, what was created, and what to do next
+
+`course_conventions.md` is created in Phase 3 (language template copied from
+`skill/templates/course_conventions_{lang}.md`).
+
+**`/course-maker lab course-init` Phase 5 creates both template files** (`skill/SKILL.md`)
+
+Phase 5 now creates `lab_templates.md` if it does not exist (previously undocumented).
+Acts as a fallback for existing courses that were set up before template files were
+introduced — re-running `lab course-init` is enough to get `lab_templates.md` without
+going through `course init`.
+
+**Repository layout updated** (`skill/SKILL.md`)
+
+Added `course_conventions.md` and `lab_templates.md` to the documented course root layout.
+
+**`COURSE_CLAUDE_TEMPLATE.md` updated**
+
+Added a note below the Language field explaining that `course_conventions.md` and
+`lab_templates.md` are generated automatically by the init wizards and should be
+edited after generation if the course conventions differ from language defaults.
+
 ---
 
 ## [2026-05-29]

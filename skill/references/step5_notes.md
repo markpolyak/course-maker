@@ -7,6 +7,7 @@
    (if it exists; if not, use plan.md order)
 3. `CLAUDE.md` → `## Course context` — audience, tone, language
 4. `lectures/NN/history.md` — any tone or pacing feedback from previous rounds
+5. `course_conventions.md` (course root) — terminology dictionary and language rules
 
 ## What speaker notes are (and are not)
 

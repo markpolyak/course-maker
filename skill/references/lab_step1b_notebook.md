@@ -9,6 +9,9 @@ Read `references/lab_context.md` before starting.
 1. Read `labs/labN/history.md` — find the approved plan (last Step 1a entry).
    The plan must be approved before this step.
 2. Read `course_plan.md` section for lab N — course name, lab title.
+3. Read `course_conventions.md` from the course root — language rules and terminology dictionary.
+4. Read `lab_templates.md` from the course root — notebook header, Block 0 template,
+   self-check cell, task formatting, scoring strings.
 
 ---
 
@@ -21,23 +24,25 @@ Generate `labs/labN/starter/exercises.ipynb`.
 1. Strictly follow the approved plan — no new tasks, no changed points, interfaces, or
    variable names without explicit user approval.
 
-2. Notebook structure — verbatim per the template in `references/lab_context.md`:
+2. Notebook structure — verbatim per the template in `lab_templates.md`:
    - First two markdown cells: header with instructions + Block 0 divider
    - Block 0: tasks 0.1, 0.2, 0.3 per template; variant formula
      `dataset_id = (Student_ID - 1) % len(datasets)` — verbatim, never change
    - Main blocks with tasks
    - Last two cells: markdown checklist + self-check code with `required_vars` and `bonus_vars`
 
-3. Task formatting — per `references/lab_context.md`:
-   - Functions: Russian docstring, type annotations, `# TODO: ваш код`, `raise NotImplementedError`
-   - Variables: description comment, `# TODO:`, type annotation, stub `= None`
-   - Classes: docstring, empty methods with `# TODO: ваш код`, `raise NotImplementedError`
+3. Task formatting — per `lab_templates.md`:
+   - Functions: docstring in course language (format from lab_templates.md), type annotations,
+     TODO comment per lab_templates.md, `raise NotImplementedError`
+   - Variables: description comment, TODO per lab_templates.md, type annotation, stub `= None`
+   - Classes: docstring (format from lab_templates.md), empty methods with TODO per lab_templates.md,
+     `raise NotImplementedError`
 
 4. Each task is preceded by a markdown cell with:
-   - Title (`### Задание N.M — Название`)
+   - Title — use task title format from lab_templates.md
    - Task description for the student — clear and concise; length determined by complexity,
      not a fixed sentence count; use LaTeX formulas where needed
-   - Hints if needed (formatted as `> 💡 **Подсказка:** ...`)
+   - Hints if needed — use hint format from lab_templates.md
 
 5. Template code in task cells — structure only, not solution:
    - Allowed: function signature with docstring, variable stubs with type annotations,
@@ -47,8 +52,8 @@ Generate `labs/labN/starter/exercises.ipynb`.
    - If the task is complex and scaffolding helps — show structure (step names in comments),
      not implementation
 
-6. Terminology and language — per `references/lab_context.md`: Russian terms, English only
-   for library names and abbreviations.
+6. Terminology and language — per `course_conventions.md`: use course-language terms;
+   English only for library names and abbreviations.
 
 7. All numerical dataset characteristics (size, frequency, value range) — verified only.
    If unsure — use web search and cite the source in a cell comment.
@@ -57,8 +62,8 @@ Generate `labs/labN/starter/exercises.ipynb`.
 
 ## Notebook Template
 
-The complete template (Block 0 cells and final cells) is defined in `references/lab_context.md`
-under "Notebook Structure". Follow it precisely.
+The complete template (Block 0 cells and final cells) is defined in `lab_templates.md`
+in the course root. Follow it precisely.
 
 Key invariants:
 - Variant formula MUST be verbatim: `dataset_id = (Student_ID - 1) % len(datasets)`

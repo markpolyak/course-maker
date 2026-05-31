@@ -23,6 +23,8 @@ If datasets are simple and the loading code is self-evident from Block 0 — ski
 
 1. Read `labs/labN/lab_spec.md` — datasets section.
 2. Read `labs/labN/starter/exercises.ipynb` — Block 0 (dataset list, sources, loading code).
+3. Read `course_conventions.md` from the course root — course language.
+4. Read `lab_templates.md` from the course root — section titles.
 
 Note: if the previous step (`/lab spec N`) was long and context was heavy, run this as
 a separate command in the same or a new session.
@@ -32,7 +34,7 @@ a separate command in the same or a new session.
 ## Prompt to Execute
 
 Generate `labs/labN/starter/datasets_info.md` — a reference file for students.
-The file is written for the student, not for autotests. Language: Russian.
+The file is written for the student, not for autotests. Language: course language (from `course_conventions.md`).
 
 **File structure:**
 
@@ -54,7 +56,7 @@ The file is written for the student, not for autotests. Language: Russian.
 
 4. Comparison table of all datasets at the end
 
-5. Section "Частые проблемы и их решения" — specific errors and how to fix them
+5. Section with title per `lab_templates.md` ("Common Issues and Solutions" or course-language equivalent) — specific errors and how to fix them
 
 **Requirements:**
 - All numbers (dataset sizes, class counts, image dimensions) — verified only; use web search

@@ -43,6 +43,10 @@ speaker notes, and figure labels separately if needed.
 e.g. "Slides in German. Speaker notes in German. Code comments and axis labels in English."
 or "Slides and speaker notes in Japanese. No language restrictions on figures."]
 
+> Note: `course_conventions.md` and `lab_templates.md` are generated automatically
+> by the init wizard. Edit them after generation if your conventions differ from
+> the language defaults.
+
 ### Recurring rules
 
 <!-- Add any rules that apply across all lectures. Examples: -->

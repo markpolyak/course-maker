@@ -12,6 +12,8 @@ Read `references/lab_context.md` and `references/lab_step1b_spec.md` before star
 
 1. Read `labs/labN/starter/exercises.ipynb` — the existing notebook to analyze.
 2. Read `labs/labN/history.md` if it exists — prior decisions.
+3. Read `course_conventions.md` from the course root — language and terminology.
+4. Read `lab_templates.md` from the course root — notebook structure and task formatting.
 
 The `lab_spec.md` template and rules for writing checks are defined in
 `references/lab_step1b_spec.md`.

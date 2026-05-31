@@ -10,6 +10,9 @@ From `CLAUDE.md` → `## Course context`:
 - Rigor vs intuition preference
 - Which sections to cover fully vs announce-only
 
+From `course_conventions.md` (course root):
+- Terminology dictionary and language rules
+
 From `history.md` (if exists):
 - Previously rejected slide structures
 - Approved decisions to preserve

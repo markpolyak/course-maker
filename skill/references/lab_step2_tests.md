@@ -8,6 +8,9 @@
 2. Read `labs/labN/starter/exercises.ipynb` — notebook structure, variable names, Block 0.
 3. Read `labs/shared/conftest_base.py` — existing infrastructure (DO NOT modify the top section).
 4. Read `labs/shared/tests_template.py` — style reference (do not copy logic, only patterns).
+5. Read `lab_templates.md` from the course root — scoring block marker and grade output string
+   for conftest.py.
+6. Read `course_conventions.md` from the course root — course language for error messages.
 
 ---
 
@@ -38,7 +41,7 @@ any — add them. Do not remove existing dependencies without explicit reason.
 Take the existing `README.md` from the starter directory (or `labs/shared/` if first time)
 and adapt for this lab. Change only:
 - Lab and course name (from `lab_spec.md` metadata)
-- Lab goal (from the **Цель** field in the first `exercises.ipynb` cell)
+- Lab goal (from the goal field in the first `exercises.ipynb` cell — field name per `lab_templates.md`)
 - Repository structure: add `datasets_info.md` if `lab_spec.md` lists it; add `theory.md`
   if `theory_md: true` in metadata
 - Task structure table: fill from the scoring table in `lab_spec.md`
@@ -48,7 +51,7 @@ Do NOT touch: submission instructions, Colab setup, contact section.
 ### Step 4: Update `conftest.py` in `labs/labN/starter/`
 
 Copy `labs/shared/conftest_base.py` → `labs/labN/starter/conftest.py` if not already there.
-Then update **only** the `# СИСТЕМА ПОДСЧЁТА БАЛЛОВ ДЛЯ ЛАБОРАТОРНОЙ РАБОТЫ` block and below.
+Then update **only** the scoring block (marker from `lab_templates.md`) and below.
 Everything above this block — DO NOT TOUCH.
 
 **What to change in the scoring block:**
@@ -64,7 +67,7 @@ Everything above this block — DO NOT TOUCH.
 - Never delete or modify: `print(f"  TASKID is {dataset_id + 1}")` — read by external CI
 - Never modify: `dataset_id = (Student_ID - 1) % len(DATASETS)` — used by external grading
 - Never delete student result output blocks — student navigates by them
-- Never modify `print(f"  ПРЕДВАРИТЕЛЬНАЯ ОЦЕНКА В ЖУРНАЛ: ...")` format — CI reads it
+- Never modify the grade output string format (from `lab_templates.md`) — CI reads it.
   Only the formula inside (numerator) may change: add/remove bonus points
 
 **Permitted changes in `pytest_sessionfinish`:**
@@ -86,7 +89,7 @@ Write tests per `lab_spec.md` — copy patterns, not logic.
 - Bonus tests: in a class named `TestBonus{N}` (one class per bonus task),
   skip via `pytest.skip` if variable not defined or is `None`
 - Test function names MUST exactly match keys in `TEST_POINTS` in `conftest.py`
-- Error messages in Russian, specific (what was expected, what was received)
+- Error messages in course language (per `course_conventions.md`), specific (what was expected, what was received)
 - Heavy operations (model training) — via `scope='module'` fixture, not repeated per test
 
 **Matplotlib tests — CRITICAL:**

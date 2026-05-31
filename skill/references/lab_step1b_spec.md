@@ -8,6 +8,7 @@ Read `references/lab_context.md` before starting.
 
 1. Read `labs/labN/starter/exercises.ipynb` — must be generated and approved before this step.
 2. Read `labs/labN/history.md` — find the approved plan.
+3. Read `course_conventions.md` from the course root — language and terminology.
 
 ---
 

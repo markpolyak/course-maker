@@ -9,6 +9,8 @@ Read `references/lab_context.md` before starting.
 1. Read `course_plan.md` — find the section for lab N (topic, learning objectives).
 2. Read `labs/labN/history.md` if it exists — note any rejected ideas or prior decisions.
 3. Read `## Lab context` from `CLAUDE.md` — course name, audience, GitHub org.
+4. Read `course_conventions.md` from the course root — terminology and language rules.
+5. Read `lab_templates.md` from the course root — task title format and interface format.
 
 ---
 
@@ -18,7 +20,8 @@ Ask the user for any missing parameters (mandatory points, bonus points, additio
 if they were not provided with the command.
 
 Then start an iterative planning conversation. Produce a numbered task list in the following
-format. For each task (translate all field labels and values into the course language):
+format. For each task (use field names per `lab_templates.md`; translate all labels and values
+into the course language):
 
 ```
 ### Task N.M — <Title>

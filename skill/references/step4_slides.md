@@ -7,6 +7,7 @@
 3. `ls lectures/NN/figures/*.png` — list of actually existing PNG files
    **Only reference PNG files that exist. Never reference a file not in this list.**
 4. `lectures/NN/history.md` — previous layout issues and fixes
+5. `course_conventions.md` (course root) — terminology dictionary and language rules
 
 ## Preamble template
 
