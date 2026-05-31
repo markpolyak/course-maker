@@ -24,8 +24,10 @@ State is stored in Markdown files — no database needed, works with git.
 | `/course-maker` | Show project status (all lectures + labs) |
 | `/course-maker help` | Show this command reference |
 | `/course-maker course init` | Scaffold a new course repository |
+| `/course-maker course plan` | Create or update course_plan.md (interactive) |
+| `/course-maker course plan update` | Edit existing plan, flag affected materials |
 | `/course-maker course status` | Show status of all lectures/labs |
-| `/course-maker course update` | Update course_plan.md and flag affected lectures |
+| `/course-maker course update` | Detect manual plan changes, flag affected lectures |
 | `/course-maker plan N` | Step 1 — detailed slide-by-slide plan for lecture N |
 | `/course-maker visuals N` | Step 2 — list of visualizations, TikZ feasibility |
 | `/course-maker figures N` | Step 3 — Python script to generate PNG figures |
@@ -201,7 +203,8 @@ Run these checks silently before asking anything:
    - Note which directories already exist; create only the missing ones.
 
 5. **Check `course_plan.md`.**
-   - Note whether it exists; do not create or modify it.
+   - "exists" — do not overwrite; note that it is already present.
+   - "missing" — will be handled in Phase 3.
 
 #### Phase 2 — Dialog: collect missing info
 
@@ -238,24 +241,202 @@ For each file, act only if it is "missing" (skip if it already exists):
 Print a compact summary:
 - What already existed and was left untouched
 - What was created in this run
-- What still needs to be done manually (e.g. copy `course_plan.md`, run
-  `/course-maker course status` to initialize the state table)
+- If `course_plan.md` is missing: "Run `/course-maker course plan` to create the course plan."
+- Next step: run `/course-maker course status` to initialize the state table
+
+---
+
+### `/course-maker course plan`
+
+Create or incrementally fill `course_plan.md`. Safe to re-run — detects current state
+and picks up where you left off.
+
+#### Phase 1 — Detect state
+
+Check `course_plan.md`:
+- **Missing** → go to Phase 2 (creation).
+- **Partial** — file exists but has `<!-- TODO -->` sections → go to Phase 3 (fill missing).
+- **Complete** — file exists with no TODO sections → show summary, offer to update:
+  "Plan looks complete. Run `/course-maker course plan update` to make changes."
+
+#### Phase 2 — Create `course_plan.md`
+
+Ask the user to choose (one message):
+
+> "`course_plan.md` not found. How would you like to proceed?
+> [1] I have an existing plan file — provide the path or paste the content
+> [2] I know my sessions and topics — let's structure them together
+> [3] Help me figure out what to cover"
+
+---
+
+**Option [1] — Import existing plan**
+
+Accept either a file path or pasted content. Read it fully, then extract:
+- Session list: types (lecture, seminar, lab, test, homework, other), titles, week/order
+- Per-lecture topics (bullet lists, numbered lists, or prose)
+- Lab assignments mentioned
+- Course-level prerequisites (prior disciplines)
+- Grading/scoring breakdown
+- Self-study materials
+- Instructor info
+
+Create a draft `course_plan.md` in the structured format (see below). Where information
+was not found, insert `<!-- TODO -->`. Show the draft and ask:
+> "Here's what I extracted. What should I correct or add?"
+
+Iterate until the user approves. Save the original file as `course_plan_source.*`
+(preserve extension). Write approved draft to `course_plan.md`.
+
+---
+
+**Options [2] and [3] — Dialog creation**
+
+Both options use the same dialog. The difference: [2] assumes the user has content
+ready; [3] means Claude will propose based on subject knowledge after collecting
+the basics. Ask one question at a time, wait for each answer:
+
+1. *(skip if known from CLAUDE.md)* "What is this course about?"
+2. "What should students be able to do after completing this course?
+   One or two concrete outcomes."
+3. "What types of sessions does the course have?
+   (e.g. lectures only / lectures + seminars / lectures + labs / all types)"
+4. "How many of each type? How many weeks total?"
+5. "Standard session duration? (or different per type — specify)"
+6. *(option [2])* "List your session titles, one per line. You can add a few topics
+   after each title separated by a dash. Skip types you haven't planned yet."
+   *(option [3])* Claude generates a full proposed outline using knowledge of typical
+   university curricula for this subject and audience. Show it, ask: "What would you
+   change?" — iterate until approved. Be explicit this is based on general knowledge;
+   the professor's judgment takes precedence.
+7. "Any course-level prerequisites — prior disciplines students must have completed?
+   Or is this professional development / open to all? (press Enter to skip)"
+8. "Grading breakdown — point weights for each session type?
+   (press Enter to skip — can fill later)"
+9. "Self-study materials — textbooks, papers, online resources?
+   (press Enter to skip — can fill later)"
+10. "Instructor name(s) and contact info?
+    (press Enter to skip — can fill later)"
+
+After collecting answers, generate a draft `course_plan.md`, show it, iterate, save.
+
+---
+
+#### Phase 3 — Fill missing sections
+
+Show a list of TODO sections found in the existing `course_plan.md`.
+For each missing section, offer to fill it now or skip.
+Fill approved sections through focused dialog (1–3 questions per section).
+Save after each section approved.
+
+---
+
+#### `course_plan.md` format
+
+```markdown
+# Course Plan — {Course Name}
+
+## Overview
+
+**Weeks:** {N}  **Lectures:** {N}  **Seminars:** {N}  **Labs:** {N}
+**Tests:** {N}  **Standard duration:** {time} min
+
+## Sessions
+
+| # | Week | Type | Title / Topic | Notes |
+|---|------|------|---------------|-------|
+| 1 | 1 | Lecture | Introduction to HMMs | |
+| 2 | 1 | Seminar | Practice: HMM basics | no pipeline |
+| 3 | 2 | Lecture | Forward algorithm | |
+| 4 | 2 | Lab | Lab 1 — HMM from scratch | |
+| 5 | 4 | Test | Midterm | no pipeline |
+| 6 | 5 | Homework | HW 1 — Viterbi | no pipeline |
+
+## Lectures
+
+### Lecture 1 — Introduction to HMMs
+
+**Topics:**
+- Motivation and applications
+- Formal definition: states, observations, parameters
+- Comparison with Markov chains
+
+**Estimated time:** 90 min
+**Prerequisites within course:** none
+**Announce-only sections:** continuous HMMs (covered in Lecture 5)
+
+### Lecture 2 — Forward algorithm
+...
+
+## Labs
+
+### Lab 1 — HMM from scratch
+*(managed by `/course-maker lab` pipeline — see `labs/lab1/`)*
+
+## Prerequisites
+
+<!-- TODO: list prior disciplines or note "no formal prerequisites" -->
+
+## Grading
+
+<!-- TODO: e.g. Labs 40% · Midterm 20% · Final 30% · Homework 10% -->
+
+## Self-study Materials
+
+<!-- TODO: textbooks, papers, online resources -->
+
+## Instructors
+
+<!-- TODO: name, email, office hours -->
+```
+
+**Rules for the Sessions table:**
+- Every session of every type appears in the table — even those without a pipeline.
+- Sessions without a skill pipeline are marked `no pipeline` in Notes.
+- Labs managed by the lab pipeline are marked with the lab directory in Notes
+  (e.g. `labs/lab1/`).
+- Row order = chronological order of sessions.
+
+**Rules for the Lectures section:**
+- One subsection per lecture session from the Sessions table.
+- `Prerequisites within course` — which earlier lectures must be completed first.
+- `Announce-only sections` — topics mentioned briefly but not taught fully in this lecture.
+
+**Rules for the Labs section:**
+- One subsection per lab session; content is a one-line pointer to the lab directory.
+- Full lab content lives in `labs/labN/` and is managed by the lab pipeline.
+
+---
+
+### `/course-maker course plan update`
+
+Use when you need to change the existing `course_plan.md` — session removed, topic
+shifted, schedule compressed, errors discovered.
+
+1. Read `course_plan.md` fully.
+2. Ask: "What needs to change?" — accept free-form description.
+3. Propose the specific edits to make, wait for approval.
+4. Apply approved edits to `course_plan.md`.
+5. Cross-check with `COURSE_STATE.md`:
+   - For every lecture whose Sessions row, Lectures subsection, or topic list changed:
+     mark `plan`, `visuals`, `figures`, `slides`, `notes` as ⚠️ in `COURSE_STATE.md`.
+   - For every lab whose Sessions row changed: mark all lab columns as ⚠️.
+   - Append a note to each affected `history.md`.
+6. Report: what was changed, which materials are now marked ⚠️ and need review.
 
 ---
 
 ### `/course-maker course update`
 
-Run this when the user has edited `course_plan.md` or wants to.
+Use when you have edited `course_plan.md` manually (outside the skill) and want the
+skill to detect what changed and flag affected materials.
 
-1. If the user wants Claude to make changes: propose the edit, wait for approval,
-   then apply to `course_plan.md`.
-2. If the user edited manually: run `git diff course_plan.md` to detect changes.
-3. Compare changed sections against `COURSE_STATE.md`. For any lecture whose
-   source section in the plan changed:
-   - Mark `plan`, `visuals`, `figures`, `slides`, `notes` as ⚠️ if they exist.
-   - Append a note to that lecture's `history.md`.
-4. Update `COURSE_STATE.md`.
-5. Report: which lectures are now marked ⚠️ and why.
+1. Run `git diff course_plan.md` to detect changes.
+2. For every lecture or lab whose content changed in the diff:
+   - Mark affected columns as ⚠️ in `COURSE_STATE.md`.
+   - Append a note to `history.md`.
+3. Update `COURSE_STATE.md`.
+4. Report: which sections changed, which materials are now ⚠️ and why.
 
 ---
 

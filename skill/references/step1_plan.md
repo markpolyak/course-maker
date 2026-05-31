@@ -3,7 +3,9 @@
 ## Context to gather before writing
 
 From `course_plan.md`:
-- Section for lecture N: full content list, estimated time, prerequisites
+- `## Sessions` table — find the row for lecture N to get its week and position
+- `## Lectures` → `### Lecture N` — topics, estimated time, prerequisites within course,
+  announce-only sections
 
 From `CLAUDE.md` → `## Course context`:
 - Audience background

@@ -1,5 +1,57 @@
 # Changelog
 
+## [2026-05-31] (2)
+
+### Added
+
+**`/course-maker course plan` — dedicated command for course plan creation and filling**
+(`skill/SKILL.md`, `skill/references/step1_plan.md`)
+
+`course_plan.md` is now a first-class artifact with its own command. The command is
+idempotent: detects whether the plan is missing, partial (has `<!-- TODO -->` sections),
+or complete, and picks up from the right place.
+
+**Three creation modes:**
+
+- **[1] Import existing plan** — accepts a file path or pasted content in any format.
+  Claude extracts sessions, lecture topics, labs, prerequisites, grading, and instructor
+  info; fills a structured template; marks anything not found as `<!-- TODO -->`.
+  Original file saved as `course_plan_source.*`. Iterates until approved.
+
+- **[2] Structure known content** — 10-question dialog (one at a time) covering session
+  types and counts, schedule, topics, prerequisites, grading, self-study materials,
+  instructor info. Skips questions the user presses Enter on (filled with TODO).
+
+- **[3] Help determine content** — same dialog, but after collecting basics Claude
+  generates a full proposed outline using knowledge of typical university curricula
+  for the subject and audience. Iterates with open-ended feedback until approved.
+  Claude is explicit that the proposal is based on general knowledge.
+
+**`course_plan.md` format** now includes:
+- `## Overview` — session type counts and standard duration
+- `## Sessions` table — all sessions of all types in chronological order; sessions
+  without a skill pipeline marked `no pipeline`
+- `## Lectures` — one subsection per lecture with topics, time, within-course
+  prerequisites, and announce-only sections
+- `## Labs` — one-line pointer per lab to the lab pipeline directory
+- `## Prerequisites`, `## Grading`, `## Self-study Materials`, `## Instructors` —
+  optional sections with `<!-- TODO -->` until filled
+
+**`/course-maker course plan update`** — dedicated command for intentional plan edits
+(session removed, topic shifted, schedule compressed). Applies edits, then cross-checks
+`COURSE_STATE.md` and flags affected lectures/labs as ⚠️.
+
+**`/course-maker course update`** — narrowed to detecting *manual* edits (git diff)
+and flagging affected materials. No longer handles intentional edits (use `course plan update`).
+
+**`course init`** no longer runs a plan dialog — just reports if `course_plan.md` is
+missing and points to `/course-maker course plan`.
+
+`step1_plan.md` updated to read from the new `## Sessions` table and `## Lectures`
+subsection format.
+
+---
+
 ## [2026-05-31]
 
 ### Fixed
