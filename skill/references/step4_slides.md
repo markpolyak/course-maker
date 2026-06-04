@@ -8,40 +8,22 @@
    **Only reference PNG files that exist. Never reference a file not in this list.**
 4. `lectures/NN/history.md` — previous layout issues and fixes
 5. `course_conventions.md` (course root) — terminology dictionary and language rules
+6. `slides_preamble.tex` (course root) — LaTeX preamble to use verbatim
 
-## Preamble template
+## Preamble
 
-```latex
-\documentclass[aspectratio=169, 10pt]{beamer}
+Read `slides_preamble.tex` from the course root and use it verbatim as the preamble.
+Before writing Chunk 0, replace these placeholders with values from `CLAUDE.md`:
+- `[Course name]` → course name
+- `[Author]` → instructor name
+- `[Institution]` → institution
+- `[Lecture] N. [Title]` in `\subtitle` → course-language word for "Lecture", lecture number, and title from `plan.md`
 
-% ── Theme ───────────────────────────────────────────────────────────────────
-\usetheme{Madrid}         % or another agreed theme
-\usecolortheme{default}
-\setbeamertemplate{navigation symbols}{}
-\setbeamertemplate{footline}[frame number]
-
-% ── Packages ────────────────────────────────────────────────────────────────
-\usepackage[T2A]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage[english]{babel}   % replace with course language from CLAUDE.md → Course context
-                              % e.g. russian, french, german, japanese (use xelatex for CJK)
-\usepackage{amsmath, amssymb, amsfonts}
-\usepackage{graphicx}
-\usepackage{booktabs}
-\usepackage{tikz}
-\usetikzlibrary{arrows.meta, positioning, shapes.geometric}
-\usepackage{xcolor}
-
-% ── Colors ──────────────────────────────────────────────────────────────────
-\definecolor{mainblue}{RGB}{46,64,87}
-\definecolor{accent}{RGB}{232,72,85}
-
-% ── Title info ──────────────────────────────────────────────────────────────
-\title{[Course name]}
-\subtitle{[course-language word for "Lecture"] N. [Title]}  % translate to course language
-\author{[Author]}
-\institute{[Institution]}
-\date{[Date]}
+If `slides_preamble.tex` is missing, stop immediately and show:
+```
+slides_preamble.tex not found in the course root.
+Run /course-maker course init to generate it, or copy
+skill/templates/slides_preamble_pdflatex.tex manually and edit it.
 ```
 
 ## Slide template
