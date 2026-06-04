@@ -836,7 +836,13 @@ git commit -m "lab N: add tests and conftest"
 
 ### `/course-maker lab validate N <student_id>`  (Step 3)
 
-Read: `references/lab_step3_validate.md`.
+Read: `references/lab_step3_validate.md` for the full validation protocol.
+
+**CRITICAL rules — apply regardless of whether the reference file was read:**
+- Do NOT read `history.md` before or during the student simulation — a real student has no access to prior validation records
+- Do NOT open `tests.py`, `conftest.py`, or `tests_template.py` until all tasks are complete
+- Download the dataset from the source in Block 0 of `exercises.ipynb` — never invent or skip data
+- After all tasks: run `jupyter nbconvert --to python exercises.ipynb && pytest tests.py -v`; show full output
 
 **Before starting:** check `git status <LAB_DIR>starter/` — if there are uncommitted changes,
 stop and ask the user to commit first. The notebook will be modified during validation;
