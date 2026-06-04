@@ -37,6 +37,10 @@ skill/templates/slides_preamble_pdflatex.tex manually and edit it.
 ```
 Always add a blank line after `\end{frame}`.
 
+Slide numbers in comments must match `plan.md` exactly:
+slide 1 = title slide, slide 2 = outline, first content slide = 3.
+Never renumber — if plan.md says slide 7, the comment says `% Slide 07`.
+
 ## Layout rules (read carefully — these prevent most iteration rounds)
 
 ### Images + text

@@ -34,19 +34,21 @@ From `history.md` (if exists):
 
 | # | Title | Content summary | Time |
 |---|-------|----------------|------|
-| 1 | Course intro / motivation | ... | 3 min |
-| 2 | ... | ... | ... |
+| 1 | Title slide | — | 1 min |
+| 2 | Outline | — | 1 min |
+| 3 | Course intro / motivation | ... | 3 min |
+| 4 | ... | ... | ... |
 
 ---
 
 ## Detailed descriptions
 
-### Slide 1 — [Title]
+### Slide 3 — [Title]
 [2–4 sentences describing exactly what appears on the slide:
 formulas, key points, diagram description, what the lecturer
 should emphasize]
 
-### Slide 2 — [Title]
+### Slide 4 — [Title]
 ...
 
 ---
@@ -68,7 +70,9 @@ without breaking the logical flow:]
 
 ## Constraints
 
-- Maximum 20 slides total
+- Slide numbering is absolute: slide 1 = title slide, slide 2 = outline, content starts at slide 3.
+  Never start content slides at 1. Slides 1 and 2 need no detailed description — they are fixed.
+- Maximum 20 content slides (not counting title, outline, and closing/summary slides)
 - Each slide description must be concrete enough that a designer
   (or Claude in Step 4) could produce the slide without asking questions
 - For "announce-only" sections: 1–2 slides max, no derivations,
