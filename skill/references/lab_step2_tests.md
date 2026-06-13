@@ -50,30 +50,41 @@ Do NOT touch: submission instructions, Colab setup, contact section.
 
 ### Step 4: Update `conftest.py` in `labs/labN/starter/`
 
-Copy `labs/shared/conftest_base.py` → `labs/labN/starter/conftest.py` if not already there.
-Then update **only** the scoring block (marker from `lab_templates.md`) and below.
-Everything above this block — DO NOT TOUCH.
+Copy `labs/shared/conftest_base.py` → `labs/labN/starter/conftest.py` if not
+already there.
 
-**What to change in the scoring block:**
-- `TEST_POINTS` — test function names and points from `lab_spec.md`
-- `TEST_BLOCKS` — test-to-task mapping from `lab_spec.md`
-- `DATASETS` — dataset list from Block 0 of `exercises.ipynb`
+The conftest has **two editable regions**:
 
-**What NOT to change without explicit reason:**
-- `import_student_notebook`, `pytest_runtest_makereport`, `student_module` fixture
-- `pytest_sessionfinish` — only change if `lab_spec.md` explicitly calls for it
+**Region 1 — customizable labels at the top of the file** (already populated
+during `/course-maker lab course-init` by reading `lab_templates.md`):
 
-**Critical prohibitions in `pytest_sessionfinish`:**
-- Never delete or modify: `print(f"  TASKID is {dataset_id + 1}")` — read by external CI
-- Never modify: `dataset_id = (Student_ID - 1) % len(DATASETS)` — used by external grading
-- Never delete student result output blocks — student navigates by them
-- Never modify the grade output string format (from `lab_templates.md`) — CI reads it.
-  Only the formula inside (numerator) may change: add/remove bonus points
+- `TASKID_LABEL` — from `lab_templates.md` § "TASKID label"
+- `GRADE_OUTPUT_LABEL` — from `lab_templates.md` § "Grade output label"
+- `SCORING_HEADER` — from `lab_templates.md` § "Scoring header"
 
-**Permitted changes in `pytest_sessionfinish`:**
-- Remove bonus point output if `lab_spec.md` has no bonus tasks
-- Add a note if some points are graded manually by the professor
-- Update the lab title in the report header
+If `labs/shared/conftest_base.py` already has these substituted, the per-lab
+copy inherits them — do nothing in region 1. If for any reason the labels are
+still defaults, substitute them now from `lab_templates.md`.
+
+**Region 2 — `LAB SCORING SYSTEM` block** (this is the per-lab edit):
+
+Update only `TEST_POINTS`, `TEST_BLOCKS`, `DATASETS`. Everything else —
+DO NOT TOUCH.
+
+- `TEST_POINTS` — test function names → points from `lab_spec.md`.
+- `TEST_BLOCKS` — TestClass name → primary test function from `lab_spec.md`.
+- `DATASETS` — dataset list verbatim from Block 0 of `exercises.ipynb`.
+
+**Inviolable invariants in `pytest_sessionfinish`:**
+- `dataset_id = (Student_ID - 1) % len(DATASETS)` — NEVER modify the formula.
+- The `print(f"  {TASKID_LABEL} is {dataset_id + 1}")` and grade-output
+  `print()` lines — NEVER change their format. The format is fixed in
+  `conftest_base.py`; only the labels (region 1) change per course.
+
+**Permitted edits in `pytest_sessionfinish`:**
+- Add a manual-grading note if some points are graded by the instructor.
+- Remove the bonus point output if `lab_spec.md` has no bonus tasks.
+- Adjust the numerator inside the grade-output line to include bonus.
 
 ### Step 5: Write `tests.py` in `labs/labN/starter/`
 

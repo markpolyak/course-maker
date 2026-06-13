@@ -1,135 +1,140 @@
+"""Style and structure reference for lab tests.py files.
+
+Contains one example of each test pattern. The /course-maker lab tests step
+uses this file as a pattern reference — copy structure, not logic. The
+actual checks come from lab_spec.md.
+
+Conventions:
+- One class per task from lab_spec.md (class name: TestTask{N}_{purpose})
+- The student_module fixture is provided by conftest.py (scope='session');
+  do not import the student notebook directly
+- Bonus tests skip via pytest.skip when the bonus variable is not defined
+- Test function names MUST match the keys in TEST_POINTS in conftest.py
+- Error messages: in the course language (see course_conventions.md);
+  specific (expected vs received)
+
+Localization note:
+The strings in this file (docstrings, assertion messages) are English —
+they are pattern references only, and are rewritten in the course language
+when generating per-lab tests.py. Class and method names always stay in
+English.
 """
-Шаблон tests.py для лабораторных работ.
 
-Содержит по одному примеру каждого паттерна тестирования.
-Claude Code на этапе 2 использует этот файл как образец стиля и структуры,
-заменяя содержимое тестов на логику из lab_spec.md.
-
-Ключевые соглашения:
-- Один класс на одно задание из lab_spec.md
-- Фикстура student_module берётся из conftest.py (scope='session')
-- Бонусные тесты скипаются через pytest.skip если переменная не определена
-- Имена тестовых функций должны совпадать с ключами в TEST_POINTS в conftest.py
-"""
-
-import pytest
-import numpy as np
-import pandas as pd
 import os
 
-
-# импорт exercises происходит через фикстуру student_module из conftest.py
-# НЕ импортировать exercises напрямую через import
+import numpy as np
+import pandas as pd
+import pytest
 
 
 # ===========================================================================
-# Паттерн 1: тест переменной
+# Pattern 1: variable test
 # ===========================================================================
 
 class TestVariableExample:
-    """Пример: проверка переменной-датафрейма"""
+    """Example: check a DataFrame variable."""
 
     def test_df_loaded(self, student_module):
-        """Переменная определена, является DataFrame, не пустая"""
-        assert hasattr(student_module, 'df'), \
-            "Переменная df не определена"
+        """Variable defined, is a DataFrame, not empty."""
+        assert hasattr(student_module, "df"), \
+            "Variable `df` is not defined"
         assert student_module.df is not None, \
-            "Переменная df равна None"
+            "Variable `df` is None"
         assert isinstance(student_module.df, pd.DataFrame), \
-            "df должен быть pandas DataFrame"
+            "`df` must be a pandas DataFrame"
         assert len(student_module.df) > 0, \
-            "df не должен быть пустым"
+            "`df` must not be empty"
 
     def test_df_no_nan(self, student_module):
-        """DataFrame не содержит пропусков"""
+        """DataFrame contains no missing values."""
         assert student_module.df.isnull().sum().sum() == 0, \
-            "df содержит пропущенные значения (NaN)"
+            "`df` contains missing values (NaN)"
 
     def test_array_shape(self, student_module):
-        """Пример: проверка размерности numpy-массива"""
+        """Example: check numpy array shape."""
         arr = student_module.observations
         assert isinstance(arr, np.ndarray), \
-            "observations должен быть np.ndarray"
+            "`observations` must be a numpy ndarray"
         assert arr.ndim == 2, \
-            f"observations должен быть двумерным, получено ndim={arr.ndim}"
+            f"`observations` must be 2-dimensional, got ndim={arr.ndim}"
         assert arr.shape[1] == 1, \
-            f"observations должен иметь форму (n, 1), получено shape={arr.shape}"
+            f"`observations` must have shape (n, 1), got shape={arr.shape}"
         assert not np.isnan(arr).any(), \
-            "observations содержит NaN"
+            "`observations` contains NaN values"
 
 
 # ===========================================================================
-# Паттерн 2: тест функции
+# Pattern 2: function test
 # ===========================================================================
 
 class TestFunctionExample:
-    """Пример: проверка функции, возвращающей результат вычисления"""
+    """Example: check a function that returns a computed result."""
 
     def test_function_returns_correct_type(self, student_module):
-        """Функция возвращает корректный тип"""
-        func = getattr(student_module, 'compute_something', None)
-        assert func is not None, "Функция compute_something не определена"
+        """Function returns the correct type."""
+        func = getattr(student_module, "compute_something", None)
+        assert func is not None, "Function `compute_something` is not defined"
 
         result = func(np.array([1.0, 2.0, 3.0]))
         assert isinstance(result, np.ndarray), \
-            f"compute_something должна возвращать np.ndarray, получено {type(result)}"
+            f"`compute_something` must return np.ndarray, got {type(result)}"
 
     def test_function_output_shape(self, student_module):
-        """Выход функции имеет правильную размерность"""
+        """Function output has the correct shape."""
         func = student_module.compute_something
         x = np.array([1.0, 2.0, 3.0])
         result = func(x)
         assert result.shape == x.shape, \
-            f"Ожидалась форма {x.shape}, получено {result.shape}"
+            f"Expected shape {x.shape}, got {result.shape}"
 
     def test_function_output_values(self, student_module):
-        """Выход функции корректен на известном входе"""
+        """Function output is correct for a known input."""
         func = student_module.compute_something
         x = np.array([1.0, 2.0, 3.0])
         result = func(x)
-        expected = np.array([...])  # подставить ожидаемые значения
+        expected = np.array([...])  # fill in expected values per lab_spec.md
         assert np.allclose(result, expected, rtol=0.05), \
-            f"Значения не совпадают: ожидалось {expected}, получено {result}"
+            f"Values do not match: expected {expected}, got {result}"
 
     def test_function_returns_figure(self, student_module):
-        """Пример: проверка функции, возвращающей график"""
+        """Example: check a function that returns a matplotlib figure."""
         import matplotlib
-        func = getattr(student_module, 'plot_something', None)
-        assert func is not None, "Функция plot_something не определена"
+        func = getattr(student_module, "plot_something", None)
+        assert func is not None, "Function `plot_something` is not defined"
 
         try:
             fig = func(np.array([1.0, 2.0, 3.0]))
         except Exception as e:
-            pytest.fail(f"plot_something завершилась с ошибкой: {e}")
+            pytest.fail(f"`plot_something` raised: {e}")
 
         assert isinstance(fig, matplotlib.figure.Figure), \
-            f"plot_something должна возвращать matplotlib.figure.Figure, получено {type(fig)}"
+            f"`plot_something` must return matplotlib.figure.Figure, got {type(fig)}"
 
 
 # ===========================================================================
-# Паттерн 3: тест класса
+# Pattern 3: class test
 # ===========================================================================
 
 class TestClassExample:
-    """Пример: проверка пользовательского класса"""
+    """Example: check a user-defined class."""
 
     def test_class_exists(self, student_module):
-        """Класс определён"""
-        assert hasattr(student_module, 'CustomClass'), \
-            "Класс CustomClass не определён"
+        """Class is defined."""
+        assert hasattr(student_module, "CustomClass"), \
+            "Class `CustomClass` is not defined"
 
     def test_class_attributes(self, student_module):
-        """Экземпляр класса имеет нужные атрибуты"""
+        """Instance has the required attributes."""
         CustomClass = student_module.CustomClass
-        # тестовые входные данные из lab_spec.md
+        # Test inputs from lab_spec.md
         params = [np.ones((2, 1)), np.zeros(1)]
         obj = CustomClass(params, lr=0.01)
 
-        assert hasattr(obj, 'lr'), "CustomClass не имеет атрибута lr"
-        assert obj.lr > 0, "Атрибут lr должен быть > 0"
+        assert hasattr(obj, "lr"), "`CustomClass` has no attribute `lr`"
+        assert obj.lr > 0, "Attribute `lr` must be > 0"
 
     def test_class_method_mutates_state(self, student_module):
-        """Метод изменяет состояние объекта (in-place)"""
+        """Method updates object state in place."""
         CustomClass = student_module.CustomClass
         W = np.ones((2, 1))
         b = np.zeros(1)
@@ -143,13 +148,13 @@ class TestClassExample:
         try:
             obj.step(x_batch, y_batch)
         except Exception as e:
-            pytest.fail(f"CustomClass.step() завершился с ошибкой: {e}")
+            pytest.fail(f"`CustomClass.step()` raised: {e}")
 
         assert not np.allclose(params[0], w_before), \
-            "step() не обновил параметры. Убедитесь, что обновление происходит in-place."
+            "`step()` did not update parameters. Ensure the update is in place."
 
     def test_class_method_returns_value(self, student_module):
-        """Пример: метод возвращает значение корректного типа и размерности"""
+        """Example: method returns a value of the correct type and shape."""
         CustomClass = student_module.CustomClass
         obj = CustomClass(n_components=3)
         obs = np.random.randn(200, 1)
@@ -157,102 +162,100 @@ class TestClassExample:
 
         result = obj.decode(obs)
         assert isinstance(result, np.ndarray), \
-            f"decode() должен возвращать np.ndarray, получено {type(result)}"
+            f"`decode()` must return np.ndarray, got {type(result)}"
         assert len(result) == len(obs), \
-            f"Длина результата {len(result)} не совпадает с длиной входа {len(obs)}"
+            f"Result length {len(result)} does not match input length {len(obs)}"
         assert result.min() >= 0 and result.max() < 3, \
-            "Значения decode() должны быть в диапазоне [0, n_components-1]"
+            "`decode()` values must be in [0, n_components - 1]"
 
 
 # ===========================================================================
-# Паттерн 4: тест артефакта
+# Pattern 4: artifact test
 # ===========================================================================
 
 class TestArtifactExample:
-    """Пример: проверка файла-артефакта, сохранённого студентом"""
+    """Example: check a file artifact saved by the student."""
 
     def test_artifact_exists(self):
-        """Файл артефакта существует"""
-        assert os.path.exists('artifact.json'), \
-            "Файл artifact.json не найден. Убедитесь, что вы сохранили артефакт."
+        """Artifact file exists."""
+        assert os.path.exists("artifact.json"), \
+            "File `artifact.json` not found. Make sure you saved the artifact."
 
     def test_artifact_loads(self):
-        """Артефакт загружается без ошибок"""
+        """Artifact loads without error."""
         import json
         try:
-            with open('artifact.json') as f:
-                data = json.load(f)
+            with open("artifact.json") as f:
+                json.load(f)
         except Exception as e:
-            pytest.fail(f"Не удалось загрузить artifact.json: {e}")
+            pytest.fail(f"Failed to load `artifact.json`: {e}")
 
     def test_artifact_structure(self):
-        """Артефакт содержит нужные ключи"""
+        """Artifact contains the required keys."""
         import json
-        with open('artifact.json') as f:
+        with open("artifact.json") as f:
             data = json.load(f)
-        required_keys = ['metric1', 'metric2', 'n_params']
+        required_keys = ["metric1", "metric2", "n_params"]
         for key in required_keys:
-            assert key in data, f"В artifact.json отсутствует ключ '{key}'"
+            assert key in data, f"Missing key `{key}` in `artifact.json`"
 
     def test_artifact_values(self):
-        """Числовые значения в артефакте корректны"""
+        """Numerical values in the artifact are correct."""
         import json
-        with open('artifact.json') as f:
+        with open("artifact.json") as f:
             data = json.load(f)
-        assert data['metric1'] > 0, \
-            "metric1 должен быть положительным"
-        # Числовое равенство с допуском rtol=0.05
-        expected = 42.0  # подставить ожидаемое значение из lab_spec.md
-        assert abs(data['metric2'] - expected) < 0.05 * abs(expected), \
-            f"metric2 ожидалось ~{expected}, получено {data['metric2']}"
+        assert data["metric1"] > 0, "`metric1` must be positive"
+        # Numerical equality with rtol=0.05
+        expected = 42.0  # fill in expected value per lab_spec.md
+        assert abs(data["metric2"] - expected) < 0.05 * abs(expected), \
+            f"`metric2`: expected ~{expected}, got {data['metric2']}"
 
 
 # ===========================================================================
-# Паттерн 5: бонусные задания
+# Pattern 5: bonus tasks
 #
-# Правило: один класс на одно бонусное задание — так же как для обычных.
-# Общий класс TestBonus НЕ используется.
-# Имена классов: TestBonus1, TestBonus2 и т.п. (или по названию задания).
-# Каждый тест внутри начинается с проверки наличия переменной и pytest.skip.
+# Rule: one class per bonus task — same as for regular tasks.
+# Do NOT use a single combined TestBonus class.
+# Class naming: TestBonus1, TestBonus2, ... (or by task name).
+# Each test begins with an existence check and pytest.skip.
 # ===========================================================================
 
 class TestBonus1:
-    """[Бонус *] Пример бонусного задания с переменной"""
+    """[Bonus *] Example bonus task with a variable."""
 
     def test_bonus_variable_exists(self, student_module):
-        """[Бонус *] Переменная определена и не None"""
-        if not hasattr(student_module, 'bonus_result') \
+        """[Bonus *] Variable defined and not None."""
+        if not hasattr(student_module, "bonus_result") \
                 or student_module.bonus_result is None:
-            pytest.skip("Бонусное задание * не выполнено")
-        # Если дошли сюда — переменная есть, проверяем тип
+            pytest.skip("Bonus task * not completed")
         assert isinstance(student_module.bonus_result, np.ndarray), \
-            "bonus_result должен быть np.ndarray"
+            "`bonus_result` must be np.ndarray"
 
     def test_bonus_variable_values(self, student_module):
-        """[Бонус *] Значения переменной корректны"""
-        if not hasattr(student_module, 'bonus_result') \
+        """[Bonus *] Variable values are correct."""
+        if not hasattr(student_module, "bonus_result") \
                 or student_module.bonus_result is None:
-            pytest.skip("Бонусное задание * не выполнено")
+            pytest.skip("Bonus task * not completed")
         assert len(student_module.bonus_result) > 0, \
-            "bonus_result не должен быть пустым"
+            "`bonus_result` must not be empty"
 
 
 class TestBonus2:
-    """[Бонус **] Пример бонусного задания с функцией"""
+    """[Bonus **] Example bonus task with a function."""
 
     def test_bonus_function_exists(self, student_module):
-        """[Бонус **] Функция определена"""
-        if not hasattr(student_module, 'bonus_func') \
+        """[Bonus **] Function is defined."""
+        if not hasattr(student_module, "bonus_func") \
                 or student_module.bonus_func is None:
-            pytest.skip("Бонусное задание ** не выполнено")
+            pytest.skip("Bonus task ** not completed")
         assert callable(student_module.bonus_func), \
-            "bonus_func должна быть вызываемой функцией"
+            "`bonus_func` must be callable"
 
     def test_bonus_function_output(self, student_module):
-        """[Бонус **] Функция возвращает корректный результат"""
-        if not hasattr(student_module, 'bonus_func') \
+        """[Bonus **] Function returns the correct result."""
+        if not hasattr(student_module, "bonus_func") \
                 or student_module.bonus_func is None:
-            pytest.skip("Бонусное задание ** не выполнено")
+            pytest.skip("Bonus task ** not completed")
         result = student_module.bonus_func(np.array([1.0, 2.0, 3.0]))
         assert result > 0.8, \
-            f"Ожидалось значение > 0.8, получено {result}"
+            f"Expected value > 0.8, got {result}"

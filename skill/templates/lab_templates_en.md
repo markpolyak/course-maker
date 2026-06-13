@@ -216,16 +216,31 @@ variable_name: np.ndarray = None  # shape (n,) or explanation
 
 ## conftest.py Strings
 
-### Scoring block marker (start of editable section)
+The lab tests step (`/course-maker lab tests N`) reads these values from this
+file and uses them as the customizable strings at the top of `conftest.py`
+(`TASKID_LABEL`, `GRADE_OUTPUT_LABEL`, `SCORING_HEADER`). The print() format
+in `conftest_base.py` is fixed — only the labels change per course/language.
 
-```python
-# LAB SCORING SYSTEM
+If your external CI expects a specific exact phrase in the grade-output line
+(e.g. for autograding), put it here verbatim — the skill substitutes it into
+`conftest.py` during lab init.
+
+### Scoring header (printed inside the LAB SCORING SYSTEM block)
+
+```
+LAB SCORING SYSTEM
 ```
 
-### Grade output string (do not modify format — CI reads it)
+### TASKID label (printed as `TASKID is {n}` — read by external CI)
 
-```python
-print(f"  PRELIMINARY GRADE FOR JOURNAL: ...")
+```
+TASKID
+```
+
+### Grade output label (printed as `PRELIMINARY GRADE: {earned} / {total}` — read by external CI)
+
+```
+PRELIMINARY GRADE
 ```
 
 ---

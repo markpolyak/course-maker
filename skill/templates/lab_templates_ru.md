@@ -216,16 +216,32 @@ variable_name: np.ndarray = None  # размерность (n,) или пояс�
 
 ## conftest.py Strings
 
-### Scoring block marker (start of editable section)
+The lab tests step (`/course-maker lab tests N`) reads these values from this
+file and uses them as the customizable strings at the top of `conftest.py`
+(`TASKID_LABEL`, `GRADE_OUTPUT_LABEL`, `SCORING_HEADER`). The print() format
+in `conftest_base.py` is fixed — only the labels change per course/language.
 
-```python
-# СИСТЕМА ПОДСЧЁТА БАЛЛОВ ДЛЯ ЛАБОРАТОРНОЙ РАБОТЫ
+The external CI for this Russian course reads `TASKID is {n}` and the
+`ПРЕДВАРИТЕЛЬНАЯ ОЦЕНКА В ЖУРНАЛ:` phrase from pytest logs. The values
+below are substituted into `conftest.py` during lab init — do not change
+without coordinating with the grader.
+
+### Scoring header (printed inside the scoring block)
+
+```
+СИСТЕМА ПОДСЧЁТА БАЛЛОВ ДЛЯ ЛАБОРАТОРНОЙ РАБОТЫ
 ```
 
-### Grade output string (do not modify format — CI reads it)
+### TASKID label (printed as `TASKID is {n}` — read by external CI)
 
-```python
-print(f"  ПРЕДВАРИТЕЛЬНАЯ ОЦЕНКА В ЖУРНАЛ: ...")
+```
+TASKID
+```
+
+### Grade output label (printed as `ПРЕДВАРИТЕЛЬНАЯ ОЦЕНКА В ЖУРНАЛ: {earned} / {total}` — read by external CI)
+
+```
+ПРЕДВАРИТЕЛЬНАЯ ОЦЕНКА В ЖУРНАЛ
 ```
 
 ---

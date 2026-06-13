@@ -50,6 +50,23 @@ For each of the three files (`tests_template.py`, `conftest_base.py`, `tests.yam
   "Could not find a real `<file>`. Placeholder written to `labs/shared/<file>` —
   replace it before running `/course-maker lab tests N`."
 
+### Phase 2a — Substitute course-specific labels into `conftest_base.py`
+
+After `labs/shared/conftest_base.py` exists, populate the customizable labels
+at the top of the file from `lab_templates.md` (if it already exists from a
+prior `course init`):
+
+- Read `lab_templates.md` § "Scoring header" → set `SCORING_HEADER`.
+- Read `lab_templates.md` § "TASKID label" → set `TASKID_LABEL`.
+- Read `lab_templates.md` § "Grade output label" → set `GRADE_OUTPUT_LABEL`.
+
+If `lab_templates.md` does not exist yet (Phase 5 will create it), leave the
+defaults in place. Re-run `/course-maker lab course-init` after Phase 5 to
+substitute the labels.
+
+This ensures every per-lab conftest.py copied from `labs/shared/` inherits the
+course-language grade-output strings without per-lab editing.
+
 ---
 
 ## Phase 3 — Dialog: CLAUDE.md `## Lab context`
