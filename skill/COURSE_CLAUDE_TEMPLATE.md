@@ -1,18 +1,9 @@
 # CLAUDE.md — [Course Name]
 
 <!-- This file is read by Claude Code at the start of every session. -->
-<!-- Two parts: (1) skill instructions, (2) course-specific context.  -->
-
----
-
-## course-maker Skill
-
-<!-- The skill is embedded below. Do not edit this section manually. -->
-<!-- To update the skill, run: /skill update                          -->
-
-<!-- SKILL:START -->
-<!-- paste contents of course-maker/SKILL.md here on /course init -->
-<!-- SKILL:END -->
+<!-- It contains course-specific context. The course-maker skill itself  -->
+<!-- is installed globally in ~/.claude/skills/course-maker/ and is      -->
+<!-- discovered automatically — no need to embed it here.                -->
 
 ---
 

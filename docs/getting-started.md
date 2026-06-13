@@ -244,10 +244,12 @@ Full workflow for a single lab:
 /course-maker lab publish 1     # push to starter repo + sync GitHub Classroom repo via gh API
 ```
 
-For labs that already have a notebook but no spec:
+For labs that already have a notebook but no spec, skip `lab plan 1` and run
+`lab spec 1` directly — it auto-detects notebook mode and generates `lab_spec.md`
+from the existing `exercises.ipynb`:
 ```
-/course-maker lab reverse-spec 1   # generate lab_spec.md from existing exercises.ipynb
-/course-maker lab tests 1          # then continue normally
+/course-maker lab spec 1        # auto-detects: no plan → notebook mode
+/course-maker lab tests 1       # then continue normally
 ```
 
 After post-release fixes:
@@ -258,8 +260,9 @@ After post-release fixes:
 **Before running `/course-maker lab course-init`:** fill in `## Lab context` in `CLAUDE.md` with
 your GitHub org, GitHub Classroom org, and starter repo URLs.
 
-**Before running `/course-maker lab init N`:** create the starter repo on GitHub and copy in your
-`conftest.py` and `tests.yaml` to `skill/templates/` (these are not auto-generated).
+**Before running `/course-maker lab init N`:** create the starter repo on GitHub. The skill ships
+with working `conftest_base.py` and `tests.yaml` in `skill/templates/`, so manual setup is no
+longer required — labs scaffold out-of-the-box.
 
 ---
 

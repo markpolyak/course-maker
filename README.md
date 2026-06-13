@@ -135,11 +135,11 @@ my-course/
 
 ---
 
-## Example
+## Examples
 
-The `examples/stochastic-processes/` directory contains a real course
-("Случайные процессы и временные ряды", 8 lectures) with completed materials
-for lectures 1–2: `plan.md`, `visuals.md`, `slides.tex`, `speaker_notes.md`.
+The `examples/` directory is reserved for example courses. It is currently
+empty — see `examples/README.md` for what is planned and how to contribute
+your own. Examples must be produced by running the skill, not hand-assembled.
 
 ---
 

@@ -61,9 +61,11 @@ Questions (ask only if not already known):
 
 For each file, act only if it is `missing` (skip if it already exists):
 
-- **`CLAUDE.md`** — create from `skill/COURSE_CLAUDE_TEMPLATE.md` with all collected
-  info embedded; embed the skill content between `SKILL:START` and `SKILL:END`.
+- **`CLAUDE.md`** — create from `skill/COURSE_CLAUDE_TEMPLATE.md` with all
+  collected info embedded in the `## Course context` section.
   If `placeholder` — fill in the placeholder fields, preserve everything else.
+  Do NOT embed the skill content in `CLAUDE.md` — the skill is installed
+  globally in `~/.claude/skills/course-maker/` and is discovered automatically.
 
 - **`course_conventions.md`** — determine template variant from the language answer:
   `ru` for Russian, `en` for English, `en` as default for unsupported languages.
