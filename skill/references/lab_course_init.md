@@ -76,21 +76,51 @@ Skip this phase if the section is already `filled`.
 If `missing` or `placeholder`, announce:
 "Filling in `## Lab context` in `CLAUDE.md`. I'll ask one question at a time."
 
-Ask in sequence (stop and wait for each answer before asking the next):
+### Phase 3a — Profile-driven questions
 
-1. "GitHub org where starter repos live?"
-2. "GitHub Classroom org? (press Enter if same as GitHub org)"
-   If blank — use GitHub org value.
-3. "GHC repo naming pattern? (e.g. `sp2026-lab{N}-{slug}` or `lab{N}-{slug}-{student}`)"
-4. For each existing lab found in Phase 1:
-   "Starter repo URL for lab {N} (dir: `{dir}`)?"
-   If the existing lab's `starter/` has its own `.git`, suggest reading the
-   remote URL: run `git -C labs/{dir}/starter remote get-url origin` and show
-   the result as the default.
-5. "Title and slug for the next lab? (e.g. `2, lab2-arima`)" — only if the user
-   ran this command to set up a new lab, not just to initialise an existing course.
+Read `CLAUDE.md` → `## Course context` → `Profile:` field. Default: `generic`.
 
-Then write the complete `## Lab context` section into `CLAUDE.md`.
+Read `skill/profiles/<profile>/lms.md` and scan its workflow to determine
+which configuration values it needs from the user. The `lms_adapter.md` in
+the course root is the source of truth for the publish workflow; this phase
+collects the inputs that workflow expects.
+
+**Common patterns by profile:**
+
+- `polyak` (GitHub Classroom + `gh api`) needs:
+  - GitHub org where starter repos live.
+  - GHC classroom org (often same as GitHub org).
+  - GHC repo naming pattern (use `ghc_repo_naming` from
+    `profiles/polyak/course_defaults.yaml` as the suggested default).
+  - Per-lab: starter repo URL (one question per existing lab found in
+    Phase 1; for labs with an existing `starter/.git`, suggest the result
+    of `git -C labs/{dir}/starter remote get-url origin` as the default).
+
+- `generic` (local zip) needs:
+  - Delivery channel (LMS name / share drive / email distribution list) —
+    free-text, used only in the lab publish summary.
+
+- Other profiles: read their `lms.md` to derive the question list.
+
+Ask the questions one at a time, applying profile defaults from
+`course_defaults.yaml` where applicable. If the user runs this command to
+also set up a new lab, additionally ask:
+
+- "Title and slug for the next lab? (e.g. `2, lab2-arima`)"
+
+### Phase 3b — Write `## Lab context`
+
+Write the collected answers into `CLAUDE.md` → `## Lab context`. The exact
+fields depend on the profile. Common fields:
+
+- LMS-related identifiers collected above (GitHub org / GHC org / delivery
+  channel / etc.).
+- Starter repos table — one row per lab if the profile requires per-lab
+  URLs; omitted for profiles without per-lab repos.
+
+The actual publish workflow lives in `<course-root>/lms_adapter.md` (copied
+in Phase 5a). The `## Lab context` section in `CLAUDE.md` holds only the
+identifiers the workflow needs to look up at publish time.
 
 ---
 
@@ -128,6 +158,26 @@ Copy `skill/templates/lab_templates_{lang}.md` → `lab_templates.md` in the
 course root.
 Confirm: "lab_templates.md created for {language}. Review the self-check cell
 and scoring strings before generating notebooks."
+
+---
+
+## Phase 5a — Install the LMS adapter
+
+Read `CLAUDE.md` → `## Course context` → `Profile:` field. Default: `generic`.
+
+If `<course-root>/lms_adapter.md` does not exist (or the user explicitly
+asks to refresh it):
+
+1. Verify `skill/profiles/<profile>/lms.md` exists. If not, fall back to
+   `skill/profiles/generic/lms.md` and warn the user that the chosen
+   profile is missing the adapter.
+2. Copy `skill/profiles/<profile>/lms.md` → `<course-root>/lms_adapter.md`.
+3. Confirm: "lms_adapter.md installed from profile `<profile>`. This is
+   the workflow `/course-maker lab publish` will follow. Edit it if your
+   setup differs from the profile defaults."
+
+If `<course-root>/lms_adapter.md` already exists, do not overwrite it
+without explicit user confirmation — they may have customized it.
 
 ---
 

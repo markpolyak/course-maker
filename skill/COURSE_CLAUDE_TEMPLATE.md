@@ -14,6 +14,13 @@
 **Course name:** [Full course name]
 **Slug:** [course-slug]
 **Semester / programme:** [e.g. Master's, semester 2, Mathematical Methods for Systems Analysis]
+**Profile:** generic
+<!-- Profile name from skill/profiles/. Default: generic (no LMS, no per-instructor defaults).
+     Available profiles: see skill/profiles/README.md. Setting this controls:
+     - Defaults pre-filled in /course-maker course init
+     - The LMS publish workflow installed by /course-maker lab course-init (lms_adapter.md)
+     Change before re-running course init or lab course-init to switch behaviour.  -->
+
 
 ### Audience
 

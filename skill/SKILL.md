@@ -85,6 +85,9 @@ file you did or did not read. Violating any of them is a hard error.
 - ALWAYS check `git diff` on the prerequisite file at the start of a subsequent
   step. If the user manually edited it, log the edit in `history.md` before
   proceeding.
+- ALWAYS read `CLAUDE.md` → `## Course context` → `Profile:` field at the
+  start of `course init`, `lab course-init`, and `lab publish`. Default
+  profile is `generic` if the field is absent.
 
 ---
 
@@ -121,7 +124,7 @@ file you did or did not read. Violating any of them is a hard error.
 | `/course-maker lab datasets N` | Step 1b — generate datasets_info.md (optional) |
 | `/course-maker lab tests N` | Step 2 — tests.py, conftest.py, requirements.txt, README |
 | `/course-maker lab validate N <id>` | Step 3 — validate as student (new session required) |
-| `/course-maker lab publish N` | Push to starter repo + sync GHC via gh API |
+| `/course-maker lab publish N` | Run the LMS publish workflow from `lms_adapter.md` |
 | `/course-maker lab update N` | Re-publish after post-release fix |
 | `/course-maker lab status N` | Status + last 3 history entries |
 

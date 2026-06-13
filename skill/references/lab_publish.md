@@ -1,111 +1,64 @@
 # Command: `/course-maker lab publish N`
 
-Push the starter directory to the public starter repo, sync the GitHub
-Classroom repo via the `gh` API, commit the publish in the course repo.
-
-Read `CLAUDE.md` → `## Lab context` to get the GHC org and repo naming pattern
-before starting.
+Publish lab N to wherever students will receive it. The concrete workflow
+lives in `<course-root>/lms_adapter.md` (copied from the course profile
+during `lab course-init`). This file is the dispatcher.
 
 ---
 
-## Step 1 — Push to starter repo (git subtree)
+## Step 0 — Locate the LMS adapter
 
-Get the URL from `CLAUDE.md` Lab context → Starter repos table for lab N.
+Read `<course-root>/lms_adapter.md`. This file was copied from
+`skill/profiles/<name>/lms.md` when the user ran
+`/course-maker lab course-init` (where `<name>` is the course profile,
+default `generic`).
 
-```bash
-git subtree push --prefix=<LAB_DIR>starter <url> main
+**If `lms_adapter.md` does not exist:**
+
+Stop and show:
+```
+<course-root>/lms_adapter.md is missing.
+
+This file defines how labs are published for your course. It is installed
+by /course-maker lab course-init from the profile configured in CLAUDE.md
+(Course context → Profile).
+
+To install it:
+  1. Check that CLAUDE.md → Course context → Profile is set
+     (default: generic).
+  2. Run /course-maker lab course-init.
+  3. Re-run /course-maker lab publish N.
+
+To choose a different LMS workflow, change the Profile field in CLAUDE.md
+before re-running lab course-init. Available profiles are listed in
+skill/profiles/.
 ```
 
-If the push fails because of diverged history, see "Recovery" below.
+Do not attempt to publish without `lms_adapter.md`. No fallback workflow.
 
 ---
 
-## Step 2 — Sync GHC repo via `gh` API
+## Step 1 — Read and execute the adapter
 
-GitHub Classroom creates its own copy of the starter repo (the GHC repo) with
-squashed history — direct `git push` does not work. Sync individual files via
-the GitHub REST API instead.
+Read `<course-root>/lms_adapter.md` in full. It contains the
+profile-specific publish steps (push to starter repo, sync GHC, upload zip,
+etc.). Execute each step in order, asking the user for confirmation on
+anything destructive (force-push, large file deletion).
 
-Read `CLAUDE.md` to find the GHC repo name for lab N.
-
-For each student-facing file in `<LAB_DIR>starter/`:
-- `exercises.ipynb`
-- `conftest.py`
-- `tests.py`
-- `requirements.txt`
-- `README.md`
-- `datasets_info.md` (if it exists)
-- `.github/workflows/tests.yaml`
-
-Run:
-
-```bash
-SHA=$(gh api repos/$GHC_REPO/contents/$FILE --jq '.sha // empty' 2>/dev/null)
-CONTENT=$(base64 < <LAB_DIR>starter/$FILE)
-if [ -n "$SHA" ]; then
-  gh api repos/$GHC_REPO/contents/$FILE --method PUT \
-    --field message="sync: lab N update" \
-    --field content="$CONTENT" \
-    --field sha="$SHA"
-else
-  gh api repos/$GHC_REPO/contents/$FILE --method PUT \
-    --field message="sync: lab N initial publish" \
-    --field content="$CONTENT"
-fi
-```
-
-**Note:** `lab_spec.md` and `history.md` are explicitly NOT in the sync list.
-They are instructor-only.
+The adapter is **the source of truth** for what gets published, in what
+order, with what flags. The skill does not override or skip its steps.
 
 ---
 
-## Step 3 — Update course repo
+## Step 2 — Update state (always performed by the skill)
 
-```bash
-git add <LAB_DIR>
-git commit -m "lab N: publish"
-git push
-```
+After the adapter steps complete successfully:
 
----
+- `COURSE_STATE.md`: set `published → ✅` for lab N.
+- Append a publish entry to `<LAB_DIR>history.md`. The adapter's last
+  step may have generated specific values to record (starter repo URL,
+  GHC repo, files synced, bundle filename); include those.
 
-## Step 4 — Update state
-
-- `COURSE_STATE.md`: published → ✅.
-- Append to `<LAB_DIR>history.md`:
-  ```markdown
-  ## [YYYY-MM-DD] Published
-
-  **Starter repo:** <url>
-  **GHC repo:** <ghc_repo>
-  **Files synced:** exercises.ipynb, conftest.py, tests.py, requirements.txt, README.md, ...
-  ```
-
----
-
-## Recovery — `git subtree push` failure
-
-If subtree push fails because of diverged history (common when GHC squashed
-history collides with the local subtree):
-
-```bash
-# Inspect divergence
-git fetch <starter-remote> main
-git log <starter-remote>/main..HEAD -- <LAB_DIR>starter/
-```
-
-Two options:
-
-1. **Force-replace starter repo content** (safe if starter repo has no external
-   contributors):
-   ```bash
-   git subtree split --prefix=<LAB_DIR>starter -b lab-N-publish
-   git push <starter-url> lab-N-publish:main --force-with-lease
-   git branch -D lab-N-publish
-   ```
-
-2. **Manual sync via gh API** (skip Step 1 subtree push, do Step 2 only).
-   Slower but avoids history conflicts. Acceptable if the starter repo and the
-   GHC repo are the only consumers.
-
-Ask the user before force-pushing.
+If any adapter step fails, do not update state. Tell the user which step
+failed and stop. State stays at `published → ❌` until the next successful
+publish.

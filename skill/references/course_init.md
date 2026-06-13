@@ -16,7 +16,7 @@ Run these checks silently before asking anything:
    - `placeholder` — exists but contains strings like `[Course Name]`, `[course-slug]`,
      `[org-name]`.
    - `filled` — exists with real content. Read the following fields from it if present:
-     course name, slug, language, audience, style preferences.
+     course name, slug, language, audience, style preferences, **`Profile:`**.
 
 2. **Check `COURSE_STATE.md`.**
    - `missing` — file does not exist.
@@ -41,19 +41,41 @@ Run these checks silently before asking anything:
 
 ## Phase 2 — Dialog: collect missing info
 
+### Phase 2a — Resolve profile
+
+Before asking content questions, determine which profile to use:
+
+- If `CLAUDE.md` has `Profile:` filled → use that.
+- Otherwise → ask: "Which profile? (default: `generic`. Available profiles:
+  list directory names under `skill/profiles/`.) Press Enter for `generic`."
+- Record the chosen profile; it will be written to `CLAUDE.md` in Phase 3.
+
+Read `skill/profiles/<profile>/course_defaults.yaml`. Its values are
+**suggested defaults** for the questions below — present them inline:
+`"Audience? (default: <value from yaml>)"`. Empty strings in the YAML
+mean "no default, ask fresh".
+
+### Phase 2b — Collect missing info
+
 Skip any question whose answer is already in `CLAUDE.md` (filled state).
 Ask only what is needed to fill the missing pieces. Ask one question at a time.
 
-Questions (ask only if not already known):
+Questions (ask only if not already known; use profile defaults as suggestions):
 
-1. Course name?
-2. Slug (short identifier, e.g. `ml-systems`)?
+1. Course name? *(no profile default — always asked)*
+2. Slug (short identifier, e.g. `ml-systems`)? *(no profile default)*
 3. Audience description — what students already know?
+   *(default: `default_audience` from profile)*
 4. Style preference: strict/formal vs intuition-first?
+   *(default: `default_style` from profile)*
 5. Language for slides and speaker notes?
+   *(default: `default_language` from profile)*
 6. LaTeX engine for slide compilation? (`pdflatex` / `xelatex` / `lualatex`)
+   *(default: `default_latex_engine` from profile)*
    Note: xelatex and lualatex support Unicode fonts natively; pdflatex requires
    T2A/inputenc for Cyrillic.
+7. Institution name (for title slide)?
+   *(default: `institution` from profile)*
 
 ---
 
@@ -62,7 +84,8 @@ Questions (ask only if not already known):
 For each file, act only if it is `missing` (skip if it already exists):
 
 - **`CLAUDE.md`** — create from `skill/COURSE_CLAUDE_TEMPLATE.md` with all
-  collected info embedded in the `## Course context` section.
+  collected info embedded in the `## Course context` section, including
+  `Profile: <name>` (default `generic`).
   If `placeholder` — fill in the placeholder fields, preserve everything else.
   Do NOT embed the skill content in `CLAUDE.md` — the skill is installed
   globally in `~/.claude/skills/course-maker/` and is discovered automatically.
