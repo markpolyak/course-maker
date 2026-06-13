@@ -1,5 +1,151 @@
 # Changelog
 
+## [2026-06-13] — Improvement waves 1–3
+
+### Added
+
+**`IMPROVEMENT_PLAN.md`** (`docs/IMPROVEMENT_PLAN.md`) — comprehensive skill
+review and 7-wave execution roadmap. Each wave has atomic steps and
+completion criteria. Recommended execution order: 1 (SKILL.md compaction) →
+2 (bootstrap) → 3 (doc drift) → 4 (profiles) → 6 (QoL) → 5 (new pipelines)
+→ 7 (alternative formats).
+
+**`## Inviolable rules` block in `SKILL.md`** — 15 rules grouped into
+Observability, Grading invariants, Validation isolation, Slides & figures,
+and Process. They apply regardless of which reference file was read. The
+first rule is the observability rule: every step must list which
+`references/*.md` files were read in the first chat message — silent skips
+become detectable. Rationale: critical rules buried in 100-line workflows
+are skipped as often as instructions in external reference files; sticky
+rules require short, high-visibility, negatively framed statements that
+survive any path.
+
+**New reference files** extracted from the bloated `SKILL.md`:
+`references/course_init.md`, `course_plan.md`, `lab_course_init.md`,
+`lab_init.md`, `lab_publish.md`, `repository_layout.md`. The `lab_publish.md`
+file additionally documents recovery from `git subtree push` failures caused
+by GitHub Classroom squashed-history divergence.
+
+**Working out-of-the-box templates** (`skill/templates/`):
+- `conftest_base.py` — real pytest conftest (~210 lines): IPython mocking,
+  nbformat-based student notebook importer, `student_module` fixture,
+  outcome tracking, session finalizer with parameterized labels
+  (`TASKID_LABEL`, `GRADE_OUTPUT_LABEL`, `SCORING_HEADER`). Substitutes
+  the previous placeholder that required pasting from a real lab.
+- `tests.yaml` — real GitHub Actions workflow: checkout, setup-python,
+  install requirements + pytest + nbformat + jupyter, nbconvert, pytest.
+  `STUDENT_ID` read from a repo variable so external CI can override per-fork.
+
+**`.gitignore`** for `__pycache__/`, editor caches, OS metadata.
+
+**`examples/`** stub with an honest README (`examples/README.md`).
+Hand-assembled artifacts labelled as "produced by the skill" would diverge
+from real pipeline output in tone, history.md evolution, and cross-step
+coherence — so the directory stays empty until a genuine example is produced
+by running the skill.
+
+**`docs/contributing.md`** — minimal contribution guide (priorities, skill
+conventions, PR checklist).
+
+**`docs/archive/`** — completed planning documents moved here:
+`TEMPLATE_MIGRATION_PLAN.md` (template language abstraction — done) and
+`LAB_PIPELINE_PLAN.md` (labforge integration — done). The archive README
+explains what was implemented for each.
+
+### Changed
+
+**`SKILL.md` compacted from 978 → 280 lines** (target ≤300). Full
+workflows for `course init`, `course plan`, `lab course-init`, `lab init`,
+and `lab publish` moved out to dedicated reference files. Each command in
+`SKILL.md` is now a thin dispatcher (`Read: references/X.md`) plus, for
+steps with a history of silent skips (`figures`, `slides`, `notes`,
+`lab validate`), a short `**CRITICAL — even if reference was skipped:**`
+block. Repository layout and state file formats extracted to
+`references/repository_layout.md`.
+
+**`tests_template.py` translated from Russian to English.** The file is
+the universal style reference for generated `tests.py`; per-language strings
+(error messages in the course language) are substituted at generation time
+from `course_conventions.md`.
+
+**Grade output strings are now parameters, not invariants.** The Russian
+phrases `СИСТЕМА ПОДСЧЁТА БАЛЛОВ ДЛЯ ЛАБОРАТОРНОЙ РАБОТЫ` and
+`ПРЕДВАРИТЕЛЬНАЯ ОЦЕНКА В ЖУРНАЛ` (read by external CI) used to be hardcoded
+"critical invariants" in `conftest_base.py` and `lab_step2_tests.md`. They
+are now values in `lab_templates_ru.md` (and English equivalents in
+`lab_templates_en.md`) under `SCORING_HEADER`, `TASKID_LABEL`,
+`GRADE_OUTPUT_LABEL`. `conftest_base.py` parameterizes the print() format
+once; per-course labels are substituted during `lab course-init` (new
+Phase 2a). The print() format itself is fixed, so external CI still
+matches; the labels become a course/language configuration knob.
+
+**`COURSE_CLAUDE_TEMPLATE.md` no longer embeds `SKILL.md`.** Removed the
+`SKILL:START`/`SKILL:END` markers and the reference to the non-existent
+`/skill update` command. The skill is loaded globally from
+`~/.claude/skills/course-maker/` and discovered automatically — embedding
+it in course-level `CLAUDE.md` was redundant and went stale on every
+skill update.
+
+**`docs/PROJECT_CONTEXT.md` updated**:
+- Layout corrected (`course-maker/skill/SKILL.md` not `course-maker/SKILL.md`)
+  and expanded to list all current files in `skill/`, `docs/`, `examples/`.
+- "Known issues" updated: chunked-generation is no longer "in v2", Inviolable
+  rules and out-of-the-box templates marked fixed in waves 1 and 2.
+- Roadmap pointed to `IMPROVEMENT_PLAN.md` as the authoritative source;
+  original design intent preserved for context.
+- Agent-agnostic core and Overleaf integration kept as separate items
+  (different goals, different consumers).
+
+**`docs/getting-started.md` updated**: the lab `reverse-spec` example
+replaced with the new `lab spec` auto-detect notebook-mode flow.
+Pre-init manual file copy step removed (handled by `course init`).
+
+**`README.md` updated**: command tables now match `SKILL.md` (added
+missing commands: `/course-maker` (no-arg status), `/course-maker help`,
+`/course-maker course plan`, `lab datasets`, `lab update`, `lab status`;
+split into two tables: Lecture pipeline and Lab pipeline). Repository
+layout now lists `course_conventions.md`, `slides_preamble.tex`,
+`lab_templates.md`, and `labs/`. Roadmap aligned with `IMPROVEMENT_PLAN.md`.
+"Examples" section honest about the empty stub state.
+
+### Fixed
+
+**Reference dispatchers reorganized** so that lab `spec` reflects the
+auto-detection of plan vs notebook mode (no separate `reverse-spec`
+command — the previous merge is now consistently documented).
+
+---
+
+## [2026-06-04] — Per-course preamble, hardened validate, slide numbering
+
+### Added
+
+**Per-course LaTeX preamble template** (`skill/templates/slides_preamble_pdflatex.tex`,
+`slides_preamble_xelatex.tex`). The engine choice (pdflatex / xelatex /
+lualatex) is asked during `course init`; the correct preamble template is
+copied to `slides_preamble.tex` in the course root. Removes the hardcoded
+engine assumption.
+
+### Changed
+
+**Slide numbering convention** (`skill/references/step1_plan.md`,
+`skill/references/step4_slides.md`): title = slide 1, outline = slide 2,
+first content slide = 3. Slide numbers are absolute and never restart.
+Comments in `slides.tex` (e.g. `% Slide 07`) match `plan.md` exactly.
+
+### Fixed
+
+**`lab validate`: inline critical rules to prevent silent skips**
+(`skill/SKILL.md`, `skill/references/lab_step3_validate.md`). Even when
+`references/lab_step3_validate.md` is skipped (which happens under heavy
+context), the inline `**CRITICAL rules — apply regardless of whether the
+reference file was read:**` block enforces: never read `history.md` during
+the student simulation; never open `tests.py`, `conftest.py`, or
+`tests_template.py` until tasks are complete; download the dataset from
+Block 0; run `nbconvert + pytest tests.py -v` and show full output.
+
+---
+
 ## [2026-05-31] (2)
 
 ### Added
