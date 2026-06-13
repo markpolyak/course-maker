@@ -2,44 +2,90 @@
 
 Read `references/lab_context.md` before starting.
 
+This step handles two cases automatically — no separate command needed:
+- **Plan mode:** `history.md` contains an approved plan → plan is the primary source.
+- **Notebook mode:** no approved plan in `history.md` (or file absent) → notebook is the
+  sole source; add a deviations report.
+
 ---
 
 ## Context to Read Before Generating
 
-1. Read `labs/labN/starter/exercises.ipynb` — must be generated and approved before this step.
-2. Read `labs/labN/history.md` — find the approved plan.
+1. Read `labs/labN/starter/exercises.ipynb`.
+2. Read `labs/labN/history.md` — check whether an approved plan exists.
 3. Read `course_conventions.md` from the course root — language and terminology.
+4. Read `lab_templates.md` from the course root — notebook structure and task formatting.
 
 ---
 
-## Prompt to Execute
+## Step 1: Analyze the Notebook
+
+Regardless of mode, extract from `exercises.ipynb`:
+
+- Lab title, course, goal (from the first cell)
+- Presence of `theory.md` / peer review
+- Dataset list from Block 0: `datasets` array, variant parameters
+- All variables defined in Block 0 (`Student_ID`, `DATASET_TYPE`, `SOURCE`, etc.)
+- All tasks: variables, functions, classes — names, signatures, types
+- Text variables (`str`) the student fills manually
+- Artifacts: files the student saves to disk
+- `required_vars` and `bonus_vars` from the self-check cell
+- Scoring: points per task, bonus tasks
+
+---
+
+## Step 2: Fill the Spec
 
 Generate `labs/labN/lab_spec.md` — the machine-readable contract between Stage 1 and Stage 2.
 This file is used in Stage 2 (test generation). Students never see it.
 It lives only in the course repo, NOT in the starter repo.
 
-Fill all sections strictly per the template below. Take data from the approved plan
-and generated notebook — do NOT invent numbers or hallucinate dataset characteristics.
+Fill all sections strictly per the template below.
 
-**What to fill:**
+**If plan exists (plan mode):** use the approved plan as the primary source of truth.
+Take numbers and structure from the plan; the notebook confirms them.
+Do NOT invent data not present in either.
+
+**If no plan (notebook mode):** the notebook is the sole source. For each task,
+**formulate checks from the task logic** — they are absent from the notebook and must be derived:
+- Variables: type, shape, absence of NaN, value range, dependencies
+- Functions: return type, correct output on a known input
+- Classes: attribute presence, method behavior, test inputs as executable Python
+- Artifacts: file existence, structure, numeric values with tolerances
+
+For every check ask: "Does this pass for ALL dataset variants when correctly implemented?"
+If no — add `DATASET_TYPE` condition or set `manual_check: true`.
+
+**What to fill (both modes):**
 
 - **Metadata:** title, topic, presence of theory.md / peer review
 - **Infrastructure:** environment, CI, nbconvert, graded_markers
-- **Datasets:** for each dataset — download method, known issues, expected shape, key columns,
-  value range, normalization
+- **Datasets:** download method, known issues, expected shape, key columns, value range, normalization
 - **Variant variables:** all variables defined in Block 0
-- **Tasks:** for each task from the plan —
-  - type (variable / function / class)
-  - interface (exactly as in notebook)
-  - concrete checks (not abstract — with variable names, numbers, operators)
-  - tolerance (`rtol` / `atol`) if applicable
-  - points, bonus
-  - for classes: attributes, methods, behavior of each method, test inputs as executable Python
-  - notes if non-standard logic
+- **Tasks:** type, interface (exactly as in notebook), concrete checks, tolerance, points, bonus,
+  class attributes/methods/test inputs, notes for non-standard logic
 - **Text answers:** all `str` variables the student fills manually
-- **Artifacts:** if a task requires saving a file — format, save method, content checks with tolerances
+- **Artifacts:** format, save method, content checks with tolerances
 - **Scoring table:** block — task — points — bonus
-- **Notes for Stage 2:** dependencies between tasks, pitfalls, non-standard test logic
+- **Notes for Stage 2:** dependencies, pitfalls, non-standard test logic
+
+---
+
+## Step 3: Deviations Report (notebook mode only)
+
+Skip this step in plan mode.
+
+After the spec body, append a section `## Deviations from Current Standards`
+(translate the heading into the course language).
+
+For each deviation note:
+- What exactly does not conform (notebook structure, task formatting, terminology,
+  missing goal, non-standard Block 0, etc.)
+- Severity: `critical` / `recommended`
+  (`critical` = blocks tests or unification; `recommended` = quality improvement)
+- What needs to be fixed and where (notebook, `conftest.py`, `README.md`)
+
+This section helps decide whether to fix the notebook before Stage 2 or generate tests as-is.
 
 ---
 
@@ -249,15 +295,47 @@ notes:
 
 ---
 
-## After Saving
+## Output Protocol
+
+**Do NOT output the spec YAML in chat.** Write the file directly, then:
+
+1. Show a human-readable summary in chat:
+   - Lab title and ID
+   - Mode used: plan mode or notebook mode
+   - Number of tasks per block (e.g. "Block 1: 3 tasks, Block 2: 2 tasks + 1 bonus")
+   - Total scoring: mandatory points + bonus points
+   - Datasets used (names only)
+   - (Notebook mode only) Deviations found: count of critical and recommended, with a brief list
+   - Any non-obvious decisions made (tolerances, variant-dependent checks, skipped checks)
+2. Ask: "Does the spec look correct? Any edits needed?"
+3. Wait for user confirmation before updating `history.md` and `COURSE_STATE.md`.
+   If the user requests edits — apply them to the file, then re-show the summary and ask again.
+   Only after the user confirms (or explicitly says "done", "ok", "proceed") — run the state updates below.
+
+---
+
+## After Confirmation
 
 Append to `labs/labN/history.md`:
+
+**Plan mode:**
 ```markdown
 ## [YYYY-MM-DD] Step 1b-2: Lab spec generated
 
 **File:** labs/labN/lab_spec.md
 **Tasks count:** <number>
 **Scoring:** <mandatory> mandatory + <bonus> bonus
+**Notes:** <any non-obvious decisions in the spec>
+```
+
+**Notebook mode:**
+```markdown
+## [YYYY-MM-DD] Step 1b-2: Lab spec generated from existing notebook
+
+**Source:** labs/labN/starter/exercises.ipynb
+**Tasks count:** <number>
+**Scoring:** <mandatory> mandatory + <bonus> bonus
+**Deviations found:** <count> critical, <count> recommended
 **Notes:** <any non-obvious decisions in the spec>
 ```
 
