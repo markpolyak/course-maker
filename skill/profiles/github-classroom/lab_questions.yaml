@@ -1,0 +1,40 @@
+# Profile: github-classroom — questions asked by lab course-init.
+#
+# /course-maker lab course-init reads this file to know which LMS-config
+# questions to add to the dialog. Each entry becomes a key under
+# CLAUDE.md → ## Lab context.
+#
+# Format:
+#   - id: <key name written into CLAUDE.md>
+#     prompt: "<question shown to the user>"
+#     default: "<optional default; may reference lms_defaults.yaml values
+#               via ${ghc_repo_naming} etc.>"
+#     required: true | false
+#     per_lab: true | false   # true → ask this question once per existing lab
+
+questions:
+  - id: github_org
+    prompt: "GitHub org where starter repos live?"
+    default: ""
+    required: true
+    per_lab: false
+
+  - id: ghc_classroom_org
+    prompt: "GitHub Classroom org? (press Enter if same as GitHub org)"
+    default: ""
+    required: false
+    per_lab: false
+
+  - id: ghc_repo_naming
+    prompt: "GHC repo naming pattern? (variables: {year} {N} {slug} {student})"
+    default: "${ghc_repo_naming}"
+    required: true
+    per_lab: false
+
+  - id: starter_repo_url
+    prompt: "Starter repo URL for lab {N} (dir: {dir})?"
+    default: ""
+    required: true
+    per_lab: true
+    # When asking per-lab, if labs/{dir}/starter/.git exists, suggest
+    # `git -C labs/{dir}/starter remote get-url origin` as the default.

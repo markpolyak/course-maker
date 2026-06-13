@@ -1,7 +1,7 @@
-# LMS Adapter: generic (local zip)
+# LMS Adapter: local-zip (local zip)
 
 This file is copied verbatim to `<course-root>/lms_adapter.md` by
-`/course-maker lab course-init` when the course profile is `generic`.
+`/course-maker lab course-init` when the course profile is `local-zip`.
 The `/course-maker lab publish N` command reads it and executes the
 steps below.
 
@@ -9,9 +9,10 @@ This adapter does not assume any LMS. It produces a self-contained zip
 of the student-facing lab materials; you upload the zip to wherever
 your course lives (Moodle, Canvas, email, internal portal).
 
-If you have a real LMS, copy `profiles/generic/` to
-`profiles/<your-lms>/`, replace this file with the LMS-specific workflow,
-and switch your course profile.
+If you have an automated LMS workflow (Moodle API, Canvas API, etc.),
+copy `profiles/local-zip/` to `profiles/<your-lms>/`, replace this file
+with the LMS-specific workflow, edit `lab_questions.yaml` to collect the
+LMS-config inputs your workflow needs, and switch your course profile.
 
 ---
 
@@ -48,7 +49,7 @@ and upload it to your students' delivery channel:
 - Email distribution
 - Anything else
 
-The skill does not automate this step in the generic profile. If you find
+The skill does not automate this step in the local-zip profile. If you find
 yourself uploading the same way every course, that's a sign you should
 write a custom profile with an automated `lms.md`.
 
@@ -75,7 +76,7 @@ This step is performed by the skill, not this adapter:
 - Append publish entry to `<LAB_DIR>history.md`:
 
   ```markdown
-  ## [YYYY-MM-DD] Published (generic profile)
+  ## [YYYY-MM-DD] Published (local-zip profile)
 
   **Bundle:** student-bundle-lab${N}.zip
   **Delivered via:** <fill in: LMS / email / share drive>

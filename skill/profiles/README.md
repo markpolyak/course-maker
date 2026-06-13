@@ -1,78 +1,131 @@
 # Profiles
 
-A **profile** is a bundle of an instructor's personal conventions:
-default values for the `course init` dialog, and the LMS-specific workflow
-for publishing labs. Profiles let the universal skill stay LMS- and
-instructor-neutral while supporting concrete real-world setups.
+A **profile** in this skill describes how labs get **published** — the LMS
+adapter. It bundles:
 
-A profile is **not** a language (course conventions and lab templates live
-in `skill/templates/course_conventions_{lang}.md` and
-`skill/templates/lab_templates_{lang}.md`). A profile and a language are
-orthogonal: an instructor with `profile: polyak` can teach a course in
-English, Russian, or any other language.
+- `lms.md` — the workflow Claude runs during `/course-maker lab publish`.
+- `lab_questions.yaml` — the LMS-config questions asked during
+  `/course-maker lab course-init`.
+- `lms_defaults.yaml` — defaults for those questions (e.g. typical repo
+  naming pattern).
+- `README.md` — what the profile is for, when to use it.
+
+A profile is **not** a personal preferences bundle. Instructor-specific
+defaults (language, latex engine, audience, style, instructor name) live
+in **user_defaults** — see below. Profile and user_defaults are orthogonal:
+a `github-classroom` user and a `local-zip` user can both have the same
+user_defaults (e.g. Russian + xelatex + a specific style).
+
+A profile is also **not** a language. The course language and its
+terminology dictionary live in
+`skill/templates/course_conventions_{lang}.md` and
+`skill/templates/lab_templates_{lang}.md`.
+
+---
+
+## Available profiles
+
+- **`local-zip/`** — LMS-free. Bundles a zip of the student-facing
+  materials; you upload the zip wherever your course lives. Use this when
+  evaluating the skill or when no other profile matches your LMS.
+- **`github-classroom/`** — GitHub Classroom via `gh api`. Pushes the
+  starter subtree to a public repo and syncs files into the GHC-managed
+  repository.
 
 ---
 
 ## How a profile is selected
 
 The profile name is stored in `CLAUDE.md` → `## Course context` →
-`Profile:`. Default: `generic`. The `course init` wizard asks for it on
+`Profile:`. Default: `local-zip`. The `course init` wizard asks for it on
 first run and writes it into `CLAUDE.md`.
 
 ## How a profile is applied
 
-- **`course init`** reads `profiles/<name>/course_defaults.yaml` and uses
-  its values as **suggested defaults** in the dialog. The user can press
-  Enter to accept, or type a different value to override.
-- **`lab course-init`** copies `profiles/<name>/lms.md` to
-  `<course-root>/lms_adapter.md`. This file becomes the LMS workflow for
-  the course.
+- **`lab course-init`** reads `profiles/<name>/lab_questions.yaml` to know
+  which LMS-config questions to ask, and copies `profiles/<name>/lms.md`
+  to `<course-root>/lms_adapter.md`.
 - **`lab publish`** reads `<course-root>/lms_adapter.md` and follows it.
   If the file is missing, the skill instructs the user to run
-  `lab course-init` to install the profile's adapter.
-
-After `course init` finishes, the profile is "baked in" — the course no
-longer depends on the profile directory existing. You can change
-`Profile:` in CLAUDE.md and re-run `course init`, but only newly-asked
-defaults will use the new profile; existing values stay.
+  `lab course-init`.
 
 ---
 
-## Profile contents
+## user_defaults (instructor preferences across courses)
 
-Every profile directory contains:
+The skill supports a **user_defaults** file that holds preferences shared
+across all courses an instructor teaches: language, LaTeX engine, default
+audience description, default style, instructor name. These pre-fill the
+`/course-maker course init` dialog so you only answer them once for your
+whole career.
 
-- **`README.md`** — describes the profile (audience, typical institution,
-  LMS choice).
-- **`course_defaults.yaml`** — defaults for the `course init` dialog.
-  Keys: `institution`, `default_audience`, `default_style`,
-  `default_language`, `default_latex_engine`, `ghc_org`, `ghc_repo_naming`,
-  and others as needed. Values may be empty strings — they become "no
-  default, ask the user fresh".
-- **`lms.md`** — the LMS publish workflow. Copied verbatim to the course
-  root as `lms_adapter.md`. Should contain step-by-step instructions for
-  pushing student materials to wherever they need to go.
+### Location
 
----
+`~/.course-maker/defaults.yaml`
 
-## Available profiles
+Override with the environment variable `$COURSE_MAKER_HOME` if you want
+to keep your config under XDG (`export COURSE_MAKER_HOME=$XDG_CONFIG_HOME/course-maker`)
+or somewhere else. The skill uses `$COURSE_MAKER_HOME/defaults.yaml` if
+the variable is set, otherwise `~/.course-maker/defaults.yaml`.
 
-- **`generic/`** — no LMS, local-zip publish. Use this if you don't have
-  a specific LMS yet, want to keep the workflow minimal, or are evaluating
-  the skill.
-- **`polyak/`** — Master's-level CS courses at ITMO University.
-  GitHub Classroom via `gh api`. Russian course materials by default.
-  This is also the worked example for "how to write your own profile".
+Works on Linux, macOS, and Windows (under Git Bash / PowerShell, where
+`~` resolves to the user's home directory).
+
+### Format
+
+```yaml
+# ~/.course-maker/defaults.yaml — instructor preferences across courses.
+# All fields optional; empty string = ask the user fresh in course init.
+
+default_language: ""           # e.g. "Russian"
+default_latex_engine: ""       # pdflatex / xelatex / lualatex
+default_audience: ""           # one paragraph; what students know coming in
+default_style: ""              # one paragraph; rigor vs intuition, formula handling
+default_instructor: ""         # name(s) for title slide / syllabus
+```
+
+### How it's created
+
+The first time you run `/course-maker course init`, the wizard asks
+content questions. At the end it offers:
+
+> "Save these answers as your user_defaults? Next time, course init will
+> pre-fill them. Press Enter to skip, or type a comma-separated list of
+> fields to save (e.g. `language, latex_engine, instructor`)."
+
+You can also create `~/.course-maker/defaults.yaml` by hand — copy the
+format above.
+
+### When user_defaults are read
+
+At the start of `/course-maker course init`, before asking content
+questions. Values are used as **suggested defaults** (press Enter to
+accept, or type to override). The result is written into the course's
+`CLAUDE.md` — the course no longer depends on user_defaults after init.
+
+### What is NOT in user_defaults
+
+- Institution name. This is per-course (you may teach at multiple
+  institutions, or in joint programmes). Asked fresh every course.
+- Profile (LMS). Profile is also per-course — same instructor may run
+  one course on GHC and another with local-zip distribution.
+- Anything course-specific (audience for THIS course, style for THIS
+  course). The `default_*` values are suggestions, not enforcement.
 
 ---
 
 ## Writing your own profile
 
-1. Copy `generic/` to `<your-slug>/`.
-2. Edit `course_defaults.yaml` with your defaults.
-3. Replace `lms.md` with the workflow for your LMS (Moodle, Canvas,
-   OpenEdX, internal system, etc.).
-4. Update `README.md` to describe what your profile is for.
-5. Open a PR if your profile would be useful as an example for others —
-   it should not contain secrets (tokens go in environment variables,
-   not files).
+If you have an LMS not covered by existing profiles (Moodle, Canvas,
+OpenEdX, internal portal with an API, etc.):
+
+1. Copy `local-zip/` to `<your-lms-slug>/`.
+2. Replace `lms.md` with your LMS-specific publish workflow.
+3. Edit `lab_questions.yaml` to describe what your workflow needs
+   (API endpoint URL, course ID, access token name from environment,
+   etc.). Tokens themselves go in environment variables, never in
+   files.
+4. Set sensible `lms_defaults.yaml` (or leave it empty).
+5. Update `README.md` to describe what your profile does.
+6. Open a PR — your profile becomes available to others on next
+   `git pull`.

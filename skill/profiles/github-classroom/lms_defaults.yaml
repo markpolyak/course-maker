@@ -1,0 +1,12 @@
+# Profile: github-classroom — LMS-related defaults.
+#
+# This file only contains values that the LMS workflow needs.
+# Personal preferences (instructor name, language, latex engine, audience,
+# style) belong in ~/.course-maker/defaults.yaml — see skill/profiles/README.md.
+
+# Pattern for the GitHub Classroom repo name (or per-student fork name).
+# Variables: {year}, {N}, {slug}, {student}.
+# {N}-{student} matches GHC fork mode: each accepted assignment becomes
+# <org>/<N>-<student>. Override per-course in CLAUDE.md if your GHC setup
+# uses a different pattern.
+ghc_repo_naming: "{N}-{student}"

@@ -76,51 +76,56 @@ Skip this phase if the section is already `filled`.
 If `missing` or `placeholder`, announce:
 "Filling in `## Lab context` in `CLAUDE.md`. I'll ask one question at a time."
 
-### Phase 3a — Profile-driven questions
+### Phase 3a — Load profile questions
 
-Read `CLAUDE.md` → `## Course context` → `Profile:` field. Default: `generic`.
+Read `CLAUDE.md` → `## Course context` → `Profile:` field. Default:
+`local-zip`.
 
-Read `skill/profiles/<profile>/lms.md` and scan its workflow to determine
-which configuration values it needs from the user. The `lms_adapter.md` in
-the course root is the source of truth for the publish workflow; this phase
-collects the inputs that workflow expects.
+Read `skill/profiles/<profile>/lab_questions.yaml`. Each entry describes
+one LMS-config question:
 
-**Common patterns by profile:**
+```yaml
+- id: <key>            # written to CLAUDE.md under ## Lab context
+  prompt: "<text>"     # shown to the user verbatim
+  default: ""          # may reference lms_defaults.yaml values via ${name}
+  required: true|false
+  per_lab: true|false  # true → ask once per existing lab
+```
 
-- `polyak` (GitHub Classroom + `gh api`) needs:
-  - GitHub org where starter repos live.
-  - GHC classroom org (often same as GitHub org).
-  - GHC repo naming pattern (use `ghc_repo_naming` from
-    `profiles/polyak/course_defaults.yaml` as the suggested default).
-  - Per-lab: starter repo URL (one question per existing lab found in
-    Phase 1; for labs with an existing `starter/.git`, suggest the result
-    of `git -C labs/{dir}/starter remote get-url origin` as the default).
+Also read `skill/profiles/<profile>/lms_defaults.yaml` — used to resolve
+`${name}` references inside `default` fields.
 
-- `generic` (local zip) needs:
-  - Delivery channel (LMS name / share drive / email distribution list) —
-    free-text, used only in the lab publish summary.
+### Phase 3b — Ask the profile's questions
 
-- Other profiles: read their `lms.md` to derive the question list.
+For each entry in `lab_questions.yaml`:
 
-Ask the questions one at a time, applying profile defaults from
-`course_defaults.yaml` where applicable. If the user runs this command to
-also set up a new lab, additionally ask:
+- If `per_lab: false`: ask once.
+- If `per_lab: true`: ask once per existing lab found in Phase 1.
+  Substitute `{N}` and `{dir}` into the prompt from the lab's row.
+  For each lab where `labs/{dir}/starter/.git` exists, run
+  `git -C labs/{dir}/starter remote get-url origin` and offer the result
+  as the default.
+- Resolve `${ghc_repo_naming}` and similar references in `default` against
+  `lms_defaults.yaml`.
+- If `default` is non-empty, show as `"<prompt> (default: <value>)"`.
+  Press Enter accepts; typing replaces.
+- If `required: true` and the user provides an empty value, repeat the
+  question.
+
+If the user runs this command to also set up a new lab, additionally ask:
 
 - "Title and slug for the next lab? (e.g. `2, lab2-arima`)"
 
-### Phase 3b — Write `## Lab context`
+### Phase 3c — Write `## Lab context`
 
-Write the collected answers into `CLAUDE.md` → `## Lab context`. The exact
-fields depend on the profile. Common fields:
-
-- LMS-related identifiers collected above (GitHub org / GHC org / delivery
-  channel / etc.).
-- Starter repos table — one row per lab if the profile requires per-lab
-  URLs; omitted for profiles without per-lab repos.
+Write the collected answers into `CLAUDE.md` → `## Lab context`. Field
+names come from the `id` of each `lab_questions.yaml` entry. For per-lab
+questions, write a table: one row per lab, one column per per-lab field
+(e.g. `starter_repo_url`).
 
 The actual publish workflow lives in `<course-root>/lms_adapter.md` (copied
 in Phase 5a). The `## Lab context` section in `CLAUDE.md` holds only the
-identifiers the workflow needs to look up at publish time.
+identifiers that workflow looks up at publish time.
 
 ---
 
@@ -163,13 +168,14 @@ and scoring strings before generating notebooks."
 
 ## Phase 5a — Install the LMS adapter
 
-Read `CLAUDE.md` → `## Course context` → `Profile:` field. Default: `generic`.
+Read `CLAUDE.md` → `## Course context` → `Profile:` field. Default:
+`local-zip`.
 
 If `<course-root>/lms_adapter.md` does not exist (or the user explicitly
 asks to refresh it):
 
 1. Verify `skill/profiles/<profile>/lms.md` exists. If not, fall back to
-   `skill/profiles/generic/lms.md` and warn the user that the chosen
+   `skill/profiles/local-zip/lms.md` and warn the user that the chosen
    profile is missing the adapter.
 2. Copy `skill/profiles/<profile>/lms.md` → `<course-root>/lms_adapter.md`.
 3. Confirm: "lms_adapter.md installed from profile `<profile>`. This is

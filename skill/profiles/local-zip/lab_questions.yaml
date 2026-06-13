@@ -1,0 +1,17 @@
+# Profile: local-zip — questions asked by lab course-init.
+#
+# /course-maker lab course-init reads this file to know which LMS-config
+# questions to add to the dialog. Each entry becomes a key under
+# CLAUDE.md → ## Lab context.
+#
+# Format:
+#   - id: <key name written into CLAUDE.md>
+#     prompt: "<question shown to the user>"
+#     default: "<optional default suggestion>"
+#     required: true | false
+
+questions:
+  - id: delivery_channel
+    prompt: "How will you deliver the lab to students? (LMS name / share drive / email / other)"
+    default: ""
+    required: false

@@ -11,7 +11,7 @@ during `lab course-init`). This file is the dispatcher.
 Read `<course-root>/lms_adapter.md`. This file was copied from
 `skill/profiles/<name>/lms.md` when the user ran
 `/course-maker lab course-init` (where `<name>` is the course profile,
-default `generic`).
+default `local-zip`).
 
 **If `lms_adapter.md` does not exist:**
 
@@ -25,7 +25,7 @@ by /course-maker lab course-init from the profile configured in CLAUDE.md
 
 To install it:
   1. Check that CLAUDE.md → Course context → Profile is set
-     (default: generic).
+     (default: local-zip).
   2. Run /course-maker lab course-init.
   3. Re-run /course-maker lab publish N.
 

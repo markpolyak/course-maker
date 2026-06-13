@@ -87,7 +87,9 @@ file you did or did not read. Violating any of them is a hard error.
   proceeding.
 - ALWAYS read `CLAUDE.md` → `## Course context` → `Profile:` field at the
   start of `course init`, `lab course-init`, and `lab publish`. Default
-  profile is `generic` if the field is absent.
+  profile is `local-zip` if the field is absent. The profile is the LMS
+  adapter only; instructor preferences come from
+  `$COURSE_MAKER_HOME/defaults.yaml` (fallback `~/.course-maker/defaults.yaml`).
 
 ---
 

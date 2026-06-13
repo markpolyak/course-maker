@@ -398,6 +398,16 @@ you read and name the sections you consulted.
 
 **Цель:** Разделить персональный слой и универсальное ядро. Это разблокирует honest universalization без потери поддержки персональных сценариев.
 
+> **Замечание после реализации (2026-06-14):** первая итерация волны 4 (коммит `35a37c1`) использовала схему «профиль = инструктор + LMS» с именами `polyak/` и `generic/`. Это оказалось плохой архитектурой: имя `polyak` бессмысленно для других преподавателей, а смешение инструктор-специфики и LMS-специфики в одну ось приводит к комбинаторному взрыву (`uni1-polyak`, `uni2-polyak`, …).
+>
+> Архитектура была пересмотрена (коммит «refactor profile system», след. за `35a37c1`):
+> - Профиль = только LMS adapter. Имена LMS-нейтральные: `local-zip/`, `github-classroom/`.
+> - Инструктор-специфика (`default_language`, `default_latex_engine`, `default_style`, etc.) живёт в **user_defaults** — отдельный файл `~/.course-maker/defaults.yaml` (с override через `$COURSE_MAKER_HOME`).
+> - Профиль содержит: `lms.md` + `lab_questions.yaml` (LMS-config questions) + `lms_defaults.yaml` (LMS-config defaults) + `README.md`.
+> - При `course init` user_defaults подмешиваются как suggestions; в конце предлагается сохранить ответы как новый user_defaults.
+>
+> Шаги 4.1–4.4 ниже описывают изначальный замысел; реальная реализация использует пересмотренную архитектуру.
+
 ### Шаг 4.1. Спроектировать структуру profiles/
 ```
 skill/profiles/

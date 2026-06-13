@@ -1,7 +1,7 @@
-# LMS Adapter: polyak (GitHub Classroom via `gh api`)
+# LMS Adapter: github-classroom (via `gh api`)
 
 This file is copied verbatim to `<course-root>/lms_adapter.md` by
-`/course-maker lab course-init` when the course profile is `polyak`.
+`/course-maker lab course-init` when the course profile is `github-classroom`.
 The `/course-maker lab publish N` command reads it and executes the
 steps below.
 
@@ -31,9 +31,10 @@ If the push fails because of diverged history, see "Recovery" below.
 ## Step 2 — Sync GHC repo via `gh api`
 
 Resolve `$GHC_REPO` from `CLAUDE.md` Lab context using the naming
-pattern from `course_defaults.yaml` (`ghc_repo_naming`). For
-`polyak` default `{N}-{student}`, the template repo name is what gets
-forked by each student; check `CLAUDE.md` for the exact value.
+pattern from `lms_defaults.yaml` (`ghc_repo_naming`, default `{N}-{student}`
+for GHC fork mode). Substitute the variables (`{N}`, `{student}`, etc.)
+from the per-lab context; check `CLAUDE.md` Lab context for the resolved
+value for this course.
 
 For each student-facing file in `<LAB_DIR>starter/`:
 - `exercises.ipynb`
