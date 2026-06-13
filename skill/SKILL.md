@@ -15,6 +15,79 @@ description: >
 A structured workflow for preparing complete lecture materials from a course plan.
 State is stored in Markdown files — no database needed, works with git.
 
+Each command has a thin dispatcher below that names the reference file with the
+full workflow. **Always read the named reference file before executing the
+workflow.** Repository layout and state file formats: `references/repository_layout.md`.
+
+---
+
+## Inviolable rules
+
+These rules apply to every command in this skill, regardless of which reference
+file you did or did not read. Violating any of them is a hard error.
+
+### Observability
+
+- **In the first chat message of every step, list which `references/*.md` files
+  you read and which top-level sections of each you consulted.** Silent skips
+  are not allowed — if you proceed without reading the named reference, say so
+  explicitly.
+
+### Grading invariants (lab)
+
+- NEVER modify the line `dataset_id = (Student_ID - 1) % len(DATASETS)` anywhere
+  (notebook, `conftest.py`, tests). This formula is used by external grading for
+  every student of every lab past and future.
+- NEVER modify the grade-output format string defined in `lab_templates.md` —
+  it is read by external CI. Only the numerator inside may change (add/remove
+  bonus points).
+
+### Validation isolation (lab)
+
+- During `/course-maker lab validate`: NEVER read `lab_spec.md`, `tests.py`,
+  `conftest.py`, `tests_template.py`, or `history.md` until all student tasks
+  are complete. The simulation must reflect what a real student sees.
+- NEVER start `lab validate` if `<LAB_DIR>starter/` has uncommitted changes —
+  the notebook will be modified during validation and the clean version will be
+  lost. Stop and ask the user to commit first.
+- NEVER skip the `/clear` prompt before `lab validate`. The current session
+  context contains `lab_spec.md` and `tests.py` from prior steps; without a
+  clear, the simulation is invalid.
+
+### Slides & figures
+
+- NEVER reference PNG files in `slides.tex` that do not exist in `figures/`.
+  List the directory before generating slides.
+- NEVER mark `figures → ✅` without running `figures.py` and verifying that the
+  expected PNG files were created.
+- NEVER add forward references to later slides. At most one mention of the next
+  lecture, only on the closing slide, only if it flows naturally.
+- Output for `slides` and `notes` is ALWAYS chunked (preamble + blocks of 5).
+  Never generate the entire file in one shot — it causes Claude Code to hang.
+
+### Process
+
+- NEVER overwrite existing files in init wizards (`course init`,
+  `lab course-init`). They are idempotent by design.
+- NEVER auto-advance to the next step after the user approves the current one —
+  wait for the next explicit command.
+- NEVER suggest short-form commands (`/lecture …`, `/lab …`); always the full
+  form `/course-maker …`.
+- NEVER cite numerical dataset characteristics (size, sampling rate, value
+  range, number of classes) without verification via web search.
+- ALWAYS read `lectures/NN/history.md` (or `<LAB_DIR>history.md`) before
+  starting any step for that lecture/lab. It is the memory of past iterations
+  and prevents re-proposing rejected ideas.
+- ALWAYS update `COURSE_STATE.md` at the end of every command, even if the
+  step is only partially done.
+- ALWAYS present output for review and wait for explicit approval before
+  saving to the file and updating state.
+- ALWAYS check `git diff` on the prerequisite file at the start of a subsequent
+  step. If the user manually edited it, log the edit in `history.md` before
+  proceeding.
+
+---
+
 ## Quick reference: commands
 
 **Lecture commands:**
@@ -24,8 +97,7 @@ State is stored in Markdown files — no database needed, works with git.
 | `/course-maker` | Show project status (all lectures + labs) |
 | `/course-maker help` | Show this command reference |
 | `/course-maker course init` | Scaffold a new course repository |
-| `/course-maker course plan` | Create or update course_plan.md (interactive) |
-| `/course-maker course plan update` | Edit existing plan, flag affected materials |
+| `/course-maker course plan` | Create, fill, or update course_plan.md (interactive) |
 | `/course-maker course status` | Show status of all lectures/labs |
 | `/course-maker course update` | Detect manual plan changes, flag affected lectures |
 | `/course-maker plan N` | Step 1 — detailed slide-by-slide plan for lecture N |
@@ -45,401 +117,33 @@ State is stored in Markdown files — no database needed, works with git.
 | `/course-maker lab init N <url> [slug]` | Scaffold lab N; dir = labs/slug/ or labs/labN/ |
 | `/course-maker lab plan N` | Step 1a — interactive planning until approved |
 | `/course-maker lab notebook N` | Step 1b — generate exercises.ipynb |
-| `/course-maker lab spec N` | Step 1b — generate lab_spec.md |
+| `/course-maker lab spec N` | Step 1b — generate lab_spec.md (auto plan/notebook mode) |
 | `/course-maker lab datasets N` | Step 1b — generate datasets_info.md (optional) |
 | `/course-maker lab tests N` | Step 2 — tests.py, conftest.py, requirements.txt, README |
-| `/course-maker lab validate N <id>` | Step 3 — validate as student (new session recommended) |
+| `/course-maker lab validate N <id>` | Step 3 — validate as student (new session required) |
 | `/course-maker lab publish N` | Push to starter repo + sync GHC via gh API |
 | `/course-maker lab update N` | Re-publish after post-release fix |
-| `/course-maker lab reverse-spec N` | Generate lab_spec.md from existing notebook |
 | `/course-maker lab status N` | Status + last 3 history entries |
 
-When the user types one of these commands, read this skill and execute the
-corresponding workflow below. Always read `COURSE_STATE.md` and the relevant
-`lectures/NN/history.md` before starting any step.
-
-**If invoked with no arguments** (`/course-maker` alone): show project status —
-read `COURSE_STATE.md` and print a summary of all lectures and labs with their
-current step statuses (✅ / 🔄 / ❌ / ⚠️). End with one line:
-"Run `/course-maker help` for available commands."
+**If invoked with no arguments** (`/course-maker` alone): read `COURSE_STATE.md`
+and print a summary of all lectures and labs with their current step statuses
+(✅ / 🔄 / ❌ / ⚠️). End with: "Run `/course-maker help` for available commands."
 
 **`/course-maker help`**: print the Quick reference tables above and stop.
 
 ---
 
-## Repository layout
-
-```
-<course-root>/
-  CLAUDE.md               ← this skill + course-specific context
-  course_plan.md          ← master course plan (source of truth)
-  COURSE_STATE.md         ← status table for all lectures/labs
-  course_conventions.md   ← language rules + terminology (generated by course init)
-  slides_preamble.tex     ← LaTeX/Beamer preamble (generated by course init)
-  lab_templates.md        ← notebook/test templates (generated by lab course-init)
-  lectures/
-    01/
-      plan.md             ← detailed slide plan (Step 1 output)
-      visuals.md          ← visualization list (Step 2 output)
-      figures/
-        figures.py        ← figure generation script (Step 3 output)
-        fig01_name.png    ← generated figures
-        ...
-      slides.tex          ← Beamer presentation (Step 4 output)
-      speaker_notes.md    ← speaker text (Step 5 output)
-      history.md          ← decision log for this lecture
-    02/
-      ...
-  labs/
-    shared/
-      tests_template.py   ← style reference for Stage 2 (never edit)
-      conftest_base.py    ← base conftest, copied per-lab then scoring updated
-      tests.yaml          ← GitHub Actions CI (never modify)
-    lab1/
-      lab_spec.md         ← Stage 1 output, instructor-only (not in starter repo)
-      history.md          ← decision log, same role as lectures/NN/history.md
-      starter/            ← git subtree → public starter repo (GitHub Classroom template)
-        exercises.ipynb
-        conftest.py
-        tests.py
-        requirements.txt
-        README.md
-        datasets_info.md  ← if needed
-        .github/workflows/tests.yaml
-    lab2/
-      ...
-  seminars/               ← future: seminar materials
-```
-
----
-
-## State files
-
-### COURSE_STATE.md
-
-Maintain this file after every command that changes state.
-Format:
-
-```markdown
-# Course State
-
-**Course:** <name>
-**Last updated:** YYYY-MM-DD
-
-## Lectures
-
-| # | Title | plan | visuals | figures | slides | notes | Updated |
-|---|-------|------|---------|---------|--------|-------|---------|
-| 01 | ... | ✅ | ✅ | ✅ | 🔄 | ❌ | 2024-03-15 |
-| 02 | ... | ✅ | ❌ | ❌ | ❌ | ❌ | 2024-03-10 |
-
-## Labs
-
-| # | Dir | Title | plan | notebook | spec | tests | validated | published | Updated |
-|---|-----|-------|------|----------|------|-------|-----------|-----------|---------|
-| 01 | lab1-backprop | Backpropagation | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | — |
-
-Legend: ✅ done · 🔄 in progress · ❌ not started · ⚠️ needs review
-```
-
-Mark a step ⚠️ (needs review) when:
-- `course_plan.md` was updated and this lecture's content may be affected
-- the user manually edited a file without going through the pipeline
-
-### history.md
-
-Every `lectures/NN/history.md` is the memory of that lecture.
-**Always read it before starting any step for that lecture.**
-It prevents re-proposing ideas the user already rejected.
-
-Append to history after each completed step or meaningful iteration.
-Format:
-
-```markdown
-# Lecture N — History
-
-## [YYYY-MM-DD] Step 1: Plan — iteration 1
-**Result:** plan.md created
-**User feedback:** "Too much time on section 3, compress to 1 slide"
-**Decision:** Merged slides 8–10 into one overview slide
-
-## [YYYY-MM-DD] Step 1: Plan — iteration 2
-**Result:** plan.md updated
-**User feedback:** Approved
-
-## [YYYY-MM-DD] Manual edit
-**What changed:** User rewrote slide 5 description directly in plan.md
-**Detected via:** git diff at start of Step 2
-```
-
----
-
-## Workflows
+## Lecture workflows
 
 ### `/course-maker course init`
-
-This command is idempotent — safe to re-run on an existing course. It detects what
-is already in place and only creates or asks about what is missing.
-
-#### Phase 1 — Auto-detect existing state
-
-Run these checks silently before asking anything:
-
-1. **Check `CLAUDE.md`.**
-   - "missing" — file does not exist.
-   - "placeholder" — exists but contains strings like `[Course Name]`, `[course-slug]`,
-     `[org-name]`.
-   - "filled" — exists with real content. Read the following fields from it if present:
-     course name, slug, language, audience, style preferences.
-
-2. **Check `COURSE_STATE.md`.**
-   - "missing" — file does not exist.
-   - "exists" — do not overwrite.
-
-3. **Check `course_conventions.md`.**
-   - "missing" — file does not exist.
-   - "exists" — do not overwrite unless the user explicitly asks to reset it.
-
-4. **Check directory structure** (`lectures/`, `labs/`).
-   - Note which directories already exist; create only the missing ones.
-
-5. **Check `course_plan.md`.**
-   - "exists" — do not overwrite; note that it is already present.
-   - "missing" — will be handled in Phase 3.
-
-#### Phase 2 — Dialog: collect missing info
-
-Skip any question whose answer is already in `CLAUDE.md` (filled state).
-Ask only what is needed to fill the missing pieces. Ask one question at a time.
-
-Questions (ask only if not already known):
-1. Course name?
-2. Slug (short identifier, e.g. `ml-systems`)?
-3. Audience description — what students already know?
-4. Style preference: strict/formal vs intuition-first?
-5. Language for slides and speaker notes?
-6. LaTeX engine for slide compilation? (`pdflatex` / `xelatex` / `lualatex`)
-   Note: xelatex and lualatex support Unicode fonts natively; pdflatex requires T2A/inputenc for Cyrillic.
-
-#### Phase 3 — Create missing files
-
-For each file, act only if it is "missing" (skip if it already exists):
-
-- **`CLAUDE.md`** — create from `skill/COURSE_CLAUDE_TEMPLATE.md` with all collected info
-  embedded; embed the skill content between `SKILL:START` and `SKILL:END`.
-  If "placeholder" — fill in the placeholder fields, preserve everything else.
-
-- **`course_conventions.md`** — determine template variant from the language answer:
-  `ru` for Russian, `en` for English, `en` as default for unsupported languages.
-  Copy `skill/templates/course_conventions_{lang}.md` → `course_conventions.md`.
-  Confirm: "course_conventions.md created for {language}.
-  Review and edit the terminology dictionary before starting labs."
-
-- **`slides_preamble.tex`** — determine variant from the engine answer:
-  `pdflatex` → `skill/templates/slides_preamble_pdflatex.tex`,
-  `xelatex` or `lualatex` → `skill/templates/slides_preamble_xelatex.tex`.
-  Default to `pdflatex` if not specified.
-  Copy to `slides_preamble.tex` in the course root.
-  Confirm: "slides_preamble.tex created for {engine}. Edit it to set your theme, colors, and title info before generating slides."
-
-- **`COURSE_STATE.md`** — create empty state file.
-
-- **Directory structure** — create only directories that do not exist yet.
-
-#### Phase 4 — Summary
-
-Print a compact summary:
-- What already existed and was left untouched
-- What was created in this run
-- If `course_plan.md` is missing: "Run `/course-maker course plan` to create the course plan."
-- Next step: run `/course-maker course status` to initialize the state table
-
----
+Read: `references/course_init.md`.
 
 ### `/course-maker course plan`
-
-Create or incrementally fill `course_plan.md`. Safe to re-run — detects current state
-and picks up where you left off.
-
-#### Phase 1 — Detect state
-
-Check `course_plan.md`:
-- **Missing** → go to Phase 2 (creation).
-- **Partial** — file exists but has `<!-- TODO -->` sections → go to Phase 3 (fill missing).
-- **Complete** — file exists with no TODO sections → show summary, offer to update:
-  "Plan looks complete. Run `/course-maker course plan update` to make changes."
-
-#### Phase 2 — Create `course_plan.md`
-
-Ask the user to choose (one message):
-
-> "`course_plan.md` not found. How would you like to proceed?
-> [1] I have an existing plan file — provide the path or paste the content
-> [2] I know my sessions and topics — let's structure them together
-> [3] Help me figure out what to cover"
-
----
-
-**Option [1] — Import existing plan**
-
-Accept either a file path or pasted content. Read it fully, then extract:
-- Session list: types (lecture, seminar, lab, test, homework, other), titles, week/order
-- Per-lecture topics (bullet lists, numbered lists, or prose)
-- Lab assignments mentioned
-- Course-level prerequisites (prior disciplines)
-- Grading/scoring breakdown
-- Self-study materials
-- Instructor info
-
-Create a draft `course_plan.md` in the structured format (see below). Where information
-was not found, insert `<!-- TODO -->`. Show the draft and ask:
-> "Here's what I extracted. What should I correct or add?"
-
-Iterate until the user approves. Save the original file as `course_plan_source.*`
-(preserve extension). Write approved draft to `course_plan.md`.
-
----
-
-**Options [2] and [3] — Dialog creation**
-
-Both options use the same dialog. The difference: [2] assumes the user has content
-ready; [3] means Claude will propose based on subject knowledge after collecting
-the basics. Ask one question at a time, wait for each answer:
-
-1. *(skip if known from CLAUDE.md)* "What is this course about?"
-2. "What should students be able to do after completing this course?
-   One or two concrete outcomes."
-3. "What types of sessions does the course have?
-   (e.g. lectures only / lectures + seminars / lectures + labs / all types)"
-4. "How many of each type? How many weeks total?"
-5. "Standard session duration? (or different per type — specify)"
-6. *(option [2])* "List your session titles, one per line. You can add a few topics
-   after each title separated by a dash. Skip types you haven't planned yet."
-   *(option [3])* Claude generates a full proposed outline using knowledge of typical
-   university curricula for this subject and audience. Show it, ask: "What would you
-   change?" — iterate until approved. Be explicit this is based on general knowledge;
-   the professor's judgment takes precedence.
-7. "Any course-level prerequisites — prior disciplines students must have completed?
-   Or is this professional development / open to all? (press Enter to skip)"
-8. "Grading breakdown — point weights for each session type?
-   (press Enter to skip — can fill later)"
-9. "Self-study materials — textbooks, papers, online resources?
-   (press Enter to skip — can fill later)"
-10. "Instructor name(s) and contact info?
-    (press Enter to skip — can fill later)"
-
-After collecting answers, generate a draft `course_plan.md`, show it, iterate, save.
-
----
-
-#### Phase 3 — Fill missing sections
-
-Show a list of TODO sections found in the existing `course_plan.md`.
-For each missing section, offer to fill it now or skip.
-Fill approved sections through focused dialog (1–3 questions per section).
-Save after each section approved.
-
----
-
-#### `course_plan.md` format
-
-```markdown
-# Course Plan — {Course Name}
-
-## Overview
-
-**Weeks:** {N}  **Lectures:** {N}  **Seminars:** {N}  **Labs:** {N}
-**Tests:** {N}  **Standard duration:** {time} min
-
-## Sessions
-
-| # | Week | Type | Title / Topic | Notes |
-|---|------|------|---------------|-------|
-| 1 | 1 | Lecture | Introduction to HMMs | |
-| 2 | 1 | Seminar | Practice: HMM basics | no pipeline |
-| 3 | 2 | Lecture | Forward algorithm | |
-| 4 | 2 | Lab | Lab 1 — HMM from scratch | |
-| 5 | 4 | Test | Midterm | no pipeline |
-| 6 | 5 | Homework | HW 1 — Viterbi | no pipeline |
-
-## Lectures
-
-### Lecture 1 — Introduction to HMMs
-
-**Topics:**
-- Motivation and applications
-- Formal definition: states, observations, parameters
-- Comparison with Markov chains
-
-**Estimated time:** 90 min
-**Prerequisites within course:** none
-**Announce-only sections:** continuous HMMs (covered in Lecture 5)
-
-### Lecture 2 — Forward algorithm
-...
-
-## Labs
-
-### Lab 1 — HMM from scratch
-*(managed by `/course-maker lab` pipeline — see `labs/lab1/`)*
-
-## Prerequisites
-
-<!-- TODO: list prior disciplines or note "no formal prerequisites" -->
-
-## Grading
-
-<!-- TODO: e.g. Labs 40% · Midterm 20% · Final 30% · Homework 10% -->
-
-## Self-study Materials
-
-<!-- TODO: textbooks, papers, online resources -->
-
-## Instructors
-
-<!-- TODO: name, email, office hours -->
-```
-
-**Rules for the Sessions table:**
-- Every session of every type appears in the table — even those without a pipeline.
-- Sessions without a skill pipeline are marked `no pipeline` in Notes.
-- Labs managed by the lab pipeline are marked with the lab directory in Notes
-  (e.g. `labs/lab1/`).
-- Row order = chronological order of sessions.
-
-**Rules for the Lectures section:**
-- One subsection per lecture session from the Sessions table.
-- `Prerequisites within course` — which earlier lectures must be completed first.
-- `Announce-only sections` — topics mentioned briefly but not taught fully in this lecture.
-
-**Rules for the Labs section:**
-- One subsection per lab session; content is a one-line pointer to the lab directory.
-- Full lab content lives in `labs/labN/` and is managed by the lab pipeline.
-
----
-
-### `/course-maker course plan update`
-
-Use when you need to change the existing `course_plan.md` — session removed, topic
-shifted, schedule compressed, errors discovered.
-
-1. Read `course_plan.md` fully.
-2. Ask: "What needs to change?" — accept free-form description.
-3. Propose the specific edits to make, wait for approval.
-4. Apply approved edits to `course_plan.md`.
-5. Cross-check with `COURSE_STATE.md`:
-   - For every lecture whose Sessions row, Lectures subsection, or topic list changed:
-     mark `plan`, `visuals`, `figures`, `slides`, `notes` as ⚠️ in `COURSE_STATE.md`.
-   - For every lab whose Sessions row changed: mark all lab columns as ⚠️.
-   - Append a note to each affected `history.md`.
-6. Report: what was changed, which materials are now marked ⚠️ and need review.
-
----
+Read: `references/course_plan.md`.
 
 ### `/course-maker course update`
 
-Use when you have edited `course_plan.md` manually (outside the skill) and want the
-skill to detect what changed and flag affected materials.
+Use when `course_plan.md` was edited manually (outside the skill).
 
 1. Run `git diff course_plan.md` to detect changes.
 2. For every lecture or lab whose content changed in the diff:
@@ -448,539 +152,129 @@ skill to detect what changed and flag affected materials.
 3. Update `COURSE_STATE.md`.
 4. Report: which sections changed, which materials are now ⚠️ and why.
 
----
+### `/course-maker plan N` (Step 1)
+Read: `references/step1_plan.md`.
+**Input:** `course_plan.md` (lecture N section), `lectures/NN/history.md`,
+`## Course context` from `CLAUDE.md`, `course_conventions.md`.
+**Output:** `lectures/NN/plan.md`. **State after approval:** plan → ✅.
 
-### `/course-maker plan N`  (Step 1)
+### `/course-maker visuals N` (Step 2)
+Read: `references/step2_visuals.md`.
+**Input:** `lectures/NN/plan.md`, `lectures/NN/history.md`.
+**Output:** `lectures/NN/visuals.md`. **State:** visuals → ✅.
 
-**Goal:** produce `lectures/NN/plan.md` — a numbered list of slides with
-content descriptions, timing, and a timing table at the end.
+### `/course-maker figures N` (Step 3)
+Read: `references/step3_figures.md`.
 
-**Before writing anything:**
-1. Read `course_plan.md` section for lecture N.
-2. Read `lectures/NN/history.md` if it exists — note any rejected structures
-   or decisions already made.
-3. Read `## Course context` from `CLAUDE.md`.
+**CRITICAL — even if reference was skipped:**
+- After saving `figures.py`, run it: `cd lectures/NN && python figures/figures.py`.
+- If the script fails: show the error, fix, re-save, re-run until clean.
+- After a clean run: verify expected PNGs in `lectures/NN/figures/`; list them.
+- Mark `figures → ✅` ONLY after a clean run with PNGs verified. Otherwise → 🔄.
 
-**Then produce the plan.** See `references/step1_plan.md` for the full prompt
-template, constraints, and output format.
+### `/course-maker slides N` (Step 4)
+Read: `references/step4_slides.md`.
 
-After the user approves:
-- Save to `lectures/NN/plan.md`
-- Append to `history.md`
-- Update `COURSE_STATE.md` (plan → ✅)
+**CRITICAL — even if reference was skipped:**
+- Output is ALWAYS chunked. A 20-slide Beamer file is 600–900 lines; one-shot
+  generation causes Claude Code to hang.
+- Chunk 0 = preamble + title. Chunk K (K≥1) = slides [5K-4 … 5K].
+  Chunk last = closing slide + `\end{document}`.
+- Append each chunk to `slides.tex` immediately; do not pause between chunks.
+- Use `slides_preamble.tex` from the course root verbatim. If missing, stop
+  and tell the user to run `/course-maker course init`.
+- Only reference PNG files that actually exist in `lectures/NN/figures/`.
 
----
+**Resuming:** `/course-maker slides N next` reads `slides.tex`, finds the last
+completed slide, continues from there (auto-chains remaining chunks).
 
-### `/course-maker visuals N`  (Step 2)
+**Revising:** "fix slide 7" → identify which chunk it belongs to, regenerate
+only that chunk, show diff, append corrected version after approval.
 
-**Goal:** produce `lectures/NN/visuals.md` — a table of all visualizations
-with TikZ feasibility assessment.
+### `/course-maker notes N` (Step 5)
+Read: `references/step5_notes.md`.
 
-**Before writing anything:**
-1. Read `lectures/NN/plan.md`.
-2. Read `lectures/NN/history.md`.
+**CRITICAL — even if reference was skipped:**
+- Output is ALWAYS chunked, same protocol as slides.
+- Chunk 0 = header + slides 1–5. Chunk K = slides [5K-4 … min(5K, total)].
+  Chunk last = timing table + cut candidates.
+- Append each chunk to `speaker_notes.md` immediately.
+- Generate in the course language (from `CLAUDE.md` → Course context).
 
-**Then produce the list.** See `references/step2_visuals.md` for format and
-TikZ feasibility criteria.
-
-After approval:
-- Save to `lectures/NN/visuals.md`
-- Append to `history.md`
-- Update `COURSE_STATE.md` (visuals → ✅)
-
----
-
-### `/course-maker figures N`  (Step 3)
-
-**Goal:** produce `lectures/NN/figures/figures.py` — a single script that
-generates all non-TikZ figures as PNG files.
-
-**Before writing anything:**
-1. Read `lectures/NN/visuals.md` — extract rows where TikZ = "no" or "hard".
-2. Read `lectures/NN/history.md`.
-
-**Then write the script.** See `references/step3_figures.md` for coding
-standards, style rules, and file naming conventions.
-
-After the user approves the script:
-1. Save to `lectures/NN/figures/figures.py`
-2. Run the script:
-   ```bash
-   cd lectures/NN && python figures/figures.py
-   ```
-3. **If the script fails:** show the error, fix the script, save again, re-run.
-   Repeat until it runs without errors. Do not mark the step done until it runs cleanly.
-4. **After a clean run:** verify that the expected PNG files were created in `lectures/NN/figures/`.
-   List them to the user.
-5. Append to `history.md`
-6. Update `COURSE_STATE.md`:
-   - figures → ✅ if all expected PNGs were generated
-   - figures → 🔄 if the user wants to iterate on the visuals further
-
----
-
-### `/course-maker slides N`  (Step 4)
-
-**Goal:** produce `lectures/NN/slides.tex` — a compilable LaTeX/Beamer file.
-
-**Output is always chunked — never generate the entire file at once.**
-A 20-slide Beamer file is ~600–900 lines. Generating it in one shot causes
-timeouts. Always split into preamble + blocks of 5 slides.
-
-**Before writing anything:**
-1. Read `lectures/NN/plan.md` — count total slides, note slide titles.
-2. Read `lectures/NN/visuals.md`.
-3. List files in `lectures/NN/figures/` — use only PNG files that exist.
-4. Read `lectures/NN/history.md` — note any layout issues from prior iterations.
-5. Read `## Course context` from `CLAUDE.md` — language for all slide text and frame titles.
-6. Read `references/step4_slides.md` — Beamer layout rules and anti-overfull checklist.
-7. Read `slides_preamble.tex` from the course root — use it verbatim as the preamble (replacing placeholders with course data).
-   If missing: stop and tell the user to run `/course-maker course init`.
-
-**Chunked generation protocol — fully automatic, no confirmation between chunks:**
-
-**Chunk 0 — Preamble + title slide (always first):**
-Generate, immediately write to `lectures/NN/slides.tex`, then proceed to Chunk 1
-without pausing.
-
-**Chunk K — slides [5K-4 … 5K] (K = 1, 2, …):**
-Generate 5 slides, immediately **append** to `slides.tex`, then proceed to the
-next chunk automatically.
-
-**Chunk last — closing slide + `\end{document}`:**
-Generate final summary slide + `\end{document}`, append immediately.
-
-After the last chunk print one summary line:
-"Done: slides.tex, M slides."
-
-**Resuming after a break:**
-If the user runs `/course-maker slides N next` and `slides.tex` already exists,
-read the file to find the last completed slide number, then continue from there
-(auto-chain the remaining chunks).
-
-**Revising a specific chunk:**
-If the user says "fix slide 7", identify which chunk it belongs to,
-regenerate only that chunk, show diff, append corrected version after approval.
-
-After all chunks are done:
-- Append to `history.md`
-- Update `COURSE_STATE.md` (slides → ✅)
-
-See `references/step4_slides.md` for Beamer template, layout rules, and
-anti-overfull checklist. Read it before writing Chunk 0.
-
----
-
-### `/course-maker notes N`  (Step 5)
-
-**Goal:** produce `lectures/NN/speaker_notes.md` — live spoken text, not a
-summary. The lecturer reads/adapts this aloud.
-
-**Output is always chunked — never generate the entire file at once.**
-Speaker notes for a 20-slide lecture run to ~2000–3000 words. Generate in
-blocks of 5 slides to avoid timeouts.
-
-**Before writing anything:**
-1. Read `lectures/NN/plan.md` — slide list, timing.
-2. Read `lectures/NN/slides.tex` if it exists — match slide order exactly.
-3. Read `lectures/NN/history.md`.
-4. Read `## Course context` from `CLAUDE.md` — tone, audience, language.
-5. Read `references/step5_notes.md` — format and tone rules.
-
-**Chunked generation protocol — fully automatic, no confirmation between chunks:**
-
-**Chunk 0 — Header + slides 1–5:**
-Generate, immediately write to `lectures/NN/speaker_notes.md`, then proceed to
-Chunk 1 without pausing.
-
-**Chunk K — slides [5K-4 … min(5K, total)] (K = 1, 2, …):**
-Generate 5 slides of notes, immediately **append** to `speaker_notes.md`, then
-proceed to the next chunk automatically.
-
-**Chunk last — timing table + cut candidates:**
-Generate the timing table and "what can be cut" section, append immediately.
-
-After the last chunk print one summary line:
-"Done: speaker_notes.md, N slides."
-
-**Resuming after a break:**
-If the user runs `/course-maker notes N next` and `speaker_notes.md` already exists,
-read the file to find the last completed slide, then continue from there
-(auto-chain the remaining chunks).
-
-After all chunks are done:
-- Append to `history.md`
-- Update `COURSE_STATE.md` (notes → ✅)
-
----
+**Resuming:** `/course-maker notes N next` reads the file, continues from the
+last completed slide.
 
 ### `/course-maker status N`
 
-Print:
-1. Row from `COURSE_STATE.md` for lecture N.
-2. Last 3 entries from `lectures/NN/history.md`.
-3. Any ⚠️ warnings with explanation.
+Print: row from `COURSE_STATE.md` for lecture N, last 3 entries from
+`lectures/NN/history.md`, any ⚠️ warnings with explanation.
 
 ---
 
-## Lab Workflows
+## Lab workflows
 
 ### `/course-maker lab course-init`
-
-This command is a setup wizard. It detects what is already in place and asks only for
-what it cannot determine on its own. Do not ask questions whose answers are already in the files.
-
-#### Phase 1 — Auto-detect existing state
-
-Run these checks silently before asking anything:
-
-1. **Scan `labs/` for existing lab directories.**
-   A directory counts as an existing lab if it contains `starter/` or `history.md`.
-   Record each found dir and its contents.
-
-2. **Check `CLAUDE.md` for `## Lab context`.**
-   The section is "missing" if it does not exist.
-   It is "placeholder" if it contains strings like `[org-name]`, `[classroom-org]`, `[org]`.
-   It is "filled" if none of the above apply.
-
-3. **Check `COURSE_STATE.md` for a `## Labs` table.**
-   It is "missing" if there is no such section.
-
-4. **Check `skill/templates/conftest_base.py` for placeholder content.**
-   It is a placeholder if it contains `# PLACEHOLDER` or `PLACEHOLDER — paste`.
-   Also look for a real `conftest.py` in any existing lab's `starter/`.
-
-5. **Check `skill/templates/tests.yaml` similarly.**
-   Also look for a real `tests.yaml` in any existing lab's `starter/.github/workflows/`.
-
-#### Phase 2 — Populate shared templates
-
-Create `labs/shared/` if it does not exist.
-
-For each of the three files (`tests_template.py`, `conftest_base.py`, `tests.yaml`):
-- If the skill template is a placeholder AND a real file exists in an existing lab's `starter/`
-  (or `starter/.github/workflows/` for tests.yaml):
-  → Copy the real file to `labs/shared/` directly. Do not use the placeholder.
-  → Tell the user: "Found real `<file>` in `<source path>` — using it."
-- Else if the skill template is not a placeholder:
-  → Copy it to `labs/shared/`.
-- Else (placeholder and no real file found):
-  → Create the placeholder in `labs/shared/` and tell the user:
-  "Could not find a real `<file>`. Placeholder written to `labs/shared/<file>` —
-  replace it before running `/course-maker lab tests N`."
-
-#### Phase 3 — Dialog: CLAUDE.md `## Lab context`
-
-Skip this phase if the section is already "filled".
-
-If "missing" or "placeholder", announce:
-"Filling in `## Lab context` in `CLAUDE.md`. I'll ask one question at a time."
-
-Ask in sequence (stop and wait for each answer before asking the next):
-
-1. "GitHub org where starter repos live?"
-2. "GitHub Classroom org? (press Enter if same as GitHub org)"
-   If blank — use GitHub org value.
-3. "GHC repo naming pattern? (e.g. `sp2026-lab{N}-{slug}` or `lab{N}-{slug}-{student}`)"
-4. For each existing lab found in Phase 1:
-   "Starter repo URL for lab {N} (dir: `{dir}`)?"
-   If the existing lab's `starter/` has its own `.git`, suggest reading the remote URL:
-   run `git -C labs/{dir}/starter remote get-url origin` and show the result as the default.
-5. "Title and slug for the next lab? (e.g. `2, lab2-arima`)" — only if the user ran
-   this command to set up a new lab, not just to initialise an existing course.
-
-Then write the complete `## Lab context` section into `CLAUDE.md`.
-
-#### Phase 4 — Dialog: COURSE_STATE.md Labs table
-
-Skip this phase if the table already exists.
-
-If missing, announce: "Creating Labs table in `COURSE_STATE.md`."
-
-For each existing lab found in Phase 1:
-- Extract what can be read from files:
-  - `dir` — the directory name
-  - Title — from the first cell of `starter/exercises.ipynb` if it exists, else ask
-  - Status columns — if `lab_spec.md` exists → spec ✅; if `tests.py` exists → tests ✅;
-    if `history.md` has "Validation" entry → validated ✅; etc. For columns that cannot
-    be inferred, set ❌ and note what was assumed.
-- Ask only: "Lab {N} ({dir}): I inferred {summary}. Does that look right?"
-  Allow the user to correct individual columns.
-
-Then write the Labs table into `COURSE_STATE.md`.
-
-#### Phase 5 — Copy lab templates
-
-Read `CLAUDE.md` → `## Course context` → Language field.
-Determine the template variant: `ru` for Russian, `en` for English,
-or `en` as default if the language is unsupported.
-
-Copy `skill/templates/lab_templates_{lang}.md` → `lab_templates.md` in the course root.
-Confirm: "lab_templates.md created for {language}.
-Review the self-check cell and scoring strings before generating notebooks."
-
-#### Phase 6 — Summary
-
-Print a compact summary:
-- What was auto-detected and filled without questions
-- What was filled based on dialog answers
-- What remains as placeholders (if any) and what to do about them
-- "Done. Run `/course-maker lab init N <url> [slug]` to scaffold the next lab."
-
----
+Read: `references/lab_course_init.md`.
 
 ### `/course-maker lab init N <url> [slug]`
+Read: `references/lab_init.md`.
 
-`slug` is optional. If provided, the lab directory is `labs/<slug>/`.
-If omitted, the directory is `labs/labN/` (e.g. `labs/lab1/`).
+### `/course-maker lab plan N` (Step 1a)
+Read: `references/lab_context.md` AND `references/lab_step1a_plan.md`.
 
-Example: `/course-maker lab init 1 https://github.com/org/lab1-backprop lab1-backprop`
+### `/course-maker lab notebook N` (Step 1b-1)
+Read: `references/lab_context.md` AND `references/lab_step1b_notebook.md`.
 
-Let `LAB_DIR = labs/<slug>/` if slug given, else `labs/labN/`.
+### `/course-maker lab spec N` (Step 1b-2)
+Read: `references/lab_context.md` AND `references/lab_step1b_spec.md`.
 
-1. Create `<LAB_DIR>` directory.
-2. Create `<LAB_DIR>history.md`:
-   ```markdown
-   # Lab N — History
+**Auto-detection:** if `<LAB_DIR>history.md` contains an approved plan → plan
+mode. Otherwise → notebook mode (deviations report appended to the spec file).
 
-   (no entries yet)
-   ```
-3. Create empty `<LAB_DIR>lab_spec.md` placeholder:
-   ```markdown
-   # Lab N Spec — placeholder
-   # Run /lab spec N to generate this file.
-   ```
-4. Add starter repo as git subtree:
-   ```bash
-   git subtree add --prefix=<LAB_DIR>starter <url> main --squash
-   ```
-5. Copy CI file:
-   ```bash
-   mkdir -p <LAB_DIR>starter/.github/workflows
-   cp labs/shared/tests.yaml <LAB_DIR>starter/.github/workflows/tests.yaml
-   ```
-6. Copy base conftest:
-   ```bash
-   cp labs/shared/conftest_base.py <LAB_DIR>starter/conftest.py
-   ```
-7. Add lab N row to `COURSE_STATE.md` Labs table (fill `Dir` = `<slug or labN>`, all status columns ❌).
-8. Commit:
-   ```bash
-   git add -A && git commit -m "lab N: init starter subtree"
-   ```
+**Protocol:** write the file directly (never dump YAML in chat), then show a
+brief human-readable summary and ask the user for confirmation. Update state
+only after approval.
 
----
+### `/course-maker lab datasets N` (Step 1b-3, optional)
+Read: `references/lab_context.md` AND `references/lab_step1b_datasets.md`.
 
-### Resolving lab directory
+### `/course-maker lab tests N` (Step 2)
+Read: `references/lab_context.md` AND `references/lab_step2_tests.md`.
 
-**Every `/course-maker lab N` command starts with this step:**
-
-Read `COURSE_STATE.md` Labs table, find the row where `#` = N, read the `Dir` column.
-That value is `LAB_DIR` — use it as `labs/<Dir>/` for all file operations in this command.
-
-Example: if row for lab 1 has `Dir = lab1-backprop`, then `LAB_DIR = labs/lab1-backprop/`.
-If the `Dir` column is absent or empty, fall back to `labs/labN/`.
-
----
-
-### `/course-maker lab plan N`  (Step 1a)
-
-**Goal:** iterative planning conversation → approved plan logged in `<LAB_DIR>history.md`.
-
-Read: `references/lab_step1a_plan.md` for the full prompt, requirements, and format.
-
-Input files: `course_plan.md` (lab N section), `<LAB_DIR>history.md`, `CLAUDE.md` (Lab context).
-Output: iterative planning conversation → approved plan.
-State: update `<LAB_DIR>history.md`, `COURSE_STATE.md` plan → ✅ after approval.
-
----
-
-### `/course-maker lab notebook N`  (Step 1b-1)
-
-**Goal:** produce `<LAB_DIR>starter/exercises.ipynb`.
-
-Read: `references/lab_step1b_notebook.md` before writing anything.
-
-Input files: `<LAB_DIR>history.md` (approved plan), `course_plan.md`.
-State: update `<LAB_DIR>history.md`, `COURSE_STATE.md` notebook → ✅.
-
----
-
-### `/course-maker lab spec N`  (Step 1b-2)
-
-**Goal:** produce `<LAB_DIR>lab_spec.md` — the contract between Stage 1 and Stage 2.
-This file is NOT published to students.
-
-Read: `references/lab_step1b_spec.md` before writing anything.
-
-Input files: `<LAB_DIR>starter/exercises.ipynb`, `<LAB_DIR>history.md`.
-State: update `<LAB_DIR>history.md`, `COURSE_STATE.md` spec → ✅.
-
----
-
-### `/course-maker lab datasets N`  (Step 1b-3, optional)
-
-**Goal:** produce `<LAB_DIR>starter/datasets_info.md` — student reference for datasets.
-
-Read: `references/lab_step1b_datasets.md`.
-
-Input files: `<LAB_DIR>lab_spec.md`, `<LAB_DIR>starter/exercises.ipynb`.
-State: update `<LAB_DIR>history.md`.
-
----
-
-### `/course-maker lab tests N`  (Step 2)
-
-**Goal:** produce `tests.py`, `conftest.py`, `requirements.txt`, `README.md` in `<LAB_DIR>starter/`.
-
-Read: `references/lab_step2_tests.md` before writing anything.
-
-Input files: `<LAB_DIR>lab_spec.md`, `<LAB_DIR>starter/exercises.ipynb`,
-`labs/shared/conftest_base.py`, `labs/shared/tests_template.py`.
-State: update `<LAB_DIR>history.md`, `COURSE_STATE.md` tests → ✅.
-Commit:
+After saving:
 ```bash
 git add <LAB_DIR>starter/
 git commit -m "lab N: add tests and conftest"
 ```
 
----
+### `/course-maker lab validate N <student_id>`
+Read: `references/lab_step3_validate.md`.
 
-### `/course-maker lab validate N <student_id>`  (Step 3)
-
-Read: `references/lab_step3_validate.md` for the full validation protocol.
-
-**CRITICAL rules — apply regardless of whether the reference file was read:**
-- Do NOT read `history.md` before or during the student simulation — a real student has no access to prior validation records
-- Do NOT open `tests.py`, `conftest.py`, or `tests_template.py` until all tasks are complete
-- Download the dataset from the source in Block 0 of `exercises.ipynb` — never invent or skip data
-- After all tasks: run `jupyter nbconvert --to python exercises.ipynb && pytest tests.py -v`; show full output
-
-**Before starting:** check `git status <LAB_DIR>starter/` — if there are uncommitted changes,
-stop and ask the user to commit first. The notebook will be modified during validation;
-without a clean commit there is no way to restore the original.
-
-Show the isolation warning and stop: ask the user to run `/clear` (or open a new session)
-before proceeding, since the current context contains lab_spec.md and tests.py from prior steps.
-If proceeding: simulate student solving `<LAB_DIR>starter/exercises.ipynb` for `Student_ID = <student_id>`.
-
-**After validation:**
-1. Ask the user whether to save the solution — if yes, create a new branch, commit the
-   solved notebook there, then return to the previous branch (`git checkout -`).
-2. Run `git restore <LAB_DIR>starter/exercises.ipynb` to remove student solutions from the working copy.
-State: update `<LAB_DIR>history.md`, `COURSE_STATE.md` validated → ✅ or ⚠️.
-
----
+**CRITICAL — see also Inviolable rules above. Highlights:**
+- Show the isolation warning, stop, wait for the user to confirm `/clear`.
+- Check `git status <LAB_DIR>starter/`; stop with commit-first message if dirty.
+- Do NOT read `history.md`, `lab_spec.md`, `tests.py`, `conftest.py`, or
+  `tests_template.py` until all student tasks are complete.
+- Download the dataset from the source in Block 0; never invent or skip data.
+- After all tasks: `jupyter nbconvert --to python exercises.ipynb && pytest tests.py -v`;
+  show full output.
+- After validation: ask whether to save the solution to a branch, then
+  `git restore <LAB_DIR>starter/exercises.ipynb` to remove student solutions.
 
 ### `/course-maker lab publish N`
-
-Read `CLAUDE.md` → `## Lab context` to get GHC org and repo naming.
-
-**Step 1 — push to starter repo (git subtree):**
-```bash
-# Get url from CLAUDE.md Lab context → Starter repos table for lab N
-git subtree push --prefix=<LAB_DIR>starter <url> main
-```
-
-**Step 2 — sync GHC repo via gh API:**
-Read `CLAUDE.md` to find GHC repo name for lab N.
-For each student-facing file in `<LAB_DIR>starter/`:
-`exercises.ipynb`, `conftest.py`, `tests.py`, `requirements.txt`,
-`README.md`, `datasets_info.md` (if exists), `.github/workflows/tests.yaml`
-
-Run for each file:
-```bash
-SHA=$(gh api repos/$GHC_REPO/contents/$FILE --jq '.sha // empty' 2>/dev/null)
-CONTENT=$(base64 < <LAB_DIR>starter/$FILE)
-if [ -n "$SHA" ]; then
-  gh api repos/$GHC_REPO/contents/$FILE --method PUT \
-    --field message="sync: lab N update" \
-    --field content="$CONTENT" \
-    --field sha="$SHA"
-else
-  gh api repos/$GHC_REPO/contents/$FILE --method PUT \
-    --field message="sync: lab N initial publish" \
-    --field content="$CONTENT"
-fi
-```
-
-Note: `lab_spec.md` and `history.md` are explicitly NOT in the sync list.
-
-**Step 3 — update course repo:**
-```bash
-git add <LAB_DIR>
-git commit -m "lab N: publish"
-git push
-```
-
-**Step 4 — update state:**
-- Update `COURSE_STATE.md`: published → ✅
-- Append to `<LAB_DIR>history.md`:
-  ```markdown
-  ## [YYYY-MM-DD] Published
-
-  **Starter repo:** <url>
-  **GHC repo:** <ghc_repo>
-  **Files synced:** exercises.ipynb, conftest.py, tests.py, requirements.txt, README.md, ...
-  ```
-
----
+Read: `references/lab_publish.md`.
 
 ### `/course-maker lab update N`
 
-Use when a lab needs to be updated AFTER publishing (fix tests, fix notebook).
+Use when a lab needs to be updated AFTER publishing.
 
 1. Make needed changes in `<LAB_DIR>starter/`.
-2. Run `/course-maker lab validate N <student_id>` to verify fix doesn't break correct solutions.
-3. Run `/course-maker lab publish N` to sync changes.
-4. Append to `<LAB_DIR>history.md`:
-   ```markdown
-   ## [YYYY-MM-DD] Post-publish update
-
-   **Changed:** <files>
-   **Reason:** <why update was needed>
-   **Validated:** Student_ID=<N>
-   ```
-5. Update `COURSE_STATE.md`: set validated → 🔄 if re-validation needed.
-
----
-
-### `/course-maker lab reverse-spec N`
-
-Use when you have an existing `exercises.ipynb` but no `lab_spec.md`.
-Generates the spec from the notebook. Pipeline continues with `/course-maker lab tests N`.
-
-Read: `references/lab_reverse_spec.md`.
-
-Input files: `<LAB_DIR>starter/exercises.ipynb`, `<LAB_DIR>history.md` (if exists).
-Output: `<LAB_DIR>lab_spec.md` + deviations report.
-State: update `<LAB_DIR>history.md`, `COURSE_STATE.md` spec → ✅.
-
----
+2. Run `/course-maker lab validate N <student_id>` to verify the fix.
+3. Run `/course-maker lab publish N` to sync.
+4. Append post-publish-update entry to `<LAB_DIR>history.md`.
+5. `COURSE_STATE.md`: set validated → 🔄 if re-validation needed.
 
 ### `/course-maker lab status N`
 
-Print:
-1. Row from `COURSE_STATE.md` Labs table for lab N (including `Dir`).
-2. Last 3 entries from `<LAB_DIR>history.md`.
-3. Any ⚠️ warnings with explanation.
-
----
-
-## General rules
-
-- **Never skip reading `history.md`** before starting a step. If it doesn't
-  exist yet, create it when writing the first output.
-- **Peer review on every output.** Present the result, wait for explicit
-  approval or feedback before saving to the file and updating state.
-- **Detect manual edits.** At the start of Steps 2–5, check if the prerequisite
-  file was manually edited since the last pipeline run (via git diff or
-  by asking). If yes, log it in `history.md` before proceeding.
-- **One step at a time.** Don't auto-advance to the next step after approval.
-  Wait for the user to issue the next command.
-- **COURSE_STATE.md is always up to date.** Update it at the end of every
-  command, even if the step is only partially done.
-- **Always use the full invocation form when suggesting next commands.**
-  Never suggest short-form commands like `/lecture visuals N` or `/lab tests N` —
-  they produce "unknown command" errors. Always write the full form:
-  `/course-maker visuals N`, `/course-maker lab tests N`, etc.
+Print: row from `COURSE_STATE.md` Labs table for lab N (including `Dir`),
+last 3 entries from `<LAB_DIR>history.md`, any ⚠️ warnings.
