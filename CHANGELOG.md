@@ -1,5 +1,55 @@
 # Changelog
 
+## [2026-06-14] — Improvement wave 6 (QoL & observability)
+
+Scope decisions for this wave (from design discussion): the lock-file step was
+**dropped** (single-user git-backed repo; a stale `.lock` from a crashed session
+causes more harm than the rare concurrent-run it prevents), and `history.md`
+compaction was **deferred** (no real large `history.md` exists to design against;
+folding it on spec risks losing the rejected-ideas memory that is its whole
+value). `doctor` is **read-only** this iteration — it reports and names the fix
+command, never edits.
+
+### Added
+
+**`scripts/validate_state.py`** — the skill's first executable artifact. Facts
+layer for drift detection: parses `COURSE_STATE.md` and cross-checks every `✅`
+status against the artifact that should exist on disk. Lenient Markdown parser
+(maps columns by header name, agnostic to order/spacing), pure stdlib. Findings
+are prefixed `DRIFT` (done but missing) / `STALE` (figures older than
+`figures.py`) / `UNTRACKED` (artifact exists, status ❌) / `SKIP` (unparseable
+row). Exit code 1 on drift/stale so it is usable standalone in external CI. The
+step→file mapping is kept in sync with `references/repository_layout.md`.
+
+**`/course-maker doctor`** (`references/doctor.md`) — read-only diagnostic.
+Step 1 runs `validate_state.py` (mechanical facts). Step 2 adds semantic checks
+Claude does itself: leftover `<!-- TODO -->` in `course_plan.md`,
+profile↔`lms_adapter.md` consistency, presence of generated config files
+(`course_conventions.md`, `slides_preamble.tex`, `lab_templates.md`). Step 3
+reports each finding with the exact command that fixes it. The split — script
+for deterministic facts, instructions for judgement — is the deliberate hybrid
+chosen for this wave.
+
+**`/course-maker stats`** (`references/stats.md`) — read-only progress bars.
+Planned totals from `course_plan.md` (Overview/Sessions + per-lecture estimated
+time); completion from `COURSE_STATE.md` (lecture complete = all 5 steps ✅, lab
+complete = tests+validated+published ✅). 10-cell bars per pipeline, optional
+hours line, in-progress list; flags plan/state count mismatches toward `doctor`.
+
+### Changed
+
+**Slides stale-figure guard** (`references/step4_slides.md`, `SKILL.md`). The
+slides step now lists PNGs *with timestamps* and warns when any PNG is older
+than `figures.py` (figures may be out of date), offering to re-run
+`/course-maker figures N` first. A warning, not a hard block. Same fact the
+`validate_state.py` `STALE` finding surfaces, applied inline at slide time.
+
+**`SKILL.md`**: `doctor` and `stats` added to the command table and as thin
+dispatchers (now 299 lines — still under the 300 target, but tight; the next
+addition should prompt extracting something).
+
+---
+
 ## [2026-06-13] — Improvement waves 1–3
 
 ### Added
