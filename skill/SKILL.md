@@ -106,6 +106,7 @@ file you did or did not read. Violating any of them is a hard error.
 | `/course-maker course status` | Show status of all lectures/labs |
 | `/course-maker course update` | Detect manual plan changes, flag affected lectures |
 | `/course-maker doctor` | Check course for state drift, missing files, config gaps (read-only) |
+| `/course-maker stats` | Show course progress bars (lectures/labs complete, hours) |
 | `/course-maker plan N` | Step 1 — detailed slide-by-slide plan for lecture N |
 | `/course-maker visuals N` | Step 2 — list of visualizations, TikZ feasibility |
 | `/course-maker figures N` | Step 3 — Python script to generate PNG figures |
@@ -163,6 +164,10 @@ Read: `references/doctor.md`. Read-only: runs `scripts/validate_state.py` for th
 facts layer, adds semantic checks (plan TODOs, profile/adapter consistency,
 generated config files), and reports each finding with the command that fixes
 it. Never edits files.
+
+### `/course-maker stats`
+Read: `references/stats.md`. Read-only: progress bars across pipelines from
+`course_plan.md` (planned totals) and `COURSE_STATE.md` (completion).
 
 ### `/course-maker plan N` (Step 1)
 Read: `references/step1_plan.md`.
