@@ -1,0 +1,67 @@
+# /course-maker doctor
+
+Diagnose a course for state drift, missing files, and configuration gaps.
+
+**Read-only.** Doctor never edits files or fixes anything — it reports findings
+and names the command that fixes each one. The user decides what to act on.
+
+## Step 1 — facts layer (mechanical)
+
+Run the drift checker from the course root and show its raw output:
+
+```bash
+python ~/.claude/skills/course-maker/scripts/validate_state.py
+```
+
+(If the skill is installed elsewhere, use that path. The script reads
+`COURSE_STATE.md` and cross-checks every `✅` status against the artifact that
+should exist on disk.) It prints findings prefixed `DRIFT` / `STALE` /
+`UNTRACKED` / `SKIP` and an `OK` summary line. Reproduce its output verbatim,
+then translate each finding into a fix in Step 3.
+
+## Step 2 — semantic checks (judgement)
+
+These need reading intent and cannot be done by the script. Check each:
+
+1. **Leftover plan TODOs.** `grep -n "<!-- TODO -->" course_plan.md`. Each hit
+   is an unfilled section → `/course-maker course plan`.
+2. **Profile ↔ adapter consistency.**
+   - Read `CLAUDE.md` → `## Course context` → `Profile:` (default `local-zip`
+     if absent).
+   - Confirm `lms_adapter.md` exists in the course root.
+   - If `Profile:` names a profile but `lms_adapter.md` is missing, or the
+     adapter does not match the named profile → `/course-maker lab course-init`.
+3. **Generated config files present.** These are referenced by later steps;
+   flag any that are missing:
+   - `course_conventions.md`, `slides_preamble.tex` → `/course-maker course init`
+   - `lab_templates.md` → `/course-maker lab course-init`
+
+## Step 3 — remediation report
+
+Print one section per category. For every finding, name the exact command that
+fixes it. Example shape:
+
+```
+Course doctor — <course name>
+
+State drift (from validate_state.py):
+  ✗ lectures/02 figures: marked ✅ but no PNG       → /course-maker figures 2
+  ⚠ lectures/05 figures: PNGs older than figures.py → /course-maker figures 5
+  ℹ lectures/07 slides: file exists, status ❌       → re-run /course-maker slides 7
+                                                       or correct COURSE_STATE.md
+
+Plan:
+  ✗ course_plan.md has 2 unfilled TODO sections      → /course-maker course plan
+
+Config:
+  ✓ course_conventions.md, slides_preamble.tex, lab_templates.md present
+  ✓ Profile 'github-classroom' matches lms_adapter.md
+
+Summary: 1 drift, 1 stale, 1 untracked, 1 plan gap. No config issues.
+```
+
+Map severities: `DRIFT` and missing files → ✗; `STALE` → ⚠; `UNTRACKED` and
+informational notes → ℹ; passing checks → ✓.
+
+Do not modify any file. End by reminding the user that doctor only reports —
+they run the suggested commands themselves.

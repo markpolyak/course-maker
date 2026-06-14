@@ -4,8 +4,13 @@
 
 1. `lectures/NN/plan.md` — slide titles, content, timing
 2. `lectures/NN/visuals.md` — which figures are TikZ vs PNG
-3. `ls lectures/NN/figures/*.png` — list of actually existing PNG files
+3. `ls -l lectures/NN/figures/*.png lectures/NN/figures/figures.py` — list of
+   actually existing PNG files, with timestamps.
    **Only reference PNG files that exist. Never reference a file not in this list.**
+   **Staleness check:** if any PNG is older than `figures.py`, the figures may
+   be out of date (the script changed after they were generated). Warn the user
+   and offer to re-run `/course-maker figures N` before generating slides. This
+   is a warning, not a hard block — proceed if the user confirms the PNGs are fine.
 4. `lectures/NN/history.md` — previous layout issues and fixes
 5. `course_conventions.md` (course root) — terminology dictionary and language rules
 6. `slides_preamble.tex` (course root) — LaTeX preamble to use verbatim

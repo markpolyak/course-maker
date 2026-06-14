@@ -105,6 +105,7 @@ file you did or did not read. Violating any of them is a hard error.
 | `/course-maker course plan` | Create, fill, or update course_plan.md (interactive) |
 | `/course-maker course status` | Show status of all lectures/labs |
 | `/course-maker course update` | Detect manual plan changes, flag affected lectures |
+| `/course-maker doctor` | Check course for state drift, missing files, config gaps (read-only) |
 | `/course-maker plan N` | Step 1 — detailed slide-by-slide plan for lecture N |
 | `/course-maker visuals N` | Step 2 — list of visualizations, TikZ feasibility |
 | `/course-maker figures N` | Step 3 — Python script to generate PNG figures |
@@ -157,6 +158,12 @@ Use when `course_plan.md` was edited manually (outside the skill).
 3. Update `COURSE_STATE.md`.
 4. Report: which sections changed, which materials are now ⚠️ and why.
 
+### `/course-maker doctor`
+Read: `references/doctor.md`. Read-only: runs `scripts/validate_state.py` for the
+facts layer, adds semantic checks (plan TODOs, profile/adapter consistency,
+generated config files), and reports each finding with the command that fixes
+it. Never edits files.
+
 ### `/course-maker plan N` (Step 1)
 Read: `references/step1_plan.md`.
 **Input:** `course_plan.md` (lecture N section), `lectures/NN/history.md`,
@@ -189,6 +196,8 @@ Read: `references/step4_slides.md`.
 - Use `slides_preamble.tex` from the course root verbatim. If missing, stop
   and tell the user to run `/course-maker course init`.
 - Only reference PNG files that actually exist in `lectures/NN/figures/`.
+- If any PNG is older than `figures.py`, warn that figures may be stale and
+  offer to re-run `/course-maker figures N` first. Warning, not a hard block.
 
 **Resuming:** `/course-maker slides N next` reads `slides.tex`, finds the last
 completed slide, continues from there (auto-chains remaining chunks).
