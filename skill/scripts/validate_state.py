@@ -108,6 +108,11 @@ def find_section(lines, name):
     return None
 
 
+def all_headings(lines):
+    """All `## ...` heading texts present in the file, in order."""
+    return [line.strip()[3:].strip() for line in lines if line.strip().startswith("## ")]
+
+
 def col_index(header, name):
     """Index of the column whose header equals `name`, or None."""
     for idx, col in enumerate(header):
@@ -225,6 +230,19 @@ def main():
         if header:
             n_labs = len(rows)
             check_labs(root, header, rows, findings)
+
+    # Loud guard against a blind run: if no recognized rows were checked, the
+    # status table is empty or uses section headings this script does not know.
+    # Reporting a reassuring "OK ... 0 checked" would be a false all-clear — the
+    # whole point of the checker is to NOT give false comfort.
+    if n_lectures == 0 and n_labs == 0:
+        headings = all_headings(lines)
+        found = ", ".join(headings) if headings else "(no ## sections)"
+        print("BLIND     COURSE_STATE.md      — no '## Lectures' or '## Labs' "
+              "rows recognized; nothing was checked")
+        print(f"          sections present: {found}")
+        print("OK        0 lectures, 0 labs checked; blind run (no false all-clear)")
+        return 1
 
     for severity, loc, msg in findings:
         print(f"{severity:<9} {loc:<20} — {msg}")

@@ -19,6 +19,16 @@ should exist on disk.) It prints findings prefixed `DRIFT` / `STALE` /
 `UNTRACKED` / `SKIP` and an `OK` summary line. Reproduce its output verbatim,
 then translate each finding into a fix in Step 3.
 
+**Blind-run check (do not skip).** A `BLIND` finding, or a summary line that
+says `0 lectures, 0 labs checked`, means the script checked nothing — the
+`## Lectures` / `## Labs` headings it understands were not found. Do NOT report
+this as "no drift". Report it as a hard finding: the script's known sections
+do not match this course's `COURSE_STATE.md` (the `sections present:` line lists
+what is actually there, e.g. `Seminars`, `Homework`). The checker only covers
+the lecture and lab pipelines; sessions tracked under other headings are not
+verified. Say so explicitly so the clean-looking result is never mistaken for
+an all-clear.
+
 ## Step 2 — semantic checks (judgement)
 
 These need reading intent and cannot be done by the script. Check each:
