@@ -129,15 +129,23 @@ def newest_mtime(paths):
     return max((p.stat().st_mtime for p in paths), default=0.0)
 
 
-def check_lectures(root, header, rows, findings):
+def check_lecture_like(root, subdir, header, rows, findings):
+    """
+    Check a section whose items carry the lecture presentation artifacts
+    (plan/visuals/figures/slides/notes), each living in <subdir>/<id>/. Used for
+    both `## Lectures` (subdir "lectures") and `## Seminars` (subdir "seminars"):
+    a seminar may have the same prepared deck as a lecture. Its practical part
+    varies by course and is not file-checked here. Columns the parser does not
+    recognize (e.g. a practice/demo column) are ignored, not flagged.
+    """
     id_idx = col_index(header, "#")
     for row in rows:
         lec_id = cell(row, id_idx).strip()
         if not lec_id:
-            findings.append(("SKIP", "lectures", "row has no # value"))
+            findings.append(("SKIP", subdir, "row has no # value"))
             continue
-        lec_dir = root / "lectures" / lec_id
-        loc = f"lectures/{lec_id}"
+        lec_dir = root / subdir / lec_id
+        loc = f"{subdir}/{lec_id}"
 
         # Simple file-backed steps.
         for step, rel in LECTURE_FILE_STEPS.items():
@@ -215,13 +223,15 @@ def main():
     lines = state.read_text(encoding="utf-8").splitlines()
     findings = []
 
-    lec_start = find_section(lines, "Lectures")
     n_lectures = 0
-    if lec_start is not None:
-        header, rows = parse_section(lines, lec_start + 1)
+    for section, subdir in (("Lectures", "lectures"), ("Seminars", "seminars")):
+        start = find_section(lines, section)
+        if start is None:
+            continue
+        header, rows = parse_section(lines, start + 1)
         if header:
-            n_lectures = len(rows)
-            check_lectures(root, header, rows, findings)
+            n_lectures += len(rows)
+            check_lecture_like(root, subdir, header, rows, findings)
 
     lab_start = find_section(lines, "Labs")
     n_labs = 0
@@ -238,10 +248,10 @@ def main():
     if n_lectures == 0 and n_labs == 0:
         headings = all_headings(lines)
         found = ", ".join(headings) if headings else "(no ## sections)"
-        print("BLIND     COURSE_STATE.md      — no '## Lectures' or '## Labs' "
-              "rows recognized; nothing was checked")
+        print("BLIND     COURSE_STATE.md      — no '## Lectures', '## Seminars', "
+              "or '## Labs' rows recognized; nothing was checked")
         print(f"          sections present: {found}")
-        print("OK        0 lectures, 0 labs checked; blind run (no false all-clear)")
+        print("OK        0 items checked; blind run (no false all-clear)")
         return 1
 
     for severity, loc, msg in findings:
@@ -249,7 +259,7 @@ def main():
 
     failing = sum(1 for s, _, _ in findings if s in ("DRIFT", "STALE"))
     other = len(findings) - failing
-    print(f"OK        {n_lectures} lectures, {n_labs} labs checked; "
+    print(f"OK        {n_lectures} lecture/seminar, {n_labs} labs checked; "
           f"{failing} drift/stale, {other} other")
     return 1 if failing else 0
 

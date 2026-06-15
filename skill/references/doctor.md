@@ -20,14 +20,15 @@ should exist on disk.) It prints findings prefixed `DRIFT` / `STALE` /
 then translate each finding into a fix in Step 3.
 
 **Blind-run check (do not skip).** A `BLIND` finding, or a summary line that
-says `0 lectures, 0 labs checked`, means the script checked nothing — the
-`## Lectures` / `## Labs` headings it understands were not found. Do NOT report
-this as "no drift". Report it as a hard finding: the script's known sections
-do not match this course's `COURSE_STATE.md` (the `sections present:` line lists
-what is actually there, e.g. `Seminars`, `Homework`). The checker only covers
-the lecture and lab pipelines; sessions tracked under other headings are not
-verified. Say so explicitly so the clean-looking result is never mistaken for
-an all-clear.
+says `0 items checked`, means the script checked nothing — the `## Lectures` /
+`## Seminars` / `## Labs` headings it understands were not found. Do NOT report
+this as "no drift". Report it as a hard finding: the script's known sections do
+not match this course's `COURSE_STATE.md` (the `sections present:` line lists
+what is actually there, e.g. `Homework`). The checker covers `## Lectures`,
+`## Seminars` (checked the same way as lectures — presentation artifacts in
+`seminars/NN/`; a seminar's practical part is not file-checked), and `## Labs`;
+sessions tracked under other headings are not verified. Say so explicitly so the
+clean-looking result is never mistaken for an all-clear.
 
 ## Step 2 — semantic checks (judgement)
 
