@@ -107,6 +107,17 @@ are published according to the LMS workflow in `<course-root>/lms_adapter.md`.
 Legend: ✅ done · 🔄 in progress · ❌ not started · ⚠️ needs review
 ```
 
+**Structural vocabulary is always English, regardless of course language.**
+Section headings (`## Lectures`, `## Seminars`, `## Labs`), column names
+(`plan`, `visuals`, `figures`, `slides`, `notes`, `notebook`, `spec`, `tests`,
+`validated`, `published`, `#`, `Dir`, `Title`, `Updated`), and the status legend
+are language-neutral keys. Only cell *content* (titles) is in the course
+language. This keeps the file machine-readable across all courses — the drift
+checker (`scripts/validate_state.py`) matches these exact English keys. Do not
+translate or merge them (e.g. no `## Семинары / Лекции`): use separate
+`## Lectures` and `## Seminars` sections with English column headers, and put
+the Russian/other-language titles in the `Title` column.
+
 Mark a step ⚠️ (needs review) when:
 - `course_plan.md` was updated and this lecture's content may be affected.
 - The user manually edited a file without going through the pipeline.

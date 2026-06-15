@@ -30,6 +30,13 @@ what is actually there, e.g. `Homework`). The checker covers `## Lectures`,
 sessions tracked under other headings are not verified. Say so explicitly so the
 clean-looking result is never mistaken for an all-clear.
 
+Common cause: `COURSE_STATE.md` uses translated or merged headings (e.g.
+`## Семинары / Лекции`). Structural vocabulary is English-canonical (see
+`repository_layout.md`). Remediation is to conform the file — split into
+separate `## Lectures` / `## Seminars` / `## Labs` sections with English column
+names, keeping titles in the course language — not merely to translate the
+heading. A combined or translated heading will not match.
+
 ## Step 2 — semantic checks (judgement)
 
 These need reading intent and cannot be done by the script. Check each:

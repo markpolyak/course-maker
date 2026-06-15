@@ -148,6 +148,9 @@ For each file, act only if it is `missing` (skip if it already exists):
   colors, and title info before generating slides."
 
 - **`COURSE_STATE.md`** — create empty state file (header + empty Lectures table).
+  Use English structural headings and column names regardless of course language
+  (see `repository_layout.md` → "Structural vocabulary is always English"); only
+  titles go in the course language.
 
 - **Directory structure** — create only directories that do not exist yet
   (`lectures/`, `labs/`).
