@@ -21,6 +21,7 @@ that need to locate or create files.
                             a seminar has a prepared deck. What a "seminar" means
                             and how its practical part is run vary by course.
   labs/                   ← per-lab artifacts + shared/ templates
+  tests/                  ← per-test artifacts (quizzes / exams)
 ```
 
 ---
@@ -82,6 +83,27 @@ are published according to the LMS workflow in `<course-root>/lms_adapter.md`.
 
 ---
 
+## Tests
+
+```
+tests/
+  01/
+    test_plan.md        ← plan: header, type legend, structure (Step 1 output)
+    test_questions.md   ← canonical question bank, answers inline (Step 2 output);
+                          instructor-only — doubles as the answer key
+    test_student.md     ← exported student-facing version, answers stripped
+                          (Step 3 output; or test_variant_<letter>.md per variant)
+    history.md          ← decision log, same role as lectures/NN/history.md
+  02/
+    ...
+```
+
+**Instructor-only vs student-facing.** `test_questions.md`, `test_plan.md`, and
+`history.md` are NOT given to students — the bank holds the answers. Only the
+exported `test_student.md` / `test_variant_*.md` are handed out.
+
+---
+
 ## State files
 
 ### `COURSE_STATE.md`
@@ -104,19 +126,26 @@ are published according to the LMS workflow in `<course-root>/lms_adapter.md`.
 |---|-----|-------|------|----------|------|-------|-----------|-----------|---------|
 | 01 | lab1-backprop | Backpropagation | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | — |
 
+## Tests
+
+| # | Title | plan | questions | published | Updated |
+|---|-------|------|-----------|-----------|---------|
+| 01 | Midterm | ❌ | ❌ | ❌ | — |
+
 Legend: ✅ done · 🔄 in progress · ❌ not started · ⚠️ needs review
 ```
 
 **Structural vocabulary is always English, regardless of course language.**
-Section headings (`## Lectures`, `## Seminars`, `## Labs`), column names
-(`plan`, `visuals`, `figures`, `slides`, `notes`, `notebook`, `spec`, `tests`,
-`validated`, `published`, `#`, `Dir`, `Title`, `Updated`), and the status legend
+Section headings (`## Lectures`, `## Seminars`, `## Labs`, `## Tests`), column
+names (`plan`, `visuals`, `figures`, `slides`, `notes`, `notebook`, `spec`,
+`tests`, `questions`, `validated`, `published`, `#`, `Dir`, `Title`, `Updated`),
+and the status legend
 are language-neutral keys. Only cell *content* (titles) is in the course
 language. This keeps the file machine-readable across all courses — the drift
 checker (`scripts/validate_state.py`) matches these exact English keys. Do not
-translate or merge them (e.g. no `## Семинары / Лекции`): use separate
-`## Lectures` and `## Seminars` sections with English column headers, and put
-the Russian/other-language titles in the `Title` column.
+translate or merge them: use separate `## Lectures` and `## Seminars` sections
+with English column headers, and put the course-language titles in the `Title`
+column.
 
 Mark a step ⚠️ (needs review) when:
 - `course_plan.md` was updated and this lecture's content may be affected.

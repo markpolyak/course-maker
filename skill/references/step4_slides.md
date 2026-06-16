@@ -132,7 +132,7 @@ Before finalizing, mentally check each slide:
 Always include:
 - Title slide: `\begin{frame}\titlepage\end{frame}`
 - Outline slide after title: `\begin{frame}{<outline title in course language>}\tableofcontents\end{frame}`
-  (e.g. "Outline" in English, "План лекции" in Russian — translate to course language)
+  (e.g. "Outline" in English — translate to course language)
 - Closing slide: summary of key takeaways. A single mention of the next lecture topic is allowed here if it flows naturally — but not required.
 
 ## Forward reference rules (strictly enforced)

@@ -26,12 +26,13 @@ this as "no drift". Report it as a hard finding: the script's known sections do
 not match this course's `COURSE_STATE.md` (the `sections present:` line lists
 what is actually there, e.g. `Homework`). The checker covers `## Lectures`,
 `## Seminars` (checked the same way as lectures — presentation artifacts in
-`seminars/NN/`; a seminar's practical part is not file-checked), and `## Labs`;
-sessions tracked under other headings are not verified. Say so explicitly so the
-clean-looking result is never mistaken for an all-clear.
+`seminars/NN/`; a seminar's practical part is not file-checked), `## Labs`, and
+`## Tests`; sessions tracked under other headings are not verified. Say so
+explicitly so the clean-looking result is never mistaken for an all-clear.
 
-Common cause: `COURSE_STATE.md` uses translated or merged headings (e.g.
-`## Семинары / Лекции`). Structural vocabulary is English-canonical (see
+Common cause: `COURSE_STATE.md` uses translated headings, or merges two session
+types into one section, instead of the English keys. Structural vocabulary is
+English-canonical (see
 `repository_layout.md`). Remediation is to conform the file — split into
 separate `## Lectures` / `## Seminars` / `## Labs` sections with English column
 names, keeping titles in the course language — not merely to translate the

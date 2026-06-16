@@ -53,6 +53,13 @@ LAB_FILE_STEPS = {
     "tests": ["starter/tests.py", "starter/conftest.py"],
 }
 
+# Test step column -> path (relative to tests/<id>/) that must exist when done.
+TEST_FILE_STEPS = {
+    "plan": "test_plan.md",
+    "questions": "test_questions.md",
+    "published": "test_student.md",
+}
+
 
 def split_row(line):
     """Split a Markdown table row into stripped cells."""
@@ -208,6 +215,33 @@ def check_labs(root, header, rows, findings):
                     findings.append(("DRIFT", loc, f"{step}: marked ✅ but missing {', '.join(missing)}"))
 
 
+def check_tests(root, header, rows, findings):
+    id_idx = col_index(header, "#")
+    for row in rows:
+        test_id = cell(row, id_idx).strip()
+        if not test_id:
+            findings.append(("SKIP", "tests", "row has no # value"))
+            continue
+        test_dir = root / "tests" / test_id
+        loc = f"tests/{test_id}"
+        for step, rel in TEST_FILE_STEPS.items():
+            idx = col_index(header, step)
+            if idx is None:
+                continue
+            mark = status_of(cell(row, idx))
+            if mark != DONE:
+                continue
+            # "published" is satisfied by the pooled export or any per-variant file.
+            if step == "published":
+                exported = (test_dir / "test_student.md").exists() or bool(
+                    sorted(test_dir.glob("test_variant_*.md")))
+                if not exported:
+                    findings.append(("DRIFT", loc, "published: marked ✅ but no "
+                                                   "test_student.md or test_variant_*.md"))
+            elif not (test_dir / rel).exists():
+                findings.append(("DRIFT", loc, f"{step}: marked ✅ but {rel} is missing"))
+
+
 def main():
     parser = argparse.ArgumentParser(description="Cross-check COURSE_STATE.md against on-disk artifacts.")
     parser.add_argument("--root", default=".", help="Course root (default: current directory)")
@@ -241,15 +275,23 @@ def main():
             n_labs = len(rows)
             check_labs(root, header, rows, findings)
 
+    test_start = find_section(lines, "Tests")
+    n_tests = 0
+    if test_start is not None:
+        header, rows = parse_section(lines, test_start + 1)
+        if header:
+            n_tests = len(rows)
+            check_tests(root, header, rows, findings)
+
     # Loud guard against a blind run: if no recognized rows were checked, the
     # status table is empty or uses section headings this script does not know.
     # Reporting a reassuring "OK ... 0 checked" would be a false all-clear — the
     # whole point of the checker is to NOT give false comfort.
-    if n_lectures == 0 and n_labs == 0:
+    if n_lectures == 0 and n_labs == 0 and n_tests == 0:
         headings = all_headings(lines)
         found = ", ".join(headings) if headings else "(no ## sections)"
         print("BLIND     COURSE_STATE.md      — no '## Lectures', '## Seminars', "
-              "or '## Labs' rows recognized; nothing was checked")
+              "'## Labs', or '## Tests' rows recognized; nothing was checked")
         print(f"          sections present: {found}")
         print("OK        0 items checked; blind run (no false all-clear)")
         return 1
@@ -259,8 +301,8 @@ def main():
 
     failing = sum(1 for s, _, _ in findings if s in ("DRIFT", "STALE"))
     other = len(findings) - failing
-    print(f"OK        {n_lectures} lecture/seminar, {n_labs} labs checked; "
-          f"{failing} drift/stale, {other} other")
+    print(f"OK        {n_lectures} lecture/seminar, {n_labs} labs, {n_tests} tests "
+          f"checked; {failing} drift/stale, {other} other")
     return 1 if failing else 0
 
 
