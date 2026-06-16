@@ -149,15 +149,7 @@ Read: `references/course_init.md`.
 Read: `references/course_plan.md`.
 
 ### `/course-maker course update`
-
-Use when `course_plan.md` was edited manually (outside the skill).
-
-1. Run `git diff course_plan.md` to detect changes.
-2. For every lecture or lab whose content changed in the diff:
-   - Mark affected columns as ⚠️ in `COURSE_STATE.md`.
-   - Append a note to `history.md`.
-3. Update `COURSE_STATE.md`.
-4. Report: which sections changed, which materials are now ⚠️ and why.
+Read: `references/course_update.md`.
 
 ### `/course-maker doctor`
 Read: `references/doctor.md`. Read-only: runs `scripts/validate_state.py` for the
@@ -284,14 +276,7 @@ Read: `references/lab_step3_validate.md`.
 Read: `references/lab_publish.md`.
 
 ### `/course-maker lab update N`
-
-Use when a lab needs to be updated AFTER publishing.
-
-1. Make needed changes in `<LAB_DIR>starter/`.
-2. Run `/course-maker lab validate N <student_id>` to verify the fix.
-3. Run `/course-maker lab publish N` to sync.
-4. Append post-publish-update entry to `<LAB_DIR>history.md`.
-5. `COURSE_STATE.md`: set validated → 🔄 if re-validation needed.
+Read: `references/lab_update.md`.
 
 ### `/course-maker lab status N`
 
