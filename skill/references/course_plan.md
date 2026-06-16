@@ -32,7 +32,7 @@ Ask the user to choose (one message):
 
 Accept either a file path or pasted content. Read it fully, then extract:
 
-- Session list: types (lecture, seminar, lab, test, homework, other), titles,
+- Session list: types (lecture, seminar, lab, quiz, homework, other), titles,
   week/order
 - Per-lecture topics (bullet lists, numbered lists, or prose)
 - Lab assignments mentioned
@@ -119,7 +119,7 @@ Save after each section approved.
 ## Overview
 
 **Weeks:** {N}  **Lectures:** {N}  **Seminars:** {N}  **Labs:** {N}
-**Tests:** {N}  **Standard duration:** {time} min
+**Quizzes:** {N}  **Standard duration:** {time} min
 
 ## Sessions
 
@@ -129,7 +129,7 @@ Save after each section approved.
 | 2 | 1 | Seminar | Practice: HMM basics | no pipeline |
 | 3 | 2 | Lecture | Forward algorithm | |
 | 4 | 2 | Lab | Lab 1 — HMM from scratch | |
-| 5 | 4 | Test | Midterm | no pipeline |
+| 5 | 4 | Quiz | Midterm | quizzes/01/ |
 | 6 | 5 | Homework | HW 1 — Viterbi | no pipeline |
 
 ## Lectures
@@ -174,7 +174,8 @@ Save after each section approved.
 - Every session of every type appears in the table — even those without a pipeline.
 - Sessions without a skill pipeline are marked `no pipeline` in Notes.
 - Labs managed by the lab pipeline are marked with the lab directory in Notes
-  (e.g. `labs/lab1/`).
+  (e.g. `labs/lab1/`); quizzes managed by the quiz pipeline likewise (e.g.
+  `quizzes/01/`).
 - Row order = chronological order of sessions.
 
 **Rules for the Lectures section:**

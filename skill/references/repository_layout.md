@@ -21,7 +21,7 @@ that need to locate or create files.
                             a seminar has a prepared deck. What a "seminar" means
                             and how its practical part is run vary by course.
   labs/                   ← per-lab artifacts + shared/ templates
-  tests/                  ← per-test artifacts (quizzes / exams)
+  quizzes/                ← per-quiz artifacts (tests / exams)
 ```
 
 ---
@@ -83,24 +83,24 @@ are published according to the LMS workflow in `<course-root>/lms_adapter.md`.
 
 ---
 
-## Tests
+## Quizzes
 
 ```
-tests/
+quizzes/
   01/
-    test_plan.md        ← plan: header, type legend, structure (Step 1 output)
-    test_questions.md   ← canonical question bank, answers inline (Step 2 output);
+    quiz_plan.md        ← plan: header, type legend, structure (Step 1 output)
+    quiz_questions.md   ← canonical question bank, answers inline (Step 2 output);
                           instructor-only — doubles as the answer key
-    test_student.md     ← exported student-facing version, answers stripped
-                          (Step 3 output; or test_variant_<letter>.md per variant)
+    quiz_student.md     ← exported student-facing version, answers stripped
+                          (Step 3 output; or quiz_variant_<letter>.md per variant)
     history.md          ← decision log, same role as lectures/NN/history.md
   02/
     ...
 ```
 
-**Instructor-only vs student-facing.** `test_questions.md`, `test_plan.md`, and
+**Instructor-only vs student-facing.** `quiz_questions.md`, `quiz_plan.md`, and
 `history.md` are NOT given to students — the bank holds the answers. Only the
-exported `test_student.md` / `test_variant_*.md` are handed out.
+exported `quiz_student.md` / `quiz_variant_*.md` are handed out.
 
 ---
 
@@ -126,7 +126,7 @@ exported `test_student.md` / `test_variant_*.md` are handed out.
 |---|-----|-------|------|----------|------|-------|-----------|-----------|---------|
 | 01 | lab1-backprop | Backpropagation | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | — |
 
-## Tests
+## Quizzes
 
 | # | Title | plan | questions | published | Updated |
 |---|-------|------|-----------|-----------|---------|
@@ -136,7 +136,7 @@ Legend: ✅ done · 🔄 in progress · ❌ not started · ⚠️ needs review
 ```
 
 **Structural vocabulary is always English, regardless of course language.**
-Section headings (`## Lectures`, `## Seminars`, `## Labs`, `## Tests`), column
+Section headings (`## Lectures`, `## Seminars`, `## Labs`, `## Quizzes`), column
 names (`plan`, `visuals`, `figures`, `slides`, `notes`, `notebook`, `spec`,
 `tests`, `questions`, `validated`, `published`, `#`, `Dir`, `Title`, `Updated`),
 and the status legend

@@ -4,8 +4,8 @@ description: >
   Pipeline for preparing university course materials: lecture slides, visualizations,
   Python figure scripts, LaTeX/Beamer presentations, speaker notes, and lab assignments.
   Use this skill whenever the user works on lecture or lab preparation,
-  mentions commands like /lecture, /lab, /course, or asks to prepare slides, figures,
-  speaker notes, course plans, lab notebooks, tests, or grading infrastructure.
+  mentions commands like /lecture, /lab, /course, /quiz, or asks to prepare slides, figures,
+  speaker notes, course plans, lab notebooks, quizzes/exams, or grading infrastructure.
   Also trigger when the user wants to update a course plan, check lecture/lab status,
   or continue work on a lecture or lab from a previous session.
 ---
@@ -41,8 +41,8 @@ file you did or did not read. Violating any of them is a hard error.
 - NEVER modify the grade-output format string defined in `lab_templates.md` —
   it is read by external CI. Only the numerator inside may change (add/remove
   bonus points).
-- NEVER give students `tests/NN/test_questions.md` — it holds answers. Before
-  marking a test `published`, verify the exported student file has no answer
+- NEVER give students `quizzes/NN/quiz_questions.md` — it holds answers. Before
+  marking a quiz `published`, verify the exported student file has no answer
   markers (`grep` for `✓`/answer lines returns nothing).
 
 ### Validation isolation (lab)
@@ -65,8 +65,8 @@ file you did or did not read. Violating any of them is a hard error.
   expected PNG files were created.
 - NEVER add forward references to later slides. At most one mention of the next
   lecture, only on the closing slide, only if it flows naturally.
-- Output for `slides`, `notes`, and `test generate` is ALWAYS chunked (blocks of
-  5 slides, or one test block per chunk). Never generate the entire file in one
+- Output for `slides`, `notes`, and `quiz generate` is ALWAYS chunked (blocks of
+  5 slides, or one quiz block per chunk). Never generate the entire file in one
   shot — it causes Claude Code to hang.
 
 ### Process
@@ -136,20 +136,20 @@ file you did or did not read. Violating any of them is a hard error.
 | `/course-maker lab update N` | Re-publish after post-release fix |
 | `/course-maker lab status N` | Status + last 3 history entries |
 
-**Test commands:**
+**Quiz commands** (quizzes / tests / exams):
 
 | Command | Description |
 |---|---|
-| `/course-maker test plan N` | Step 1 — interactive test plan (blocks, types, variants) |
-| `/course-maker test generate N [next]` | Step 2 — generate question bank (chunked by block) |
-| `/course-maker test publish N [format]` | Step 3 — export student-facing version (markdown) |
+| `/course-maker quiz plan N` | Step 1 — interactive quiz plan (blocks, types, variants) |
+| `/course-maker quiz generate N [next]` | Step 2 — generate question bank (chunked by block) |
+| `/course-maker quiz publish N [format]` | Step 3 — export student-facing version (markdown) |
 
 **If invoked with no arguments** (`/course-maker` alone): read `COURSE_STATE.md`
-and print a summary of all lectures, labs, and tests with their current step
+and print a summary of all lectures, labs, and quizzes with their current step
 statuses (✅ / 🔄 / ❌ / ⚠️). End with: "Run `/course-maker help` for available
 commands."
 
-**`/course-maker help`**: print the three command tables (Lecture, Lab, Test)
+**`/course-maker help`**: print the three command tables (Lecture, Lab, Quiz)
 into the chat — the user cannot see `SKILL.md` — then stop.
 
 ---
@@ -294,19 +294,19 @@ last 3 entries from `<LAB_DIR>history.md`, any ⚠️ warnings.
 
 ---
 
-## Test workflows
+## Quiz workflows
 
-A test/quiz/exam pipeline. The bank `tests/NN/test_questions.md` holds questions
-with answers inline (it is also the key); `test publish` exports a student copy
-with answers stripped. Artifacts in `tests/NN/`; state in the `## Tests` section.
+A quiz/test/exam pipeline. The bank `quizzes/NN/quiz_questions.md` holds questions
+with answers inline (it is also the key); `quiz publish` exports a student copy
+with answers stripped. Artifacts in `quizzes/NN/`; state in the `## Quizzes` section.
 See also the Inviolable rules on chunking and answer-leak.
 
-### `/course-maker test plan N` (Step 1)
-Read: `references/test_plan.md`.
+### `/course-maker quiz plan N` (Step 1)
+Read: `references/quiz_plan.md`.
 
-### `/course-maker test generate N` (Step 2)
-Read: `references/test_generate.md`. Chunked one block per chunk; resume with
-`/course-maker test generate N next`.
+### `/course-maker quiz generate N` (Step 2)
+Read: `references/quiz_generate.md`. Chunked one block per chunk; resume with
+`/course-maker quiz generate N next`.
 
-### `/course-maker test publish N [format]` (Step 3)
-Read: `references/test_publish.md`. Only `markdown` is implemented for now.
+### `/course-maker quiz publish N [format]` (Step 3)
+Read: `references/quiz_publish.md`. Only `markdown` is implemented for now.

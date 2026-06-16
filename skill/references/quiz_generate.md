@@ -1,32 +1,32 @@
-# /course-maker test generate N — Step 2
+# /course-maker quiz generate N — Step 2
 
-Generate the canonical question bank `tests/NN/test_questions.md` from
-`test_plan.md`. This file is **instructor-facing**: answers live inline. It is
-the single source of truth and doubles as the answer key. `test publish` later
+Generate the canonical question bank `quizzes/NN/quiz_questions.md` from
+`quiz_plan.md`. This file is **instructor-facing**: answers live inline. It is
+the single source of truth and doubles as the answer key. `quiz publish` later
 exports a student-facing version with answers stripped.
 
 ## Context to read first
 
-1. `tests/NN/history.md` — past iterations, rejected questions.
-2. `tests/NN/test_plan.md` — header, type legend, structure (blocks, types,
+1. `quizzes/NN/history.md` — past iterations, rejected questions.
+2. `quizzes/NN/quiz_plan.md` — header, type legend, structure (blocks, types,
    counts, weights, M variants).
 3. `course_conventions.md`, `CLAUDE.md` → `## Course context` — the bank
    **content** is written in the course language; this reference file is English.
 4. Taught lectures/seminars for the covered topics, to keep questions in scope.
 
-## Output format: `tests/NN/test_questions.md`
+## Output format: `quizzes/NN/quiz_questions.md`
 
 Follow this structure (content in the course language):
 
 ```markdown
-# <Test title>
+# <Quiz title>
 ## <Course name>
 
-**<Program / level / time / weight / numeric precision — from test_plan.md>**
+**<Program / level / time / weight / numeric precision — from quiz_plan.md>**
 
 ---
 
-## Test structure
+## Quiz structure
 | Block | Topic | Questions | Weight each |
 |-------|-------|-----------|-------------|
 | 1 | <topic> | 3 | 8% |
@@ -69,15 +69,15 @@ the numbers/data; recompute each answer. For `M = 1`, emit a single variant.
 
 A full bank is long (often 600+ lines) — generating it in one shot causes Claude
 Code to hang, exactly like slides. Generate **one block per chunk**:
-- Chunk 0 = title + header + the "Test structure" table.
+- Chunk 0 = title + header + the "Quiz structure" table.
 - Chunk K = Block K (all its questions and all their variants).
-- Append each chunk to `test_questions.md` immediately; do not pause between
-  chunks. `test generate N next` reads the file, finds the last completed block,
+- Append each chunk to `quiz_questions.md` immediately; do not pause between
+  chunks. `quiz generate N next` reads the file, finds the last completed block,
   continues from there.
 
 ## Verification and state
 
 After the last block: count questions and variants per block and confirm they
-match `test_plan.md`. Report any mismatch. On approval, append an entry to
-`tests/NN/history.md` and set `questions → ✅` in the `## Tests` section of
-`COURSE_STATE.md`. Do not auto-advance to `test publish`.
+match `quiz_plan.md`. Report any mismatch. On approval, append an entry to
+`quizzes/NN/history.md` and set `questions → ✅` in the `## Quizzes` section of
+`COURSE_STATE.md`. Do not auto-advance to `quiz publish`.

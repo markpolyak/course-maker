@@ -1,6 +1,6 @@
-# /course-maker test publish N [format] — Step 3
+# /course-maker quiz publish N [format] — Step 3
 
-Export the canonical bank `tests/NN/test_questions.md` to a student-facing
+Export the canonical bank `quizzes/NN/quiz_questions.md` to a student-facing
 artifact in a chosen format. This is **export**, distinct from `lab publish`
 (which syncs to an LMS). Default and only currently implemented format:
 `markdown`. The dispatcher is designed to grow (LaTeX, docx, Moodle JSON), but
@@ -8,16 +8,16 @@ do not implement those until asked — if an unimplemented format is requested,
 say so and stop.
 
 ```
-/course-maker test publish N            → markdown (default)
-/course-maker test publish N markdown   → markdown
-/course-maker test publish N latex|docx|moodle → not implemented yet; stop
+/course-maker quiz publish N            → markdown (default)
+/course-maker quiz publish N markdown   → markdown
+/course-maker quiz publish N latex|docx|moodle → not implemented yet; stop
 ```
 
 ## Context to read first
 
-1. `tests/NN/test_questions.md` — the canonical bank (the source).
-2. `tests/NN/test_plan.md` — variant count M and header metadata.
-3. `tests/NN/history.md`.
+1. `quizzes/NN/quiz_questions.md` — the canonical bank (the source).
+2. `quizzes/NN/quiz_plan.md` — variant count M and header metadata.
+3. `quizzes/NN/history.md`.
 
 ## Export modes
 
@@ -39,10 +39,10 @@ trace of the answer**:
 - Drop the "trick question" (⚠️) markers — they hint at the answer.
 
 Write to:
-- Pool mode: `tests/NN/test_student.md`.
-- Per-variant mode: `tests/NN/test_variant_<letter>.md` per variant.
+- Pool mode: `quizzes/NN/quiz_student.md`.
+- Per-variant mode: `quizzes/NN/quiz_variant_<letter>.md` per variant.
 
-The bank (`test_questions.md`) itself remains the answer key — do not produce a
+The bank (`quiz_questions.md`) itself remains the answer key — do not produce a
 separate key file unless asked.
 
 ## CRITICAL — answer-leak check (do not skip)
@@ -51,10 +51,10 @@ A single missed answer exposes the key to students. After writing each export
 file, verify no answer survived:
 
 ```bash
-grep -nE "✓|Answer/criteria" tests/NN/test_student.md   # must print nothing
+grep -nE "✓|Answer/criteria" quizzes/NN/quiz_student.md   # must print nothing
 ```
 
 If the count is not zero, the export is invalid: show the offending lines, fix
 the stripping, rewrite, and re-check until the grep is empty. Only then report
-success and set `published → ✅` in the `## Tests` section of `COURSE_STATE.md`;
-append an entry to `tests/NN/history.md`.
+success and set `published → ✅` in the `## Quizzes` section of `COURSE_STATE.md`;
+append an entry to `quizzes/NN/history.md`.

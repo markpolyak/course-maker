@@ -27,7 +27,7 @@ not match this course's `COURSE_STATE.md` (the `sections present:` line lists
 what is actually there, e.g. `Homework`). The checker covers `## Lectures`,
 `## Seminars` (checked the same way as lectures — presentation artifacts in
 `seminars/NN/`; a seminar's practical part is not file-checked), `## Labs`, and
-`## Tests`; sessions tracked under other headings are not verified. Say so
+`## Quizzes`; sessions tracked under other headings are not verified. Say so
 explicitly so the clean-looking result is never mistaken for an all-clear.
 
 Common cause: `COURSE_STATE.md` uses translated headings, or merges two session

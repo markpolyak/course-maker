@@ -53,11 +53,11 @@ LAB_FILE_STEPS = {
     "tests": ["starter/tests.py", "starter/conftest.py"],
 }
 
-# Test step column -> path (relative to tests/<id>/) that must exist when done.
-TEST_FILE_STEPS = {
-    "plan": "test_plan.md",
-    "questions": "test_questions.md",
-    "published": "test_student.md",
+# Quiz step column -> path (relative to quizzes/<id>/) that must exist when done.
+QUIZ_FILE_STEPS = {
+    "plan": "quiz_plan.md",
+    "questions": "quiz_questions.md",
+    "published": "quiz_student.md",
 }
 
 
@@ -215,16 +215,16 @@ def check_labs(root, header, rows, findings):
                     findings.append(("DRIFT", loc, f"{step}: marked ✅ but missing {', '.join(missing)}"))
 
 
-def check_tests(root, header, rows, findings):
+def check_quizzes(root, header, rows, findings):
     id_idx = col_index(header, "#")
     for row in rows:
-        test_id = cell(row, id_idx).strip()
-        if not test_id:
-            findings.append(("SKIP", "tests", "row has no # value"))
+        quiz_id = cell(row, id_idx).strip()
+        if not quiz_id:
+            findings.append(("SKIP", "quizzes", "row has no # value"))
             continue
-        test_dir = root / "tests" / test_id
-        loc = f"tests/{test_id}"
-        for step, rel in TEST_FILE_STEPS.items():
+        quiz_dir = root / "quizzes" / quiz_id
+        loc = f"quizzes/{quiz_id}"
+        for step, rel in QUIZ_FILE_STEPS.items():
             idx = col_index(header, step)
             if idx is None:
                 continue
@@ -233,12 +233,12 @@ def check_tests(root, header, rows, findings):
                 continue
             # "published" is satisfied by the pooled export or any per-variant file.
             if step == "published":
-                exported = (test_dir / "test_student.md").exists() or bool(
-                    sorted(test_dir.glob("test_variant_*.md")))
+                exported = (quiz_dir / "quiz_student.md").exists() or bool(
+                    sorted(quiz_dir.glob("quiz_variant_*.md")))
                 if not exported:
                     findings.append(("DRIFT", loc, "published: marked ✅ but no "
-                                                   "test_student.md or test_variant_*.md"))
-            elif not (test_dir / rel).exists():
+                                                   "quiz_student.md or quiz_variant_*.md"))
+            elif not (quiz_dir / rel).exists():
                 findings.append(("DRIFT", loc, f"{step}: marked ✅ but {rel} is missing"))
 
 
@@ -275,23 +275,23 @@ def main():
             n_labs = len(rows)
             check_labs(root, header, rows, findings)
 
-    test_start = find_section(lines, "Tests")
-    n_tests = 0
-    if test_start is not None:
-        header, rows = parse_section(lines, test_start + 1)
+    quiz_start = find_section(lines, "Quizzes")
+    n_quizzes = 0
+    if quiz_start is not None:
+        header, rows = parse_section(lines, quiz_start + 1)
         if header:
-            n_tests = len(rows)
-            check_tests(root, header, rows, findings)
+            n_quizzes = len(rows)
+            check_quizzes(root, header, rows, findings)
 
     # Loud guard against a blind run: if no recognized rows were checked, the
     # status table is empty or uses section headings this script does not know.
     # Reporting a reassuring "OK ... 0 checked" would be a false all-clear — the
     # whole point of the checker is to NOT give false comfort.
-    if n_lectures == 0 and n_labs == 0 and n_tests == 0:
+    if n_lectures == 0 and n_labs == 0 and n_quizzes == 0:
         headings = all_headings(lines)
         found = ", ".join(headings) if headings else "(no ## sections)"
         print("BLIND     COURSE_STATE.md      — no '## Lectures', '## Seminars', "
-              "'## Labs', or '## Tests' rows recognized; nothing was checked")
+              "'## Labs', or '## Quizzes' rows recognized; nothing was checked")
         print(f"          sections present: {found}")
         print("OK        0 items checked; blind run (no false all-clear)")
         return 1
@@ -301,7 +301,7 @@ def main():
 
     failing = sum(1 for s, _, _ in findings if s in ("DRIFT", "STALE"))
     other = len(findings) - failing
-    print(f"OK        {n_lectures} lecture/seminar, {n_labs} labs, {n_tests} tests "
+    print(f"OK        {n_lectures} lecture/seminar, {n_labs} labs, {n_quizzes} quizzes "
           f"checked; {failing} drift/stale, {other} other")
     return 1 if failing else 0
 
