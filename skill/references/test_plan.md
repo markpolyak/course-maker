@@ -66,5 +66,6 @@ table headers and field labels English.
 
 Show a short human-readable summary, ask for confirmation, iterate on feedback.
 On approval: save `test_plan.md`, append an entry to `tests/NN/history.md`, set
-`plan → ✅` in the `## Tests` section of `COURSE_STATE.md`. Do not auto-advance
-to `test generate` — wait for the explicit command.
+`plan → ✅` in the `## Tests` section of `COURSE_STATE.md` (create that section
+with the standard columns if it does not exist yet). Do not auto-advance to
+`test generate` — wait for the explicit command.

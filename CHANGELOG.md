@@ -1,5 +1,53 @@
 # Changelog
 
+## [2026-06-16] — Wave 5 (partial): test pipeline
+
+Implemented `/course-maker test` only (the rest of wave 5 — syllabus, seminar,
+homework, lab triage — is untouched).
+
+### Added
+
+**`/course-maker test` pipeline** — three commands and reference files:
+- `test plan N` (`references/test_plan.md`): interactive plan. Question types and
+  counts are instructor-defined (not hardcoded); supports a pool (`M = 1`) or
+  `M > 1` parametrized variants per question. Output `tests/NN/test_plan.md`.
+- `test generate N [next]` (`references/test_generate.md`): generates the
+  canonical bank `tests/NN/test_questions.md` with answers inline (the bank is
+  also the answer key). Chunked one block per chunk — a full bank is 600+ lines
+  and one-shot generation hangs Claude Code, same as slides. Content in the
+  course language. Format modeled on a real exam bank.
+- `test publish N [format]` (`references/test_publish.md`): exports a
+  student-facing copy with all answers stripped. Only `markdown` is implemented;
+  the dispatcher is ready for latex/docx/moodle (not built). A mandatory
+  `grep ✓` leak check must return empty before a test is marked `published`.
+
+Architecture mirrors labs: a canonical instructor-only source separated from the
+student-facing export (bank ↔ publish, like `lab_spec.md` ↔ `starter/`).
+
+**State + drift integration**: new `## Tests` section in `COURSE_STATE.md`
+(English-canonical columns `plan | questions | published`). `validate_state.py`
+checks it (published satisfied by `test_student.md` or any `test_variant_*.md`);
+blind-run guard, summary, and `doctor.md` coverage all include tests.
+
+### Changed
+
+**Inviolable rules**: the chunking rule now covers `test generate`; a new
+grading invariant forbids handing `test_questions.md` to students and requires
+the answer-leak check before marking a test published.
+
+**SKILL.md slimming**: `course update` and `lab update` workflows extracted to
+`references/` (thin dispatchers); redundant Input/Output/State lines removed from
+the `plan`/`visuals` dispatchers (they duplicated the references). SKILL.md is
+now 311 lines — over the historical ≤300 target. With a 4th pipeline plus the
+inline CRITICAL safety blocks, ≤300 is no longer reachable without removing
+safety rails; the target needs revisiting (raise it, or do a dedicated slimming
+pass) rather than gutting the rules.
+
+**Cyrillic scrub**: removed Russian that had entered skill instruction files
+(variant-label and section-heading examples added earlier this session, and a
+pre-existing Russian outline-title example in `step4_slides.md`). Skill machinery stays
+English-only; illustrative labels are Latin with a course-language note.
+
 ## [2026-06-14] — Improvement wave 6 (QoL & observability)
 
 Scope decisions for this wave (from design discussion): the lock-file step was
