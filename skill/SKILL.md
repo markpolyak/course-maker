@@ -149,7 +149,8 @@ and print a summary of all lectures, labs, and tests with their current step
 statuses (✅ / 🔄 / ❌ / ⚠️). End with: "Run `/course-maker help` for available
 commands."
 
-**`/course-maker help`**: print the Quick reference tables above and stop.
+**`/course-maker help`**: print the three command tables (Lecture, Lab, Test)
+into the chat — the user cannot see `SKILL.md` — then stop.
 
 ---
 

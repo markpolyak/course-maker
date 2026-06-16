@@ -63,7 +63,7 @@ Same pattern for speaker notes.
 
 The skill uses Anthropic's native skill format: `SKILL.md` with YAML frontmatter
 (name + description for triggering) + a `references/` subdirectory for
-step-specific instructions loaded on demand. This keeps `SKILL.md` under ~300 lines
+step-specific instructions loaded on demand. This keeps `SKILL.md` under ~350 lines
 while full detail lives in reference files.
 
 **Current trigger:** `/course-maker` (the skill name). In Claude Code, skills
@@ -179,7 +179,7 @@ course-maker/                       ← repo root
   .gitignore
 
   skill/                            ← the skill (symlinked or copied to ~/.claude/skills/course-maker/)
-    SKILL.md                        ← main dispatcher (≤300 lines) + Inviolable rules
+    SKILL.md                        ← main dispatcher (≤350 lines) + Inviolable rules
     COURSE_CLAUDE_TEMPLATE.md       ← template CLAUDE.md for new course repos
     references/
       repository_layout.md          ← directory structure + state file formats
