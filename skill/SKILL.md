@@ -218,11 +218,11 @@ Read: `references/step5_notes.md`.
 - Output is ALWAYS chunked, same protocol as slides.
 - Chunk 0 = header + slides 1–5. Chunk K = slides [5K-4 … min(5K, total)].
   Chunk last = timing table + cut candidates.
-- Append each chunk to `speaker_notes.md` immediately.
+- Append each chunk to `speaker_notes.md` immediately; do not pause between chunks (no per-chunk approval — auto-chain to the end).
 - Generate in the course language (from `CLAUDE.md` → Course context).
 
 **Resuming:** `/course-maker notes N next` reads the file, continues from the
-last completed slide.
+last completed slide (auto-chains remaining chunks).
 
 ### `/course-maker status N`
 
