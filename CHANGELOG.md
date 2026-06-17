@@ -1,5 +1,29 @@
 # Changelog
 
+## [2026-06-17] — Wave 5 (partial): syllabus
+
+### Added
+
+**`/course-maker syllabus [pdf|latex|docx]`** (`references/syllabus.md`) —
+generates a student-facing `syllabus.md` from `course_plan.md` (title,
+instructors, description, prerequisites, human-readable schedule, grading,
+materials) in the course language. Drops internal pipeline notes
+(`labs/lab1/`, `quizzes/01/`, `no pipeline`) and **omits unfilled
+`<!-- TODO -->` sections** — these are reported to the instructor in chat, never
+leaked into the student document. With a format arg it exports via pandoc (pdf
+needs a LaTeX engine; latex and docx are pandoc targets too); if pandoc is
+missing it leaves the markdown in place and explains how to convert. A derived
+view of the plan — no state row, no history; regenerate when the plan changes.
+`syllabus.md` added to the course-root layout in `repository_layout.md`.
+
+### Fixed
+
+**`notes` auto-chains chunks without per-chunk approval** (`SKILL.md`). It used
+to ask for approval before saving every chunk because, unlike `slides`, its
+CRITICAL block lacked the "do not pause between chunks" phrase, so the global
+"wait for approval before saving" rule took over. Now mirrors `slides`: all
+chunks are appended back to back; approval is only for marking the step done.
+
 ## [2026-06-16] — Wave 5 (partial): quiz pipeline
 
 Implemented `/course-maker quiz` only (the rest of wave 5 — syllabus, seminar,

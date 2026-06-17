@@ -111,6 +111,7 @@ file you did or did not read. Violating any of them is a hard error.
 | `/course-maker course update` | Detect manual plan changes, flag affected lectures |
 | `/course-maker doctor` | Check course for state drift, missing files, config gaps (read-only) |
 | `/course-maker stats` | Show course progress bars (lectures/labs complete, hours) |
+| `/course-maker syllabus [pdf\|latex\|docx]` | Generate/update student syllabus.md from course_plan.md; optional export |
 | `/course-maker plan N` | Step 1 — detailed slide-by-slide plan for lecture N |
 | `/course-maker visuals N` | Step 2 — list of visualizations, TikZ feasibility |
 | `/course-maker figures N` | Step 3 — Python script to generate PNG figures |
@@ -174,6 +175,11 @@ it. Never edits files.
 ### `/course-maker stats`
 Read: `references/stats.md`. Read-only: progress bars across pipelines from
 `course_plan.md` (planned totals) and `COURSE_STATE.md` (completion).
+
+### `/course-maker syllabus [pdf|latex|docx]`
+Read: `references/syllabus.md`. Generates/updates student-facing `syllabus.md`
+from `course_plan.md` (omitting internal pipeline notes and unfilled TODOs);
+with a format arg, exports it via pandoc. No state row.
 
 ### `/course-maker plan N` (Step 1)
 Read: `references/step1_plan.md`.

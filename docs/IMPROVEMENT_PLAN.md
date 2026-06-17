@@ -447,8 +447,9 @@ profile: generic   # one of: generic, polyak, ...
 
 **Цель:** Закрыть пробелы — тесты, семинары, домашки, syllabus.
 
-### Шаг 5.1. `/course-maker syllabus`
-Простая команда: `course_plan.md` → PDF syllabus через Pandoc или LaTeX. Низкая сложность, высокая отдача.
+### Шаг 5.1. `/course-maker syllabus` ✅ реализовано
+Канонический `syllabus.md` из `course_plan.md` + экспорт через pandoc (pdf/latex/docx).
+Reference: `references/syllabus.md`.
 
 ### Шаг 5.2. `/course-maker seminar N`
 Пайплайн семинара: план разбора задач, раздаточный материал, решения.
