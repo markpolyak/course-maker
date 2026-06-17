@@ -1,5 +1,9 @@
 # Step 3 — Python Figure Script
 
+> **Session directory.** Paths below use `lectures/NN/`. For the seminar mirror
+> `/course-maker seminar figures N`, substitute `seminars/NN/` for `lectures/NN/`
+> throughout (including the `cd` to run the script) — the structure is identical.
+
 ## Context to gather before writing
 
 From `lectures/NN/visuals.md`:

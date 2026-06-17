@@ -50,6 +50,26 @@ memory of past iterations — always read it before starting any step.
 
 ---
 
+## Seminars
+
+```
+seminars/
+  01/
+    plan.md, visuals.md, figures/, slides.tex, speaker_notes.md, history.md
+                        ← deck: same artifacts as lectures/NN/ (the seminar
+                          commands reuse the lecture step references)
+    practice.ipynb      ← practical part: live code-demo notebook
+                          (`/course-maker seminar practice N`)
+  02/
+    ...
+```
+
+A seminar is the deck (the lecture pipeline, retargeted to `seminars/NN/`) plus
+a practical part. The form of the practical part varies by course; here it is a
+Jupyter demo notebook and is not autograded (unlike a lab).
+
+---
+
 ## Labs
 
 ```
@@ -121,6 +141,12 @@ exported `quiz_student.md` / `quiz_variant_*.md` are handed out.
 |---|-------|------|---------|---------|--------|-------|---------|
 | 01 | ... | ✅ | ✅ | ✅ | 🔄 | ❌ | 2026-03-15 |
 
+## Seminars
+
+| # | Title | plan | visuals | figures | slides | notes | practice | Updated |
+|---|-------|------|---------|---------|--------|-------|----------|---------|
+| 01 | ... | ✅ | ✅ | ✅ | ✅ | ✅ | 🔄 | 2026-03-15 |
+
 ## Labs
 
 | # | Dir | Title | plan | notebook | spec | tests | validated | published | Updated |
@@ -139,7 +165,8 @@ Legend: ✅ done · 🔄 in progress · ❌ not started · ⚠️ needs review
 **Structural vocabulary is always English, regardless of course language.**
 Section headings (`## Lectures`, `## Seminars`, `## Labs`, `## Quizzes`), column
 names (`plan`, `visuals`, `figures`, `slides`, `notes`, `notebook`, `spec`,
-`tests`, `questions`, `validated`, `published`, `#`, `Dir`, `Title`, `Updated`),
+`tests`, `questions`, `practice`, `validated`, `published`, `#`, `Dir`, `Title`,
+`Updated`),
 and the status legend
 are language-neutral keys. Only cell *content* (titles) is in the course
 language. This keeps the file machine-readable across all courses — the drift

@@ -1,5 +1,9 @@
 # Step 4 — LaTeX/Beamer Presentation
 
+> **Session directory.** Paths below use `lectures/NN/`. For the seminar mirror
+> `/course-maker seminar slides N`, substitute `seminars/NN/` for `lectures/NN/`
+> throughout — the structure is identical.
+
 ## Context to gather before writing
 
 1. `lectures/NN/plan.md` — slide titles, content, timing

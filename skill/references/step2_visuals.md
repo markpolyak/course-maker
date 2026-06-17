@@ -1,5 +1,9 @@
 # Step 2 — Visualizations List
 
+> **Session directory.** Paths below use `lectures/NN/`. For the seminar mirror
+> `/course-maker seminar visuals N`, substitute `seminars/NN/` for `lectures/NN/`
+> throughout — the structure is identical.
+
 ## Context to gather before writing
 
 From `lectures/NN/plan.md`:

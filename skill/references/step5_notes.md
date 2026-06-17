@@ -1,5 +1,9 @@
 # Step 5 — Speaker Notes
 
+> **Session directory.** Paths below use `lectures/NN/`. For the seminar mirror
+> `/course-maker seminar notes N`, substitute `seminars/NN/` for `lectures/NN/`
+> throughout — the structure is identical.
+
 ## Context to gather before writing
 
 1. `lectures/NN/plan.md` — content and timing per slide
