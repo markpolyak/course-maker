@@ -4,7 +4,7 @@ description: >
   Pipeline for preparing university course materials: lecture slides, visualizations,
   Python figure scripts, LaTeX/Beamer presentations, speaker notes, and lab assignments.
   Use this skill whenever the user works on lecture or lab preparation,
-  mentions commands like /lecture, /lab, /course, /quiz, or asks to prepare slides, figures,
+  mentions commands like /lecture, /seminar, /lab, /course, /quiz, or asks to prepare slides, figures,
   speaker notes, course plans, lab notebooks, quizzes/exams, or grading infrastructure.
   Also trigger when the user wants to update a course plan, check lecture/lab status,
   or continue work on a lecture or lab from a previous session.
@@ -65,9 +65,9 @@ file you did or did not read. Violating any of them is a hard error.
   expected PNG files were created.
 - NEVER add forward references to later slides. At most one mention of the next
   lecture, only on the closing slide, only if it flows naturally.
-- Output for `slides`, `notes`, and `quiz generate` is ALWAYS chunked (blocks of
-  5 slides, or one quiz block per chunk). Never generate the entire file in one
-  shot — it causes Claude Code to hang.
+- Output for `slides`, `notes`, `quiz generate`, and `seminar practice` is ALWAYS
+  chunked (blocks of 5 slides, or one quiz block / notebook section per chunk).
+  Never generate the entire file in one shot — it causes Claude Code to hang.
 
 ### Process
 
@@ -121,6 +121,14 @@ file you did or did not read. Violating any of them is a hard error.
 | `/course-maker notes N next` | Step 5 — next block of 5 slides |
 | `/course-maker status N` | Show state + history summary for lecture N |
 
+**Seminar commands** (seminar = lecture deck + practical part, in seminars/NN/):
+
+| Command | Description |
+|---|---|
+| `/course-maker seminar plan\|visuals\|figures\|slides\|notes N` | Deck steps — reuse lecture step references, target seminars/NN/ |
+| `/course-maker seminar practice N` | Practical live code-demo notebook (practice.ipynb) |
+| `/course-maker seminar status N` | Status + last 3 history entries for seminar N |
+
 **Lab commands:**
 
 | Command | Description |
@@ -146,12 +154,12 @@ file you did or did not read. Violating any of them is a hard error.
 | `/course-maker quiz publish N [format]` | Step 3 — export student-facing version (markdown) |
 
 **If invoked with no arguments** (`/course-maker` alone): read `COURSE_STATE.md`
-and print a summary of all lectures, labs, and quizzes with their current step
+and print a summary of all lectures, seminars, labs, and quizzes with their current step
 statuses (✅ / 🔄 / ❌ / ⚠️). End with: "Run `/course-maker help` for available
 commands."
 
-**`/course-maker help`**: print the three command tables (Lecture, Lab, Quiz)
-into the chat — the user cannot see `SKILL.md` — then stop.
+**`/course-maker help`**: print the four command tables (Lecture, Seminar, Lab,
+Quiz) into the chat — the user cannot see `SKILL.md` — then stop.
 
 ---
 
@@ -234,6 +242,26 @@ last completed slide (auto-chains remaining chunks).
 
 Print: row from `COURSE_STATE.md` for lecture N, last 3 entries from
 `lectures/NN/history.md`, any ⚠️ warnings with explanation.
+
+---
+
+## Seminar workflows
+
+A seminar = a lecture deck + a practical part, in `seminars/NN/`.
+
+### `/course-maker seminar plan|visuals|figures|slides|notes N`
+Use the matching lecture step reference (`step1_plan.md` … `step5_notes.md`),
+applied to `seminars/NN/`. All lecture CRITICAL rules apply with paths under
+`seminars/NN/` (chunking for slides/notes; run `figures.py` before figures ✅).
+
+### `/course-maker seminar practice N`
+Read: `references/seminar_practice.md`.
+**CRITICAL — even if reference was skipped:** generate `practice.ipynb` chunked
+by section; it is runnable code — execute it top to bottom and fix until clean
+before marking `practice → ✅`; it is a demo (no conftest/tests).
+
+### `/course-maker seminar status N`
+Like `/course-maker status N` but for the `## Seminars` row and `seminars/NN/`.
 
 ---
 

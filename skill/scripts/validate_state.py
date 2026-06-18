@@ -136,15 +136,16 @@ def newest_mtime(paths):
     return max((p.stat().st_mtime for p in paths), default=0.0)
 
 
-def check_lecture_like(root, subdir, header, rows, findings):
+def check_lecture_like(root, subdir, header, rows, findings, extra_steps=None):
     """
     Check a section whose items carry the lecture presentation artifacts
     (plan/visuals/figures/slides/notes), each living in <subdir>/<id>/. Used for
     both `## Lectures` (subdir "lectures") and `## Seminars` (subdir "seminars"):
-    a seminar may have the same prepared deck as a lecture. Its practical part
-    varies by course and is not file-checked here. Columns the parser does not
-    recognize (e.g. a practice/demo column) are ignored, not flagged.
+    a seminar has the same prepared deck as a lecture, plus its own steps passed
+    in `extra_steps` (e.g. {"practice": "practice.ipynb"}). Columns the parser
+    does not recognize are ignored, not flagged.
     """
+    simple_steps = {**LECTURE_FILE_STEPS, **(extra_steps or {})}
     id_idx = col_index(header, "#")
     for row in rows:
         lec_id = cell(row, id_idx).strip()
@@ -155,7 +156,7 @@ def check_lecture_like(root, subdir, header, rows, findings):
         loc = f"{subdir}/{lec_id}"
 
         # Simple file-backed steps.
-        for step, rel in LECTURE_FILE_STEPS.items():
+        for step, rel in simple_steps.items():
             idx = col_index(header, step)
             if idx is None:
                 continue
@@ -265,7 +266,8 @@ def main():
         header, rows = parse_section(lines, start + 1)
         if header:
             n_lectures += len(rows)
-            check_lecture_like(root, subdir, header, rows, findings)
+            extra = {"practice": "practice.ipynb"} if subdir == "seminars" else None
+            check_lecture_like(root, subdir, header, rows, findings, extra_steps=extra)
 
     lab_start = find_section(lines, "Labs")
     n_labs = 0
