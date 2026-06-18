@@ -1,5 +1,41 @@
 # Changelog
 
+## [2026-06-18] — Wave 5 (partial): seminar pipeline
+
+A seminar = a lecture deck plus a practical part, all in `seminars/NN/` (the
+"full mirror" model, chosen over a practice-only or problem-walkthrough model).
+This also closes a real gap: the drift checker tracked `## Seminars` but no
+command wrote to `seminars/` — now the deck steps do.
+
+### Added
+
+**`/course-maker seminar` pipeline:**
+- `seminar plan|visuals|figures|slides|notes N` reuse the lecture step
+  references (`step1_plan.md` … `step5_notes.md`), retargeted to `seminars/NN/`.
+  Each step reference gained a "Session directory" note making the
+  `lectures/NN/` → `seminars/NN/` substitution explicit.
+- `seminar practice N` (`references/seminar_practice.md`) generates
+  `seminars/NN/practice.ipynb` — an instructor-driven live code-demo notebook,
+  not autograded (no conftest/tests). Chunked by section; executed top-to-bottom
+  (`nbconvert --execute`) and fixed until clean before `practice → ✅`.
+- `seminar status N`.
+
+The form of the practical part is course-specific; the skill stays neutral and
+ships only the demo-notebook flavor here.
+
+**State + drift:** `## Seminars` gains a `practice` column; `validate_state.py`
+drift-checks the deck artifacts plus `practice.ipynb` for seminars (lectures
+unaffected — `check_lecture_like` gained an `extra_steps` param).
+`repository_layout.md` documents the `seminars/` layout, the `## Seminars` state
+table, and the `practice` vocabulary key.
+
+### Changed
+
+**SKILL.md** (346/350): Seminar commands table + Seminar workflows section; the
+chunking inviolable rule now covers `seminar practice`; `help` prints four
+tables (Lecture, Seminar, Lab, Quiz); no-arg status lists seminars; `/seminar`
+added to the trigger description.
+
 ## [2026-06-17] — Wave 5 (partial): syllabus
 
 ### Added

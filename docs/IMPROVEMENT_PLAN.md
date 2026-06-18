@@ -451,9 +451,11 @@ profile: generic   # one of: generic, polyak, ...
 Канонический `syllabus.md` из `course_plan.md` + экспорт через pandoc (pdf/latex/docx).
 Reference: `references/syllabus.md`.
 
-### Шаг 5.2. `/course-maker seminar N`
-Пайплайн семинара: план разбора задач, раздаточный материал, решения.
-Reference: `references/seminar.md`.
+### Шаг 5.2. `/course-maker seminar N` ✅ реализовано
+Семинар = колода (зеркало лекционного пайплайна, цель `seminars/NN/`) + практика
+(`seminar practice N` → `practice.ipynb`, demo-ноутбук). Модель «полное зеркало»
+выбрана вместо «разбора задач» из исходной формулировки.
+Reference: `references/seminar_practice.md` (+ переиспользуемые `step1..step5`).
 
 ### Шаг 5.3. `/course-maker quiz N` ✅ реализовано
 Пайплайн контрольной/теста: варианты, ключи, рубрика.
