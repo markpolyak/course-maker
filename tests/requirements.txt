@@ -1,0 +1,4 @@
+# Test-only dependencies for the course-maker suite.
+pytest>=8
+PyYAML>=6          # Level 0 yaml syntax checks + anti-personalization profile reads
+matplotlib>=3.7    # Level 3 e2e: fixture figures.py and re-run check

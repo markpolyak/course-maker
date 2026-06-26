@@ -14,3 +14,10 @@ __pycache__/
 # OS
 .DS_Store
 Thumbs.db
+
+# Test fixtures: PNGs are generated at e2e setup from the committed figures.py,
+# not stored as binaries.
+tests/e2e/fixtures/course/lectures/01/figures/*.png
+
+# Throwaway test virtualenv
+.venv-test/
