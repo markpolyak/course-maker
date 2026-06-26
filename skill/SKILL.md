@@ -141,6 +141,7 @@ file you did or did not read. Violating any of them is a hard error.
 | `/course-maker lab datasets N` | Step 1b — generate datasets_info.md (optional) |
 | `/course-maker lab tests N` | Step 2 — tests.py, conftest.py, requirements.txt, README |
 | `/course-maker lab validate N <id>` | Step 3 — validate as student (new session required) |
+| `/course-maker lab triage N` | After a ⚠️ validation: diagnose which step to revisit (read-only) |
 | `/course-maker lab publish N` | Run the LMS publish workflow from `lms_adapter.md` |
 | `/course-maker lab update N` | Re-publish after post-release fix |
 | `/course-maker lab status N` | Status + last 3 history entries |
@@ -186,8 +187,7 @@ Read: `references/stats.md`. Read-only: progress bars across pipelines from
 
 ### `/course-maker syllabus [pdf|latex|docx]`
 Read: `references/syllabus.md`. Generates/updates student-facing `syllabus.md`
-from `course_plan.md` (omitting internal pipeline notes and unfilled TODOs);
-with a format arg, exports it via pandoc. No state row.
+from `course_plan.md`; with a format arg, exports it via pandoc. No state row.
 
 ### `/course-maker plan N` (Step 1)
 Read: `references/step1_plan.md`.
@@ -314,6 +314,9 @@ Read: `references/lab_step3_validate.md`.
   show full output.
 - After validation: ask whether to save the solution to a branch, then
   `git restore <LAB_DIR>starter/exercises.ipynb` to remove student solutions.
+
+### `/course-maker lab triage N`
+Read: `references/lab_triage.md`. Read-only diagnostic after a ⚠️ validation; maps each issue from the latest Step 3 `history.md` entry to its root-cause step and names the command to run next. Edits nothing; reading `lab_spec.md`/`tests.py`/notebook is allowed (validation is done).
 
 ### `/course-maker lab publish N`
 Read: `references/lab_publish.md`.
