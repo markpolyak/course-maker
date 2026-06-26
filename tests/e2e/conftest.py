@@ -17,6 +17,7 @@ for chunked `... next` steps) can be added later behind the same fixtures.
 """
 
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -27,7 +28,12 @@ import pytest
 from _paths import SKILL_DIR  # tests/ is on pythonpath (pytest.ini)
 
 FIXTURE_COURSE = Path(__file__).parent / "fixtures" / "course"
+LOG_DIR = Path(__file__).parent / "logs"
 E2E_ENABLED = os.environ.get("COURSE_MAKER_E2E") == "1"
+# Pin the model for reproducibility; without it `claude -p` uses your CLI default
+# model (the same one normal sessions resolve), which can drift as settings
+# change. e.g. COURSE_MAKER_E2E_MODEL=opus
+E2E_MODEL = os.environ.get("COURSE_MAKER_E2E_MODEL")
 CLAUDE_BIN = shutil.which("claude")
 VALIDATE = SKILL_DIR / "scripts" / "validate_state.py"
 
@@ -90,19 +96,37 @@ def _wrap(command):
     )
 
 
+def _slug(command):
+    return re.sub(r"[^a-z0-9]+", "-", command.lower()).strip("-")[:60] or "command"
+
+
 @pytest.fixture
 def course_maker(course_dir):
     """Return run(command) -> CompletedProcess, executing a course-maker command
-    headlessly inside the fixture course."""
+    headlessly inside the fixture course.
+
+    Every run captures the full turn-by-turn transcript (--verbose
+    --output-format stream-json) and writes it to tests/e2e/logs/<command>.jsonl,
+    so you can inspect exactly what claude did. View it with: `jq . <file>`.
+    """
 
     def run(command, timeout=900):
-        return subprocess.run(
-            [CLAUDE_BIN, "-p", _wrap(command), "--dangerously-skip-permissions"],
-            cwd=course_dir,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
+        LOG_DIR.mkdir(exist_ok=True)
+        log_path = LOG_DIR / f"{_slug(command)}.jsonl"
+        cmd = [
+            CLAUDE_BIN, "-p", _wrap(command),
+            "--dangerously-skip-permissions",
+            "--verbose", "--output-format", "stream-json",
+        ]
+        if E2E_MODEL:
+            cmd += ["--model", E2E_MODEL]
+        proc = subprocess.run(
+            cmd, cwd=course_dir, capture_output=True, text=True, timeout=timeout
         )
+        log_path.write_text(proc.stdout or "", encoding="utf-8")
+        # Visible on failure (pytest shows captured stdout) and with `pytest -s`.
+        print(f"\n[course-maker e2e] '{command}' transcript -> {log_path}")
+        return proc
 
     return run
 

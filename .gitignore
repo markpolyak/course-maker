@@ -21,3 +21,6 @@ tests/e2e/fixtures/course/lectures/01/figures/*.png
 
 # Throwaway test virtualenv
 .venv-test/
+
+# e2e conversation transcripts
+tests/e2e/logs/

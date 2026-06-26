@@ -59,6 +59,17 @@ the default run stays pure. Coverage today (smoke — the riskiest commands):
 Each e2e test also runs `validate_state.py` over the result and requires a clean
 bill, tying the Level 1 facts engine into the behavioural checks.
 
+**Seeing what claude did.** Every e2e run writes the full turn-by-turn transcript
+(tool calls + results) to `tests/e2e/logs/<command>.jsonl` (gitignored). Read it
+with `jq . tests/e2e/logs/course-maker-quiz-publish-1.jsonl`. The transcript path
+is also printed on failure and under `pytest -s`.
+
+**Model.** The runner does not pin a model, so `claude -p` uses your CLI default
+model (the same one normal `claude` sessions resolve when you don't override),
+which can drift with your settings. For reproducible runs pin it:
+`COURSE_MAKER_E2E_MODEL=opus make e2e` (accepts an alias like `opus`/`sonnet` or a
+full model id).
+
 The harness grants approval in advance via the runner's prompt, so a single
 non-interactive turn writes the files (the skill is unchanged). Chunked
 `... next` steps need a scripted multi-turn approver (Claude Agent SDK) — a
