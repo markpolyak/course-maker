@@ -67,6 +67,15 @@ or "Slides and speaker notes in Japanese. No language restrictions on figures."]
 
 <!-- Fill this in when running /lab course-init. Used by all /lab commands. -->
 
+### Lab grading
+
+grade_reporter: none      # none | scoring_ci | <reporter in skill/extensions/reporters/>
+                          # Optional end-of-tests output. 'none' = plain pytest pass/fail.
+                          # 'scoring_ci' = points summary + autograder-readable grade line.
+lab_variants: false       # true if each student gets a different dataset (per-student
+                          # variants; see skill/extensions/variants/). false = same task
+                          # for everyone.
+
 **GitHub org:** [org-name]
 **GHC classroom org:** [classroom-org]
 **GHC repo naming:** [classroom-org]/[prefix]-[lab-slug]

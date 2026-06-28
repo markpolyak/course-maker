@@ -51,6 +51,14 @@ Let `LAB_DIR = labs/<slug>/` if slug given, else `labs/labN/`.
    cp labs/shared/conftest_base.py <LAB_DIR>starter/conftest.py
    ```
 
+6b. **Copy the grade reporter, if the course uses one:**
+   ```bash
+   [ -f labs/shared/grade_report.py ] && \
+     cp labs/shared/grade_report.py <LAB_DIR>starter/grade_report.py
+   ```
+   Present only when `grade_reporter` is not `none` (installed by
+   `/course-maker lab course-init` Phase 2a). If absent, labs run plain pytest.
+
 7. **Add lab N row to `COURSE_STATE.md` Labs table.**
    Fill `Dir` = `<slug>` or `labN`, all status columns ❌.
 

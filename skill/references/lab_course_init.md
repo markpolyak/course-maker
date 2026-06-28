@@ -22,9 +22,13 @@ Run these checks silently before asking anything:
 3. **Check `COURSE_STATE.md` for a `## Labs` table.**
    - `missing` — no such section.
 
-4. **Check `skill/templates/conftest_base.py` for placeholder content.**
-   It is a placeholder if it contains `# PLACEHOLDER` or `PLACEHOLDER — paste`.
-   Also look for a real `conftest.py` in any existing lab's `starter/`.
+4. **Read the grade-reporting config from `CLAUDE.md` → `## Lab context`
+   → `### Lab grading`.**
+   - `grade_reporter` — default `none`.
+   - `lab_variants` — default `false`.
+   `conftest_base.py` ships as a real, universal harness (no placeholder); it
+   needs no per-course substitution. Any grade output is supplied by an
+   optional reporter (Phase 2a), not by editing the conftest.
 
 5. **Check `skill/templates/tests.yaml` similarly.**
    Also look for a real `tests.yaml` in any existing lab's `starter/.github/workflows/`.
@@ -50,22 +54,36 @@ For each of the three files (`tests_template.py`, `conftest_base.py`, `tests.yam
   "Could not find a real `<file>`. Placeholder written to `labs/shared/<file>` —
   replace it before running `/course-maker lab tests N`."
 
-### Phase 2a — Substitute course-specific labels into `conftest_base.py`
+### Phase 2a — Install the grade reporter (optional)
 
-After `labs/shared/conftest_base.py` exists, populate the customizable labels
-at the top of the file from `lab_templates.md` (if it already exists from a
-prior `course init`):
+The universal `conftest_base.py` prints no grade output on its own. Any
+scoring / grade-output is supplied by an optional reporter dropped next to the
+conftest as `grade_report.py` (see `skill/extensions/reporters/README.md`).
 
-- Read `lab_templates.md` § "Scoring header" → set `SCORING_HEADER`.
-- Read `lab_templates.md` § "TASKID label" → set `TASKID_LABEL`.
-- Read `lab_templates.md` § "Grade output label" → set `GRADE_OUTPUT_LABEL`.
+Read `grade_reporter` from `CLAUDE.md` → `## Lab context` → `### Lab grading`
+(default `none`):
 
-If `lab_templates.md` does not exist yet (Phase 5 will create it), leave the
-defaults in place. Re-run `/course-maker lab course-init` after Phase 5 to
-substitute the labels.
+- **`none`** → do nothing. Labs run plain pytest (pass/fail only).
+- **`<name>`** (e.g. `scoring_ci`):
+  1. Copy `skill/extensions/reporters/<name>.py` → `labs/shared/grade_report.py`.
+  2. If `lab_templates.md` exists (from `course init`), substitute the labels
+     at the top of `grade_report.py`:
+     - `lab_templates.md` § "Scoring header" → `SCORING_HEADER`
+     - `lab_templates.md` § "TASKID label" → `TASKID_LABEL`
+     - `lab_templates.md` § "Grade output label" → `GRADE_OUTPUT_LABEL`
+     If `lab_templates.md` does not exist yet (Phase 5 creates it), leave the
+     defaults and re-run this command after Phase 5 to substitute the labels.
+  3. If `<name>.py` is missing, warn: "grade_reporter `<name>` not found in
+     skill/extensions/reporters/ — labs will run plain pytest."
 
-This ensures every per-lab conftest.py copied from `labs/shared/` inherits the
-course-language grade-output strings without per-lab editing.
+This way the course-language grade strings live in the reporter, not in the
+universal conftest, and every per-lab `grade_report.py` copied from
+`labs/shared/` inherits them without per-lab editing.
+
+`lab_variants` (default `false`) is read by `/course-maker lab notebook N` and
+`lab tests N`: when `true`, Block 0 includes the variant cells from
+`skill/extensions/variants/block0_snippet.md` and the reporter's `DATASETS`
+list is populated; when `false`, neither is present.
 
 ---
 
