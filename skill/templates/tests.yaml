@@ -4,12 +4,15 @@
 # /course-maker lab init. This file is shared across all labs and should
 # not be modified per lab — change it once here, propagates to new labs.
 #
-# Critical behavior the skill relies on:
-# - STUDENT_ID is read from a repository variable, with fallback "1".
-#   For GitHub Classroom: students set their own variable per-fork.
+# Behavior:
 # - pytest runs from the repo root; tests.py and conftest.py are at root.
-# - The grade-output line printed by pytest_sessionfinish is captured by
-#   external grading via the workflow logs.
+# - STUDENT_ID is exported (repo variable, fallback "1"). It is only meaningful
+#   when the lab uses per-student variants (lab_variants: true); otherwise
+#   nothing reads it and it is harmless. For GitHub Classroom with variants,
+#   students set their own variable per-fork.
+# - If the course uses a grade reporter (grade_report.py) whose grade line your
+#   autograder consumes, that line is captured from the workflow logs. With no
+#   reporter, pytest's own pass/fail result is the CI outcome.
 
 name: Lab Tests
 
@@ -51,6 +54,7 @@ jobs:
 
       - name: Run tests
         env:
+          # Used only by labs with per-student variants; harmless otherwise.
           STUDENT_ID: ${{ vars.STUDENT_ID || '1' }}
         run: |
           pytest tests.py -v --tb=short
