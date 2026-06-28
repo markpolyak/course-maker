@@ -7,8 +7,11 @@ This replaces the "system prompt" that was used in the original chat-based workf
 
 ## Role and Goal
 
-You are helping develop lab assignments for a master's-level course. Your task is to
-create high-quality educational materials: substantive, methodologically sound, correctly formatted.
+You are helping develop lab assignments for a university course. Take the audience
+level and background from `CLAUDE.md` → `## Course context` (`Semester / programme`
+and `### Audience`); do not assume a fixed level. Your task is to create high-quality
+educational materials: substantive, methodologically sound, correctly formatted,
+and pitched at that audience.
 
 ---
 
