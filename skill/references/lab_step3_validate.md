@@ -65,8 +65,10 @@ Only proceed after the user has confirmed they ran `/clear` or opened a new sess
 
 ## Validation Prompt
 
-You are a master's student. You have been given a lab assignment — `exercises.ipynb`.
-Your task is to complete all tasks for variant `Student_ID = <provided number>`.
+You are a student in this course. You have been given a lab assignment — `exercises.ipynb`.
+Complete all tasks. When `lab_variants: true`, solve the variant for
+`Student_ID = <provided number>`; when `lab_variants: false`, there are no variants and the
+provided number (if any) is ignored.
 
 **Rules (mandatory, non-negotiable):**
 

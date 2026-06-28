@@ -47,8 +47,9 @@ For array dimensions, note the shape in a comment alongside.
 
 ## Points and Task Structure
 
-Block 0 (variant selection, dataset loading) **has zero points** — it is a mandatory technical
-step without which the remaining tasks cannot be completed.
+Block 0 (setup; and, when `lab_variants: true`, variant selection and dataset loading)
+**has zero points** — it is a mandatory technical step without which the remaining tasks
+cannot be completed.
 
 Points are awarded only for tasks where the student implements meaningful logic: computations,
 modeling, result interpretation, visualization.
@@ -60,14 +61,14 @@ Bonus tasks are explicitly marked with the bonus marker from `lab_templates.md`.
 ## Notebook Structure
 
 The beginning and end of the notebook follow the template in `lab_templates.md` in the course root.
-Adapt only: lab title, topic, goal, library list, `datasets` array contents, additional variant
-parameters, `required_vars` and `bonus_vars`. Everything else — verbatim.
+Adapt only: lab title, topic, goal, library list, `required_vars` and `bonus_vars`, and —
+when `lab_variants: true` — the `datasets` array contents and any variant parameters.
+Everything else — verbatim.
 
-**CRITICAL — variant formula must be verbatim:**
-```python
-dataset_id = (Student_ID - 1) % len(datasets)
-```
-This formula is used by autotests and external CI. Any change breaks grading for all students.
+**When `lab_variants: true`:** Block 0 includes the variant-selection cells. The variant
+formula is canonical and must be verbatim — see `skill/extensions/variants/README.md`.
+Any change to it breaks grading for all students. When `lab_variants: false`, there are no
+variant cells and no `datasets` array.
 
 **Visualizations:** all graphs have a title (`title`) and axis labels (`xlabel`, `ylabel`).
 Functions returning a graph return `matplotlib.figure.Figure`.
@@ -76,8 +77,8 @@ Functions returning a graph return `matplotlib.figure.Figure`.
 
 ## What NOT to do
 
-- **Never change the variant formula** — it must be verbatim:
-  `dataset_id = (Student_ID - 1) % len(datasets)`
+- **When `lab_variants: true`, never change the variant formula** — it is canonical
+  and verbatim; see `skill/extensions/variants/README.md`.
 - **Goal of the lab — one concise sentence.** Do not list everything the student does.
   The goal states the final result, not a list of steps.
   See `course_conventions.md` for bad/good examples in the course language.

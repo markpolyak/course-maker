@@ -6,10 +6,10 @@
 
 1. Read `labs/labN/lab_spec.md` — full specification.
 2. Read `labs/labN/starter/exercises.ipynb` — notebook structure, variable names, Block 0.
-3. Read `labs/shared/conftest_base.py` — existing infrastructure (DO NOT modify the top section).
+3. Read `labs/shared/conftest_base.py` — universal harness (DO NOT modify).
 4. Read `labs/shared/tests_template.py` — style reference (do not copy logic, only patterns).
-5. Read `lab_templates.md` from the course root — scoring block marker and grade output string
-   for conftest.py.
+5. If the course uses a grade reporter (`grade_reporter` not `none`): read
+   `lab_templates.md` from the course root — scoring/grade labels for `grade_report.py`.
 6. Read `course_conventions.md` from the course root — course language for error messages.
 
 ---
@@ -48,43 +48,31 @@ and adapt for this lab. Change only:
 
 Do NOT touch: submission instructions, Colab setup, contact section.
 
-### Step 4: Update `conftest.py` in `labs/labN/starter/`
+### Step 4: Update the grade reporter (only if the course uses one)
 
-Copy `labs/shared/conftest_base.py` → `labs/labN/starter/conftest.py` if not
-already there.
+`conftest.py` is the universal harness and needs **no per-lab edit**. Whether a
+lab produces any scoring output depends on `grade_reporter` in `CLAUDE.md` →
+`## Lab context` → `### Lab grading`:
 
-The conftest has **two editable regions**:
+- **`grade_reporter: none`** → there is no `grade_report.py`; labs run plain
+  pytest (pass/fail). Skip this step entirely.
+- **`grade_reporter: <name>`** → `lab init` copied
+  `labs/shared/grade_report.py` into `labs/labN/starter/`. Edit only its data
+  block (the reporter's contract is in `skill/extensions/reporters/README.md`):
 
-**Region 1 — customizable labels at the top of the file** (already populated
-during `/course-maker lab course-init` by reading `lab_templates.md`):
+  - `TEST_POINTS` — test function names → points from `lab_spec.md`.
+  - `TEST_BLOCKS` — TestClass name → primary test function from `lab_spec.md`.
+  - `DATASETS` — **only when `lab_variants: true`** — dataset list verbatim from
+    Block 0 of `exercises.ipynb`. Leave empty when the lab has no variants.
 
-- `TASKID_LABEL` — from `lab_templates.md` § "TASKID label"
-- `GRADE_OUTPUT_LABEL` — from `lab_templates.md` § "Grade output label"
-- `SCORING_HEADER` — from `lab_templates.md` § "Scoring header"
+  Labels (`TASKID_LABEL`, `GRADE_OUTPUT_LABEL`, `SCORING_HEADER`) were
+  substituted from `lab_templates.md` at `lab course-init`; if still defaults,
+  substitute them now. Do not change the `print()` layout — only the labels and
+  the data block are course/lab-specific.
 
-If `labs/shared/conftest_base.py` already has these substituted, the per-lab
-copy inherits them — do nothing in region 1. If for any reason the labels are
-still defaults, substitute them now from `lab_templates.md`.
-
-**Region 2 — `LAB SCORING SYSTEM` block** (this is the per-lab edit):
-
-Update only `TEST_POINTS`, `TEST_BLOCKS`, `DATASETS`. Everything else —
-DO NOT TOUCH.
-
-- `TEST_POINTS` — test function names → points from `lab_spec.md`.
-- `TEST_BLOCKS` — TestClass name → primary test function from `lab_spec.md`.
-- `DATASETS` — dataset list verbatim from Block 0 of `exercises.ipynb`.
-
-**Inviolable invariants in `pytest_sessionfinish`:**
-- `dataset_id = (Student_ID - 1) % len(DATASETS)` — NEVER modify the formula.
-- The `print(f"  {TASKID_LABEL} is {dataset_id + 1}")` and grade-output
-  `print()` lines — NEVER change their format. The format is fixed in
-  `conftest_base.py`; only the labels (region 1) change per course.
-
-**Permitted edits in `pytest_sessionfinish`:**
-- Add a manual-grading note if some points are graded by the instructor.
-- Remove the bonus point output if `lab_spec.md` has no bonus tasks.
-- Adjust the numerator inside the grade-output line to include bonus.
+  **When `lab_variants: true`:** the variant formula in the reporter is verbatim
+  — see `skill/extensions/variants/README.md`. Never modify it, and keep the
+  reporter's `DATASETS` identical to Block 0's `datasets`.
 
 ### Step 5: Write `tests.py` in `labs/labN/starter/`
 
@@ -99,7 +87,8 @@ Write tests per `lab_spec.md` — copy patterns, not logic.
 - For artifacts: test file existence, test loading, test structure, test values
 - Bonus tests: in a class named `TestBonus{N}` (one class per bonus task),
   skip via `pytest.skip` if variable not defined or is `None`
-- Test function names MUST exactly match keys in `TEST_POINTS` in `conftest.py`
+- When a grade reporter is used, test function names MUST exactly match keys in
+  `TEST_POINTS` in `grade_report.py`
 - Error messages in course language (per `course_conventions.md`), specific (what was expected, what was received)
 - Heavy operations (model training) — via `scope='module'` fixture, not repeated per test
 
@@ -121,13 +110,16 @@ Write tests per `lab_spec.md` — copy patterns, not logic.
 - If multiple standard methods solve correctly (`imshow`, `pcolormesh`, `heatmap`,
   `axvspan`, `fill_between`) — test must not prefer one over others
 
-**Critical prohibition:** never modify `dataset_id = (Student_ID - 1) % len(DATASETS)` anywhere.
+**Critical prohibition (when `lab_variants: true`):** keep the variant formula
+verbatim everywhere it appears (Block 0 and the grade reporter) — see
+`skill/extensions/variants/README.md`. When `lab_variants: false`, there is no
+such formula.
 
 ### Step 6: Verify Compatibility
 
-After writing, verify:
-- All keys in `TEST_POINTS` (`conftest.py`) match test function names in `tests.py`
-- All tests in `TEST_BLOCKS` (`conftest.py`) exist in `tests.py`
+After writing, verify (when a grade reporter is used; skip if `grade_reporter: none`):
+- All keys in `TEST_POINTS` (`grade_report.py`) match test function names in `tests.py`
+- All tests in `TEST_BLOCKS` (`grade_report.py`) exist in `tests.py`
 - Sum of `TEST_POINTS` matches the scoring table in `lab_spec.md`
 
 ### Step 7: Do NOT Touch
@@ -145,7 +137,7 @@ Append to `labs/labN/history.md`:
 ```markdown
 ## [YYYY-MM-DD] Step 2: Tests generated
 
-**Files changed:** conftest.py, tests.py, requirements.txt, README.md
+**Files changed:** tests.py, requirements.txt, README.md (+ grade_report.py if a reporter is used)
 **Test count:** <number> tests, <number> bonus tests
 **Compatibility check:** TEST_POINTS ✅ / TEST_BLOCKS ✅ / scoring total ✅
 **Notes:** <any non-obvious test decisions>

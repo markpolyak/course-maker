@@ -31,6 +31,12 @@ when the course language is English. Edit after generation if your conventions d
 
 ## Block 0 Divider Cell (markdown)
 
+> Tasks 0.1 and 0.2 below (variant selection) apply **only when
+> `lab_variants: true`**. The canonical code and the variant formula live in
+> `skill/extensions/variants/block0_snippet.md`; the cells below are the
+> localized wording for this language. When `lab_variants: false`, Block 0 is
+> just Task 0.3 (dependency install) and the divider title is "Block 0: Setup".
+
 ```markdown
 ---
 ## Block 0: Variant Setup
@@ -214,12 +220,14 @@ variable_name: np.ndarray = None  # shape (n,) or explanation
 
 ---
 
-## conftest.py Strings
+## Grade reporter labels
 
-The lab tests step (`/course-maker lab tests N`) reads these values from this
-file and uses them as the customizable strings at the top of `conftest.py`
-(`TASKID_LABEL`, `GRADE_OUTPUT_LABEL`, `SCORING_HEADER`). The print() format
-in `conftest_base.py` is fixed — only the labels change per course/language.
+Used **only when the course sets a grade reporter** (`grade_reporter` not `none`
+in `CLAUDE.md` → `## Lab context`). `/course-maker lab course-init` reads these
+values and substitutes them into the labels at the top of `grade_report.py`
+(`TASKID_LABEL`, `GRADE_OUTPUT_LABEL`, `SCORING_HEADER`). The print() layout in
+the reporter is fixed — only the labels change per course/language. With
+`grade_reporter: none` this section is unused.
 
 If your external CI expects a specific exact phrase in the grade-output line
 (e.g. for autograding), put it here verbatim — the skill substitutes it into

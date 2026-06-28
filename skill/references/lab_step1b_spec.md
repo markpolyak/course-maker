@@ -24,8 +24,9 @@ Regardless of mode, extract from `exercises.ipynb`:
 
 - Lab title, course, goal (from the first cell)
 - Presence of `theory.md` / peer review
-- Dataset list from Block 0: `datasets` array, variant parameters
-- All variables defined in Block 0 (`Student_ID`, `DATASET_TYPE`, `SOURCE`, etc.)
+- When `lab_variants: true`: dataset list from Block 0 (`datasets` array, variant
+  parameters) and the Block 0 variant variables (`Student_ID`, `DATASET_TYPE`,
+  `SOURCE`, etc.). When `lab_variants: false`: skip — there is no `datasets` array.
 - All tasks: variables, functions, classes — names, signatures, types
 - Text variables (`str`) the student fills manually
 - Artifacts: files the student saves to disk
@@ -149,6 +150,8 @@ graded_markers: false   # true — if ### Begin/End graded code markers used
 
 ## Datasets
 
+# Only when lab_variants: true. Omit this section entirely when the lab has no
+# per-student variants.
 datasets:
   - id: <dataset_id>
     description: <name and source>
@@ -162,6 +165,8 @@ datasets:
 
 ## Variant Variables
 
+# Only when lab_variants: true. Omit this section entirely when the lab has no
+# per-student variants.
 variant_vars:
   - name: Student_ID
     type: int

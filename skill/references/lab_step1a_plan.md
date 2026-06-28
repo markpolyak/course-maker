@@ -35,7 +35,7 @@ into the course language):
 ```
 
 **Requirements for the plan:**
-- Block 0 (variant selection, dataset loading) is present but has ZERO points
+- Block 0 (setup; variant selection too when `lab_variants: true`) is present but has ZERO points
 - Sum of mandatory task points = <mandatory points from user>
 - Sum of bonus task points = <bonus points from user>
 - Tasks follow a logical order: from data loading to modeling and interpretation
