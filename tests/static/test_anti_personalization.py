@@ -1,26 +1,23 @@
-"""Level 0 — anti-personalization tracker (expected to fail until wave 4).
+"""Level 0 — anti-personalization guard.
 
 The skill must be universal: one instructor's conventions must not be baked into
-the universal machinery (SKILL.md + references/*.md). Per the IMPROVEMENT_PLAN
-wave 4, personal grading config (the per-student variant-assignment formula and
-the external-CI grade label) moves out of the universal files into a profile.
+the universal machinery (SKILL.md + references/*.md). Personal grading config —
+the per-student variant-assignment formula and any external-CI grade label —
+lives in opt-in extensions (skill/extensions/{variants,reporters}/) and in the
+user's own out-of-repo defaults, never inline in the universal files.
 
 Design note — why this file hardcodes *no* personal literal:
 A leak detector has to describe what it looks for, but it must not embed one
 instructor's actual values (their variant formula, their CI label) — that would
 just relocate the personalization from references/ into tests/. So:
 
+* the structural check flags the *shape* of a per-student variant-assignment
+  formula in the universal files, using a generic pattern, not the verbatim
+  formula. This is now a hard guard (the formula has moved to the variants
+  extension); the universal files must stay formula-free.
 * the profile-driven check reads whatever a profile *declares* as its own
   grading values and asserts none of them appear in the universal files. No
-  literal is written here; it is read from the profile that owns it. This is the
-  permanent guard and becomes meaningful once wave 4 creates that profile field.
-* the interim structural check flags the *shape* of the known current leak — an
-  inlined per-student variant-assignment formula in the universal files — using
-  a generic pattern, not the verbatim formula.
-
-Marked xfail (not skip): the suite stays green while wave 4 is pending, but the
-moment the leak is gone the test XPASSes — a loud signal to drop the xfail and
-turn this into a hard guard.
+  literal is written here; it is read from the profile that owns it.
 """
 
 import re
@@ -60,7 +57,7 @@ def declared_personal_values():
     return values
 
 
-def interim_structural_leaks():
+def structural_leaks():
     found = []
     for path in universal_files():
         for n, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
@@ -69,16 +66,11 @@ def interim_structural_leaks():
     return found
 
 
-@pytest.mark.xfail(
-    reason="IMPROVEMENT_PLAN wave 4: per-student variant formula must move out of "
-    "SKILL.md + references/ into a profile",
-    strict=False,
-)
 def test_no_variant_formula_in_universal_files():
-    leaks = interim_structural_leaks()
+    leaks = structural_leaks()
     assert not leaks, (
         "a per-student variant-assignment formula is inlined in universal files "
-        "(should live in a profile): " + ", ".join(leaks)
+        "(should live in skill/extensions/variants/): " + ", ".join(leaks)
     )
 
 

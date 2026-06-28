@@ -14,6 +14,7 @@ SKILL_MD = SKILL_DIR / "SKILL.md"
 REFERENCES_DIR = SKILL_DIR / "references"
 TEMPLATES_DIR = SKILL_DIR / "templates"
 PROFILES_DIR = SKILL_DIR / "profiles"
+EXTENSIONS_DIR = SKILL_DIR / "extensions"
 SCRIPTS_DIR = REPO_ROOT / "scripts"
 
 

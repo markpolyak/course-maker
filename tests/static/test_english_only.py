@@ -2,8 +2,10 @@
 
 CLAUDE.md rule: "All text in skill/SKILL.md and skill/references/*.md must be in
 English." The skill machinery is what Claude reads as instructions; it stays
-English regardless of the course language. Localized course-content templates
-(templates/*_ru.md) are deliberately NOT covered — Cyrillic there is expected.
+English regardless of the course language. skill/extensions/*.md (opt-in
+reporter/variant docs) are machinery too and are held to the same rule.
+Localized course-content templates (templates/*_ru.md) are deliberately NOT
+covered — Cyrillic there is expected.
 
 Intent of the rule is "no non-English natural-language prose" (in practice:
 Cyrillic, since the courses are Russian), NOT "no mathematical notation". So the
@@ -22,7 +24,7 @@ import unicodedata
 
 import pytest
 
-from _paths import REFERENCES_DIR, SKILL_MD, SCRIPTS_DIR, load_module
+from _paths import EXTENSIONS_DIR, REFERENCES_DIR, SKILL_MD, SCRIPTS_DIR, load_module
 
 nonlatin = load_module(SCRIPTS_DIR / "nonlatin.py", "nonlatin")
 
@@ -40,7 +42,13 @@ def is_foreign_letter(ch):
 
 
 def english_only_files():
-    return [SKILL_MD, *sorted(REFERENCES_DIR.glob("*.md"))]
+    # extensions/ is skill machinery too (opt-in reporters/variants docs), so it
+    # is held to the same English-only rule as SKILL.md + references/.
+    return [
+        SKILL_MD,
+        *sorted(REFERENCES_DIR.glob("*.md")),
+        *sorted(EXTENSIONS_DIR.rglob("*.md")),
+    ]
 
 
 def non_english_lines(path):

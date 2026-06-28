@@ -407,6 +407,13 @@ you read and name the sections you consulted.
 > - При `course init` user_defaults подмешиваются как suggestions; в конце предлагается сохранить ответы как новый user_defaults.
 >
 > Шаги 4.1–4.4 ниже описывают изначальный замысел; реальная реализация использует пересмотренную архитектуру.
+>
+> **Замечание после реализации (2026-06-29):** персональный grading-слой вынесен НЕ в профиль (как предполагал шаг 4.4), а в третью ось — `skill/extensions/`. Причина: контракт автогрейдера и система вариантов ортогональны и LMS, и инструктору (автогрейдить можно локально; один преподаватель может вести курс с вариантами и без). Реализация:
+> - `skill/templates/conftest_base.py` сведён к универсальному harness'у + шов `report(outcomes)`; no-op по умолчанию.
+> - `skill/extensions/reporters/scoring_ci.py` — opt-in репортер (бывший scoring-блок + метки + CI-строка). Подключается `grade_reporter:` в курсовом `CLAUDE.md`.
+> - `skill/extensions/variants/` — opt-in система вариантов; формула `dataset_id` теперь инвариант только при `lab_variants: true`, и её нет ни в одном универсальном файле.
+> - Гард `tests/static/test_anti_personalization.py::test_no_variant_formula_in_universal_files` снят с `xfail` и стал жёстким; English-only гард расширен на `skill/extensions/`.
+> - Остаётся отдельной задачей #2: нейтрализовать дефолт ru-метки `ПРЕДВАРИТЕЛЬНАЯ ОЦЕНКА В ЖУРНАЛ` в `lab_templates_ru.md` и переложить персональную строку в user_defaults.
 
 ### Шаг 4.1. Спроектировать структуру profiles/
 ```
