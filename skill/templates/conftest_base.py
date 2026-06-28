@@ -2,41 +2,39 @@
 
 Copied to labs/<LAB_DIR>/starter/conftest.py by /course-maker lab init.
 
-Per-lab modifications happen ONLY in the SCORING block at the bottom
-(TEST_POINTS, TEST_BLOCKS, DATASETS) plus the customizable strings at the
-top. Everything else — IPython mocking, notebook importer, fixtures,
-pytest hooks — should not be modified per lab.
+This is the UNIVERSAL test harness. Its only jobs are:
+  - import the student notebook and expose it as a fixture;
+  - run the lab's pytest test classes;
+  - track per-test outcomes;
+  - hand those outcomes to an OPTIONAL grade reporter.
 
-This file ships as a working universal template. Override the strings at
-the top to localize the grade output for your CI / language. See the
-project's lab_templates.md for the conventional values.
+It deliberately knows nothing about scoring, grade-output formatting, an
+external CI contract, or per-student dataset variants. Those are pluggable,
+opt-in concerns so the harness stays universal across courses:
 
-Critical invariants (see also course-maker Inviolable rules):
-- dataset_id = (Student_ID - 1) % len(DATASETS) is verbatim in pytest_sessionfinish
-- The grade-output line is read by external CI; if your CI relies on a
-  specific format, set GRADE_OUTPUT_LABEL accordingly and do not change the
-  print() format string.
+  - Grade reporting: drop a `grade_report.py` next to this file defining
+    `report(outcomes: dict[str, str]) -> None`. It is called once at the end
+    of the session with a mapping of test name -> outcome
+    ("passed" | "failed" | "skipped"). If no `grade_report.py` is present,
+    nothing extra is printed (pytest's own summary still applies).
+    A ready-made reporter lives in skill/extensions/reporters/.
+  - Per-student dataset variants: see skill/extensions/variants/.
+
+Per-lab edits to THIS file should be unnecessary. The only lab-specific file
+is the test module itself (tests.py) and, if used, grade_report.py.
 """
 
 import builtins
-import os
-import sys
+import importlib.util
 import types
 from pathlib import Path
 
 import pytest
 
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Customizable strings — override per course via lab_templates.md values
-# ─────────────────────────────────────────────────────────────────────────────
-# These defaults work for any language. For Russian/English courses, the
-# values come from lab_templates.md (see /course-maker lab tests step).
-
-TASKID_LABEL = "TASKID"
-GRADE_OUTPUT_LABEL = "PRELIMINARY GRADE"
+# Filename of the notebook the student submits. Override only if a lab uses a
+# different name.
 NOTEBOOK_FILENAME = "exercises.ipynb"
-SCORING_HEADER = "LAB SCORING SYSTEM"
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -148,107 +146,31 @@ def pytest_runtest_makereport(item, call):
         _test_outcomes[item.name] = report.outcome
 
 
-# =============================================================================
-# LAB SCORING SYSTEM — UPDATE PER LAB
-# =============================================================================
-# Everything below is updated per lab from lab_spec.md.
-# Marker (do not delete this line; the lab tests step locates the section by it):
-#   LAB SCORING SYSTEM
-
-TEST_POINTS: dict[str, int] = {
-    # Map: test function name → points awarded if test passes.
-    # Sum should equal the mandatory points total in lab_spec.md
-    # (excluding bonus tasks).
-    #
-    # Example:
-    # "test_data_loaded": 5,
-    # "test_observations_shape": 10,
-    # "test_model_fit": 15,
-}
-
-TEST_BLOCKS: dict[str, str] = {
-    # Map: TestClass name → primary test function name in that class.
-    # Used by pytest_sessionfinish to print per-block status.
-    #
-    # Example:
-    # "TestTask1_DataLoading": "test_data_loaded",
-    # "TestTask2_ModelFit":   "test_model_fit",
-}
-
-DATASETS: list[tuple] = [
-    # Paste verbatim from Block 0 of exercises.ipynb. Must match exactly —
-    # student variants are derived from this list via the dataset_id formula.
-    #
-    # Format: (dataset_type, description, source) — or whatever shape
-    # Block 0 uses in this lab.
-    #
-    # Example:
-    # ("sp500", "S&P 500 Index, ticker ^GSPC, 2010-2023, yfinance", "^GSPC"),
-]
-
-
 # ─────────────────────────────────────────────────────────────────────────────
-# pytest_sessionfinish — prints student-visible grade summary
+# Grade-report seam — DO NOT MODIFY
 # ─────────────────────────────────────────────────────────────────────────────
-# Permitted edits per lab:
-#   - Add a manual-grading note if some points are graded by the instructor
-#   - Remove the bonus line if the lab has no bonus tasks
-#   - Adjust the numerator inside the grade-output line to include bonus
-# Forbidden edits:
-#   - Changing the dataset_id formula
-#   - Changing the format of the TASKID and grade-output print lines
-#   (both are read by external CI grading)
+# Optional. If a `grade_report.py` sits next to this conftest and defines
+# report(outcomes), it is called with the collected outcomes at session end.
+# No reporter -> no extra output (plain pytest). This keeps scoring,
+# grade-output formatting, and any autograder contract out of the universal
+# harness. See skill/extensions/reporters/ for a ready-made reporter.
+
+def _load_grade_reporter():
+    path = Path(__file__).parent / "grade_report.py"
+    if not path.exists():
+        return None
+    spec = importlib.util.spec_from_file_location("grade_report", path)
+    module = importlib.util.module_from_spec(spec)
+    try:
+        spec.loader.exec_module(module)
+    except Exception as exc:  # a broken reporter must not crash the test run
+        print(f"[course-maker] grade_report.py failed to load: {exc}")
+        return None
+    reporter = getattr(module, "report", None)
+    return reporter if callable(reporter) else None
+
 
 def pytest_sessionfinish(session, exitstatus):
-    # ── Variant ID (verbatim formula — DO NOT MODIFY) ──
-    try:
-        student_id = int(os.environ.get("STUDENT_ID", "1"))
-    except ValueError:
-        student_id = 1
-    if not DATASETS:
-        dataset_id = 0
-    else:
-        dataset_id = (student_id - 1) % len(DATASETS)
-
-    # ── Earned points ──
-    mandatory_earned = sum(
-        points for name, points in TEST_POINTS.items()
-        if _test_outcomes.get(name) == "passed"
-    )
-    mandatory_total = sum(TEST_POINTS.values())
-
-    # ── Bonus points (tests in classes named TestBonus*) ──
-    bonus_earned = 0
-    bonus_total = 0
-    for name, outcome in _test_outcomes.items():
-        # Bonus convention: test points may be looked up in TEST_POINTS or
-        # default to 1 if the test is not registered there (bonus tasks
-        # often use pytest.skip).
-        if name.startswith("test_bonus_"):
-            pts = TEST_POINTS.get(name, 1)
-            bonus_total += pts
-            if outcome == "passed":
-                bonus_earned += pts
-
-    # ── Output ──
-    print()
-    print("=" * 60)
-    print(f"  {SCORING_HEADER}")
-    print("=" * 60)
-    print(f"  {TASKID_LABEL} is {dataset_id + 1}")
-
-    for cls_name, primary_test in TEST_BLOCKS.items():
-        outcome = _test_outcomes.get(primary_test, "not_run")
-        marker = {"passed": "✓", "failed": "✗", "skipped": "○"}.get(outcome, "?")
-        print(f"  {marker} {cls_name}: {outcome}")
-
-    print()
-    if bonus_total > 0:
-        print(
-            f"  {GRADE_OUTPUT_LABEL}: "
-            f"{mandatory_earned + bonus_earned} / {mandatory_total} "
-            f"(+ {bonus_earned} bonus of {bonus_total})"
-        )
-    else:
-        print(f"  {GRADE_OUTPUT_LABEL}: {mandatory_earned} / {mandatory_total}")
-    print("=" * 60)
+    reporter = _load_grade_reporter()
+    if reporter is not None:
+        reporter(dict(_test_outcomes))
