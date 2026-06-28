@@ -35,12 +35,14 @@ file you did or did not read. Violating any of them is a hard error.
 
 ### Grading invariants (lab)
 
-- NEVER modify the line `dataset_id = (Student_ID - 1) % len(DATASETS)` anywhere
-  (notebook, `conftest.py`, tests). This formula is used by external grading for
-  every student of every lab past and future.
-- NEVER modify the grade-output format string defined in `lab_templates.md` —
-  it is read by external CI. Only the numerator inside may change (add/remove
-  bonus points).
+- When a lab uses per-student variants (`lab_variants: true`), the variant
+  formula is a verbatim invariant wherever it appears (Block 0 and the grade
+  reporter) — see `skill/extensions/variants/README.md`. With
+  `lab_variants: false` there is no such formula.
+- When a lab uses a grade reporter (`grade_reporter` not `none`), keep its
+  grade-output `print()` layout fixed — an external CI may grep it. Only the
+  labels (course/language) and the numerator (bonus) change. See
+  `skill/extensions/reporters/README.md`.
 - NEVER give students `quizzes/NN/quiz_questions.md` — it holds answers. Before
   marking a quiz `published`, verify the exported student file has no answer
   markers (`grep` for `✓`/answer lines returns nothing).
@@ -139,7 +141,7 @@ file you did or did not read. Violating any of them is a hard error.
 | `/course-maker lab notebook N` | Step 1b — generate exercises.ipynb |
 | `/course-maker lab spec N` | Step 1b — generate lab_spec.md (auto plan/notebook mode) |
 | `/course-maker lab datasets N` | Step 1b — generate datasets_info.md (optional) |
-| `/course-maker lab tests N` | Step 2 — tests.py, conftest.py, requirements.txt, README |
+| `/course-maker lab tests N` | Step 2 — tests.py, requirements.txt, README (+ grade_report.py if a reporter is used) |
 | `/course-maker lab validate N <id>` | Step 3 — validate as student (new session required) |
 | `/course-maker lab triage N` | After a ⚠️ validation: diagnose which step to revisit (read-only) |
 | `/course-maker lab publish N` | Run the LMS publish workflow from `lms_adapter.md` |
