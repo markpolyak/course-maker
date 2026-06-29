@@ -16,6 +16,21 @@ LMS-config inputs your workflow needs, and switch your course profile.
 
 ---
 
+## Lab init — starter setup
+
+Used by `/course-maker lab init N [url] [slug]` (step 4). This profile has no
+remote starter repo: the lab's `starter/` is just a local directory.
+
+```bash
+mkdir -p <LAB_DIR>starter
+```
+
+The `<url>` argument is not used by this profile. The starter is filled by the
+later lab steps (`exercises.ipynb`, `conftest.py`, `tests.py`, …) and shipped as
+a zip at publish time (Step 1 below).
+
+---
+
 ## Step 1 — Build the student bundle
 
 From the course root:

@@ -1,14 +1,22 @@
-# Command: `/course-maker lab init N <url> [slug]`
+# Command: `/course-maker lab init N [url] [slug]`
 
-Scaffold lab N: create the directory, attach the starter repo as a git subtree,
-copy CI templates, register the lab in `COURSE_STATE.md`.
+Scaffold lab N: create the directory, set up `starter/` per the course's LMS
+adapter, copy CI templates, register the lab in `COURSE_STATE.md`.
+
+`url` is the starter-repo URL. Required only for profiles that attach a remote
+starter repo (e.g. `github-classroom`); profiles that distribute locally
+(e.g. `local-zip`) do not use it.
 
 `slug` is optional. If provided, the lab directory is `labs/<slug>/`.
 If omitted, the directory is `labs/labN/` (e.g. `labs/lab1/`).
 
-Example:
+Example (github-classroom):
 ```
 /course-maker lab init 1 https://github.com/org/lab1-backprop lab1-backprop
+```
+Example (local-zip):
+```
+/course-maker lab init 1 lab1-backprop
 ```
 
 Let `LAB_DIR = labs/<slug>/` if slug given, else `labs/labN/`.
@@ -35,10 +43,16 @@ Let `LAB_DIR = labs/<slug>/` if slug given, else `labs/labN/`.
    # Run /course-maker lab spec N to generate this file.
    ```
 
-4. **Add starter repo as git subtree:**
-   ```bash
-   git subtree add --prefix=<LAB_DIR>starter <url> main --squash
-   ```
+4. **Set up `<LAB_DIR>starter/` per the LMS adapter:**
+   Read `<course-root>/lms_adapter.md` → "Lab init — starter setup" and follow
+   it. This step is LMS-specific:
+   - A remote-starter profile (e.g. `github-classroom`) attaches a public
+     starter repo at `<LAB_DIR>starter` (via `git subtree add`) using `<url>`.
+   - A local profile (e.g. `local-zip`) just creates an empty
+     `<LAB_DIR>starter/` directory; `<url>` is unused.
+
+   If `lms_adapter.md` has no such section, default to creating an empty
+   `<LAB_DIR>starter/` directory.
 
 5. **Copy CI workflow:**
    ```bash
@@ -64,7 +78,7 @@ Let `LAB_DIR = labs/<slug>/` if slug given, else `labs/labN/`.
 
 8. **Commit:**
    ```bash
-   git add -A && git commit -m "lab N: init starter subtree"
+   git add -A && git commit -m "lab N: init starter"
    ```
 
 ---
@@ -74,5 +88,7 @@ Let `LAB_DIR = labs/<slug>/` if slug given, else `labs/labN/`.
 - If `labs/shared/conftest_base.py` or `labs/shared/tests.yaml` are placeholders,
   step 5 or 6 produces a placeholder in `<LAB_DIR>starter/`. The user must
   replace them with real content before `/course-maker lab tests N`.
-- The starter repo URL must point to an existing GitHub repository — create it
-  first. The subtree command will fail otherwise.
+- Any constraint on `<url>` (e.g. github-classroom requires the starter repo to
+  already exist, or `git subtree add` fails) is documented in the profile's
+  `lms_adapter.md` "Lab init — starter setup" section, not here — step 4 is
+  LMS-agnostic.

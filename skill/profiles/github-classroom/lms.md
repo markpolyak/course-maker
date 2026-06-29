@@ -16,6 +16,21 @@ pattern before starting.
 
 ---
 
+## Lab init — starter setup
+
+Used by `/course-maker lab init N <url> [slug]` (step 4) to attach the starter.
+This profile keeps each lab's `starter/` as a git subtree of a public starter
+repository.
+
+```bash
+git subtree add --prefix=<LAB_DIR>starter <url> main --squash
+```
+
+`<url>` must point to an existing GitHub repository — create it first, or the
+subtree command fails.
+
+---
+
 ## Step 1 — Push to starter repo (git subtree)
 
 Get the URL from `CLAUDE.md` Lab context → Starter repos table for lab N.
