@@ -161,7 +161,7 @@ my-course/
 | `/course-maker lab notebook N` | Step 1b: generate exercises.ipynb |
 | `/course-maker lab spec N` | Step 1b: generate lab_spec.md (auto plan/notebook mode) |
 | `/course-maker lab datasets N` | Step 1b: generate datasets_info.md (optional) |
-| `/course-maker lab tests N` | Step 2: tests.py, conftest.py, requirements.txt, README |
+| `/course-maker lab tests N` | Step 2: tests.py, requirements.txt, README (+ grade_report.py if a reporter is used) |
 | `/course-maker lab validate N <id>` | Step 3: validate as student (new session required) |
 | `/course-maker lab publish N` | Push to starter repo + sync GitHub Classroom |
 | `/course-maker lab update N` | Re-publish after post-release fix |

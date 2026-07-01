@@ -237,7 +237,7 @@ Full workflow for a single lab:
 /course-maker lab spec 1        # Stage 1b: generate lab_spec.md (instructor-only)
 /course-maker lab datasets 1    # Stage 1b: generate datasets_info.md (optional)
 
-/course-maker lab tests 1       # Stage 2: generate tests.py, conftest.py, requirements.txt, README
+/course-maker lab tests 1       # Stage 2: generate tests.py, requirements.txt, README (+ grade_report.py if a reporter is used)
 
 /course-maker lab validate 1 7  # Stage 3: validate as student 7 (new session recommended)
 
@@ -260,9 +260,61 @@ After post-release fixes:
 **Before running `/course-maker lab course-init`:** fill in `## Lab context` in `CLAUDE.md` with
 your GitHub org, GitHub Classroom org, and starter repo URLs.
 
-**Before running `/course-maker lab init N`:** create the starter repo on GitHub. The skill ships
-with working `conftest_base.py` and `tests.yaml` in `skill/templates/`, so manual setup is no
-longer required — labs scaffold out-of-the-box.
+**Before running `/course-maker lab init N`:** for a profile that uses a remote starter repo
+(e.g. `github-classroom`), create the starter repo first and pass its URL. For a local profile
+(e.g. `local-zip`), no remote repo is needed — the `starter/` is just a local folder. The skill
+ships with working `conftest_base.py` and `tests.yaml`, so labs scaffold out-of-the-box.
+
+### Lab grading and per-student variants
+
+By **default, labs are deliberately minimal**: the test harness
+(`conftest_base.py`) runs the lab's pytest tests and reports plain pass/fail.
+There is no scoring block, no autograder grade line, and no per-student variant
+scheme — so a course that grades manually or has no variants needs no setup at
+all.
+
+Two opt-in features are controlled from `CLAUDE.md` → `## Lab context` →
+`### Lab grading`:
+
+```
+grade_reporter: none      # none | scoring_ci | <your own reporter>
+lab_variants: false       # true if each student gets a different dataset
+```
+
+- **`grade_reporter`** — selects an optional *grade reporter* that turns the
+  raw pytest outcomes into end-of-run output. `none` (default) prints nothing
+  extra. `scoring_ci` prints a points summary and a grade line designed to be
+  read by an external autograder/CI. You can add your own reporter under
+  `skill/extensions/reporters/`. See that folder's `README.md` for the contract.
+- **`lab_variants`** — when `true`, each student is assigned a different dataset
+  via a fixed formula in Block 0 of the notebook (so solutions can't be copied
+  verbatim). When `false` (default), every student gets the same task and there
+  is no variant code. See `skill/extensions/variants/README.md`.
+
+The two are independent — you can use either, both, or neither.
+
+**To run an autograded course with per-student variants** (a common STEM
+setup), set both flags:
+
+```
+grade_reporter: scoring_ci
+lab_variants: true
+```
+
+Then the pipeline wires it up for you:
+
+1. `/course-maker lab course-init` installs the reporter into `labs/shared/`
+   (as `grade_report.py`) and substitutes your course-language grade labels into
+   it from `lab_templates.md`.
+2. `/course-maker lab notebook N` includes the Block 0 variant cells.
+3. `/course-maker lab tests N` fills the reporter's `TEST_POINTS`,
+   `TEST_BLOCKS`, and `DATASETS` from the lab spec.
+4. `/course-maker lab init N` copies `grade_report.py` into each lab's
+   `starter/`, and the CI workflow captures the grade line from the test logs.
+
+If your autograder greps the grade line for an exact phrase, set that phrase as
+the grade-output label in `lab_templates.md`; it is substituted into
+`grade_report.py` automatically.
 
 ---
 
