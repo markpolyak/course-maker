@@ -413,7 +413,7 @@ you read and name the sections you consulted.
 > - `skill/extensions/reporters/scoring_ci.py` — opt-in репортер (бывший scoring-блок + метки + CI-строка). Подключается `grade_reporter:` в курсовом `CLAUDE.md`.
 > - `skill/extensions/variants/` — opt-in система вариантов; формула `dataset_id` теперь инвариант только при `lab_variants: true`, и её нет ни в одном универсальном файле.
 > - Гард `tests/static/test_anti_personalization.py::test_no_variant_formula_in_universal_files` снят с `xfail` и стал жёстким; English-only гард расширен на `skill/extensions/`.
-> - Остаётся отдельной задачей #2: нейтрализовать дефолт ru-метки `ПРЕДВАРИТЕЛЬНАЯ ОЦЕНКА В ЖУРНАЛ` в `lab_templates_ru.md` и переложить персональную строку в user_defaults.
+> - #2 (нейтрализация ru-дефолта метки) выполнено (2026-07-02): дефолт в `lab_templates_ru.md` заменён на нейтральный `ПРЕДВАРИТЕЛЬНАЯ ОЦЕНКА`; user_defaults расширен полями `default_grade_output_label` / `default_taskid_label` / `default_scoring_header`; `lab course-init` Phase 2a подставляет метки по приоритету user_defaults → lab_templates.md → reporter default. Персональная CI-фраза теперь живёт только в личном `~/.course-maker/defaults.yaml`, вне репозитория.
 
 ### Шаг 4.1. Спроектировать структуру profiles/
 ```

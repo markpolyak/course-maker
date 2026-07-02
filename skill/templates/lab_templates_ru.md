@@ -246,10 +246,15 @@ defaults — change them to match whatever your grader reads.
 TASKID
 ```
 
-### Grade output label (printed as `ПРЕДВАРИТЕЛЬНАЯ ОЦЕНКА В ЖУРНАЛ: {earned} / {total}` — read by external CI)
+### Grade output label (printed as `<label>: {earned} / {total}`)
+
+Generic Russian default. If your autograder greps the log for a specific exact
+phrase, set it in user_defaults (`default_grade_output_label`) — that keeps your
+CI phrase in your personal config rather than in this shared template — or
+replace the value below for this course only.
 
 ```
-ПРЕДВАРИТЕЛЬНАЯ ОЦЕНКА В ЖУРНАЛ
+ПРЕДВАРИТЕЛЬНАЯ ОЦЕНКА
 ```
 
 ---

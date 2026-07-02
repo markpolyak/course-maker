@@ -312,9 +312,12 @@ Then the pipeline wires it up for you:
 4. `/course-maker lab init N` copies `grade_report.py` into each lab's
    `starter/`, and the CI workflow captures the grade line from the test logs.
 
-If your autograder greps the grade line for an exact phrase, set that phrase as
-the grade-output label in `lab_templates.md`; it is substituted into
-`grade_report.py` automatically.
+If your autograder greps the grade line for an exact phrase, put that phrase in
+your personal `user_defaults` (`default_grade_output_label` in
+`~/.course-maker/defaults.yaml`) so it stays in your config rather than in the
+shared course-language templates. It takes precedence over the generic label
+from `lab_templates.md` and is substituted into `grade_report.py` automatically.
+(You can still override per course by editing `lab_templates.md`.)
 
 ---
 

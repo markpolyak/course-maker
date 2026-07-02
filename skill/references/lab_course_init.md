@@ -66,13 +66,21 @@ Read `grade_reporter` from `CLAUDE.md` → `## Lab context` → `### Lab grading
 - **`none`** → do nothing. Labs run plain pytest (pass/fail only).
 - **`<name>`** (e.g. `scoring_ci`):
   1. Copy `skill/extensions/reporters/<name>.py` → `labs/shared/grade_report.py`.
-  2. If `lab_templates.md` exists (from `course init`), substitute the labels
-     at the top of `grade_report.py`:
-     - `lab_templates.md` § "Scoring header" → `SCORING_HEADER`
-     - `lab_templates.md` § "TASKID label" → `TASKID_LABEL`
-     - `lab_templates.md` § "Grade output label" → `GRADE_OUTPUT_LABEL`
-     If `lab_templates.md` does not exist yet (Phase 5 creates it), leave the
-     defaults and re-run this command after Phase 5 to substitute the labels.
+  2. Substitute the labels at the top of `grade_report.py`. Resolve each label
+     by precedence — **user_defaults → lab_templates.md → reporter default**:
+     - `SCORING_HEADER` ← `default_scoring_header` (user_defaults), else
+       `lab_templates.md` § "Scoring header", else leave the reporter default.
+     - `TASKID_LABEL` ← `default_taskid_label`, else § "TASKID label", else default.
+     - `GRADE_OUTPUT_LABEL` ← `default_grade_output_label`, else § "Grade output
+       label", else default.
+
+     Read user_defaults from `$COURSE_MAKER_HOME/defaults.yaml` (fallback
+     `~/.course-maker/defaults.yaml`); use a field only when it is non-empty.
+     This keeps an instructor's autograder phrase in their personal config
+     rather than in the shared course-language templates. If neither
+     user_defaults nor `lab_templates.md` provides a value (e.g. `lab_templates.md`
+     is created later in Phase 5), leave the reporter default and re-run this
+     command after Phase 5.
   3. If `<name>.py` is missing, warn: "grade_reporter `<name>` not found in
      skill/extensions/reporters/ — labs will run plain pytest."
 
