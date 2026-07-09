@@ -1,17 +1,19 @@
 name: e2e
 
 # Level 3: behavioural smoke tests that drive the skill through `claude -p`.
-# Costs tokens and is non-deterministic, so it does NOT run per-push:
-#   * nightly on a schedule, and
-#   * on demand via the "Run workflow" button.
+# Costs tokens and is non-deterministic, so it does NOT run per-push and does
+# NOT run on any schedule — only manually via the "Run workflow" button.
+# The `schedule` trigger below is intentionally commented out: it was firing
+# nightly and sending failure-notification emails even though nobody was
+# running the tests. Re-enable only with explicit sign-off.
 #
 # Requires an ANTHROPIC_API_KEY repository secret. LaTeX is intentionally not
 # installed (texlive is huge): the slides test then checks figure references but
 # skips the xelatex compile. Add texlive-xetex to the steps if you want it.
 
 on:
-  schedule:
-    - cron: "0 3 * * *"   # 03:00 UTC nightly
+  # schedule:
+  #   - cron: "0 3 * * *"   # 03:00 UTC nightly — disabled, manual-only per policy
   workflow_dispatch:
 
 jobs:
