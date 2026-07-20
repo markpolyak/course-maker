@@ -78,7 +78,7 @@ without breaking the logical flow:]
   Never start content slides at 1. Slides 1 and 2 need no detailed description — they are fixed.
 - Maximum 20 content slides (not counting title, outline, and closing/summary slides)
 - Each slide description must be concrete enough that a designer
-  (or Claude in Step 4) could produce the slide without asking questions
+  (or the agent in Step 4) could produce the slide without asking questions
 - For "announce-only" sections: 1–2 slides max, no derivations,
   just motivation + pointer to where it's covered fully
 - Mark slides that contain a formula with `[formula]` tag in the summary

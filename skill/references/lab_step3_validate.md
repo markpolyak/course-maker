@@ -26,23 +26,23 @@ Do not proceed until the working tree for `<LAB_DIR>starter/` is clean.
 
 ## IMPORTANT: Clear context before validation
 
-This step simulates a student solving the lab. Claude must not have access to `lab_spec.md`
+This step simulates a student solving the lab. The agent must not have access to `lab_spec.md`
 or the test files before completing all tasks. The current session likely has all of that
 in context from the preceding steps.
 
 When the user runs `/course-maker lab validate N <student_id>`, show this message first
 and **stop — do not proceed until the user confirms**:
 ```
-Context must be cleared before validation — otherwise Claude will know the contents of
-lab_spec.md and tests.py and cannot objectively simulate a student.
+Context must be cleared before validation — otherwise the agent will know the
+contents of lab_spec.md and tests.py and cannot objectively simulate a student.
 
-Run /clear in this chat, then run the command again:
+Start a fresh session/context, then run the command again:
   /course-maker lab validate N <student_id>
-
-Or open a new Claude Code session at the course repo root and run the command there.
+(Claude Code: run /clear in this chat. Codex CLI / Cursor: open a new
+chat/session at the course repo root and run the command there.)
 ```
 
-Only proceed after the user has confirmed they ran `/clear` or opened a new session.
+Only proceed after the user has confirmed they started a fresh session/context.
 
 ---
 

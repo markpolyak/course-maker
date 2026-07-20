@@ -3,7 +3,7 @@
 A **profile** in this skill describes how labs get **published** — the LMS
 adapter. It bundles:
 
-- `lms.md` — the workflow Claude runs during `/course-maker lab publish`.
+- `lms.md` — the workflow the agent runs during `/course-maker lab publish`.
 - `lab_questions.yaml` — the LMS-config questions asked during
   `/course-maker lab course-init`.
 - `lms_defaults.yaml` — defaults for those questions (e.g. typical repo

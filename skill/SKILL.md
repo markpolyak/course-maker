@@ -55,9 +55,10 @@ file you did or did not read. Violating any of them is a hard error.
 - NEVER start `lab validate` if `<LAB_DIR>starter/` has uncommitted changes —
   the notebook will be modified during validation and the clean version will be
   lost. Stop and ask the user to commit first.
-- NEVER skip the `/clear` prompt before `lab validate`. The current session
-  context contains `lab_spec.md` and `tests.py` from prior steps; without a
-  clear, the simulation is invalid.
+- NEVER skip the fresh-context prompt before `lab validate`. The current session
+  contains `lab_spec.md` and `tests.py` from prior steps; without a clean context
+  the simulation is invalid. (Claude Code: `/clear`; Codex CLI / Cursor: a new
+  chat/session.)
 
 ### Slides & figures
 
@@ -69,7 +70,8 @@ file you did or did not read. Violating any of them is a hard error.
   lecture, only on the closing slide, only if it flows naturally.
 - Output for `slides`, `notes`, `quiz generate`, and `seminar practice` is ALWAYS
   chunked (blocks of 5 slides, or one quiz block / notebook section per chunk).
-  Never generate the entire file in one shot — it causes Claude Code to hang.
+  Never generate the entire file in one shot — a full file exceeds a single
+  generation/context budget and stalls the agent.
 
 ### Process
 
@@ -228,7 +230,7 @@ if requested, say so and stop.)
 
 **CRITICAL — even if reference was skipped:**
 - Output is ALWAYS chunked, for either format. A full deck is 600–900 lines;
-  one-shot generation causes Claude Code to hang.
+  one-shot generation exceeds a single generation/context budget and stalls the agent.
 - Chunk 0 = preamble/headmatter + title. Chunk K (K≥1) = slides [5K-4 … 5K].
   Chunk last = closing slide (beamer also appends `\end{document}`).
 - Append each chunk to the deck file (`slides.tex` or `slides.md`) immediately;
@@ -336,7 +338,8 @@ git commit -m "lab N: add tests and conftest"
 Read: `references/lab_step3_validate.md`.
 
 **CRITICAL — see also Inviolable rules above. Highlights:**
-- Show the isolation warning, stop, wait for the user to confirm `/clear`.
+- Show the isolation warning, stop, wait for the user to confirm a fresh
+  session/context (Claude Code: `/clear`; Codex CLI / Cursor: a new chat/session).
 - Check `git status <LAB_DIR>starter/`; stop with commit-first message if dirty.
 - Do NOT read `history.md`, `lab_spec.md`, `tests.py`, `conftest.py`, or
   `tests_template.py` until all student tasks are complete.

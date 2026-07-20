@@ -53,7 +53,7 @@ Iterate until the user approves. Save the original file as `course_plan_source.*
 ### Options [2] and [3] — Dialog creation
 
 Both options use the same dialog. The difference: [2] assumes the user has
-content ready; [3] means Claude will propose based on subject knowledge after
+content ready; [3] means the agent will propose based on subject knowledge after
 collecting the basics. Ask one question at a time, wait for each answer:
 
 1. *(skip if known from CLAUDE.md)* "What is this course about?"
@@ -65,7 +65,7 @@ collecting the basics. Ask one question at a time, wait for each answer:
 5. "Standard session duration? (or different per type — specify)"
 6. *(option [2])* "List your session titles, one per line. You can add a few
    topics after each title separated by a dash. Skip types you haven't planned yet."
-   *(option [3])* Claude generates a full proposed outline using knowledge of
+   *(option [3])* the agent generates a full proposed outline using knowledge of
    typical university curricula for this subject and audience. Show it, ask:
    "What would you change?" — iterate until approved. Be explicit this is based
    on general knowledge; the professor's judgment takes precedence.

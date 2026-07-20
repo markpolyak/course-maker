@@ -67,8 +67,9 @@ the numbers/data; recompute each answer. For `M = 1`, emit a single variant.
 
 ## Chunked generation (mandatory)
 
-A full bank is long (often 600+ lines) — generating it in one shot causes Claude
-Code to hang, exactly like slides. Generate **one block per chunk**:
+A full bank is long (often 600+ lines) — generating it in one shot exceeds a
+single generation/context budget and stalls the agent, exactly like slides.
+Generate **one block per chunk**:
 - Chunk 0 = title + header + the "Quiz structure" table.
 - Chunk K = Block K (all its questions and all their variants).
 - Append each chunk to `quiz_questions.md` immediately; do not pause between
