@@ -119,6 +119,7 @@ file you did or did not read. Violating any of them is a hard error.
 | `/course-maker figures N` | Step 3 — Python script to generate PNG figures |
 | `/course-maker slides N [format]` | Step 4 — deck chunk 0 (beamer→slides.tex / slidev→slides.md); format from CLAUDE.md or arg |
 | `/course-maker slides N next` | Step 4 — next block of 5 slides (format detected from the existing file) |
+| `/course-maker slides N export [pdf\|png]` | Export the existing deck to a file (beamer→PDF, slidev→pdf/png) |
 | `/course-maker notes N` | Step 5 — speaker notes, chunk 0 (slides 1–5) |
 | `/course-maker notes N next` | Step 5 — next block of 5 slides |
 | `/course-maker status N` | Show state + history summary for lecture N |
@@ -244,6 +245,14 @@ the last completed slide, continues from there (auto-chains remaining chunks).
 
 **Revising:** "fix slide 7" → identify which chunk it belongs to, regenerate
 only that chunk, show diff, append corrected version after approval.
+
+### `/course-maker slides N export [pdf|png]`
+Read: `references/slides_export.md`. Mechanical export of the existing deck — no
+approval, no state change. Detect the deck format from the file present
+(`slides.tex` → beamer PDF, `slides.md` → slidev pdf/png). If the export tool (a
+LaTeX engine, or Node for Slidev) is missing, say how to install it — never fail
+silently. Presenting a Slidev deck live (`npx slidev`) is the user's job; never
+launch it.
 
 ### `/course-maker notes N` (Step 5)
 Read: `references/step5_notes.md`.
