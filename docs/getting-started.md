@@ -20,8 +20,9 @@ in a single session.
 ## Step 0: Install the skill
 
 The skill is a single cross-tool Agent Skill (`SKILL.md` + `references/`). Clone
-once, then symlink it into your agent's skills directory — a `git pull` in the
-repo then keeps every tool up to date.
+once, then install it into your agent's skills directory either by **symlink**
+(recommended — a `git pull` in the clone updates every tool) or by **copy**
+(self-contained, but re-copy after updates — use `cp -r` instead of `ln -s`).
 
 ```bash
 # Clone the repository
@@ -37,10 +38,15 @@ ln -s "$(pwd)/course-maker/skill" ~/.agents/skills/course-maker
 
 For **Claude Code** and **Codex CLI** the skill is global — available in every
 project. **Cursor has no global skills directory**, so the skill is project-scoped:
-symlink it into each course repo (created in Step 1) and gitignore the link:
+install it into each course repo (created in Step 1). Copying makes the course
+repo self-contained (the skill travels with it); symlinking needs a gitignore so
+the external link doesn't get committed:
 
 ```bash
 mkdir -p my-course/.cursor/skills
+# Copy (self-contained repo):
+cp -r "$(pwd)/course-maker/skill" my-course/.cursor/skills/course-maker
+# — or — Symlink (auto-updates; keep the link out of git):
 ln -s "$(pwd)/course-maker/skill" my-course/.cursor/skills/course-maker
 echo ".cursor/skills/" >> my-course/.gitignore
 ```

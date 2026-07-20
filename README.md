@@ -47,8 +47,13 @@ git clone https://github.com/markpolyak/course-maker
 ```
 
 The same skill (`SKILL.md` + `references/`) works in every tool; only the
-install location differs. Symlink it (a `git pull` then keeps every tool
-up to date). Run these from the PARENT directory of the cloned repo:
+install location differs. Two ways to install:
+
+- **Symlink** (recommended) — a `git pull` in the clone then updates every tool.
+- **Copy** — self-contained, but you must re-copy after each update. Replace
+  `ln -s` with `cp -r` in the commands below.
+
+Run these from the PARENT directory of the cloned repo:
 
 ```bash
 # Claude Code — global (~/.claude/skills):
@@ -59,13 +64,16 @@ mkdir -p ~/.agents/skills
 ln -s "$(pwd)/course-maker/skill" ~/.agents/skills/course-maker
 ```
 
-**Cursor has no global skills directory** — skills are project-scoped. Symlink
-the skill into each course repo (add `.cursor/skills/` to that repo's
-`.gitignore`):
+**Cursor has no global skills directory** — skills are project-scoped, so install
+into each course repo's `.cursor/skills/`:
 
 ```bash
 mkdir -p my-course/.cursor/skills
+# Symlink (external clone; gitignore the link so it doesn't travel with the repo):
 ln -s "$(pwd)/course-maker/skill" my-course/.cursor/skills/course-maker
+echo ".cursor/skills/" >> my-course/.gitignore
+# — or — Copy, to make the course repo self-contained (skill travels with it):
+cp -r "$(pwd)/course-maker/skill" my-course/.cursor/skills/course-maker
 ```
 
 Then create a course and initialize it in your agent:
