@@ -79,7 +79,8 @@ Works on Linux, macOS, and Windows (under Git Bash / PowerShell, where
 # All fields optional; empty string = ask the user fresh in course init.
 
 default_language: ""           # e.g. "Russian"
-default_latex_engine: ""       # pdflatex / xelatex / lualatex
+default_slides_format: ""      # beamer / slidev  (empty = ask; course default beamer)
+default_latex_engine: ""       # pdflatex / xelatex / lualatex  (beamer only)
 default_audience: ""           # one paragraph; what students know coming in
 default_style: ""              # one paragraph; rigor vs intuition, formula handling
 default_instructor: ""         # name(s) for title slide / syllabus

@@ -114,6 +114,26 @@ def test_figures_fresh_passes(tmp_path):
     assert code == 0, out
 
 
+def test_slides_slidev_md_counts_as_done(tmp_path):
+    """slides ✅ is satisfied by slides.md (Slidev), not only slides.tex."""
+    write_state(tmp_path, lectures_table("| 01 | Intro | ❌ | ❌ | ❌ | ✅ | ❌ | 2026-01-01 |\n"))
+    lec = tmp_path / "lectures" / "01"
+    lec.mkdir(parents=True)
+    (lec / "slides.md").write_text("# deck", encoding="utf-8")
+    code, out = run(tmp_path)
+    assert code == 0, out
+    assert "DRIFT" not in out
+
+
+def test_slides_done_without_any_deck_drifts(tmp_path):
+    """slides ✅ but neither slides.tex nor slides.md present -> DRIFT."""
+    write_state(tmp_path, lectures_table("| 01 | Intro | ❌ | ❌ | ❌ | ✅ | ❌ | 2026-01-01 |\n"))
+    (tmp_path / "lectures" / "01").mkdir(parents=True)
+    code, out = run(tmp_path)
+    assert code == 1
+    assert "DRIFT" in out and "slides" in out
+
+
 def test_quiz_published_without_export_drifts(tmp_path):
     body = (
         "# Course State\n\n## Quizzes\n\n"

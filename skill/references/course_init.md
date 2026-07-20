@@ -26,8 +26,9 @@ Run these checks silently before asking anything:
    - `missing` — file does not exist.
    - `exists` — do not overwrite unless the user explicitly asks to reset it.
 
-4. **Check `slides_preamble.tex`.**
-   - `missing` — file does not exist.
+4. **Check the slide preamble/headmatter.**
+   - Beamer courses use `slides_preamble.tex`; Slidev courses use
+     `slides_headmatter.md`. Note which exists; `missing` = neither is present.
    - `exists` — do not overwrite.
 
 5. **Check directory structure** (`lectures/`, `labs/`).
@@ -93,16 +94,21 @@ Questions (ask only if not already known):
    *(default: `default_style` from user_defaults)*
 6. Language for slides and speaker notes?
    *(default: `default_language` from user_defaults)*
-7. LaTeX engine for slide compilation? (`pdflatex` / `xelatex` / `lualatex`)
-   *(default: `default_latex_engine` from user_defaults)*
-   Note: xelatex and lualatex support Unicode fonts natively; pdflatex
-   requires T2A/inputenc for Cyrillic.
+7. Slides format? (`beamer` / `slidev`) *(default: `default_slides_format`
+   from user_defaults, else `beamer`)*
+   Note: `beamer` → LaTeX/PDF; `slidev` → Markdown deck presented/exported via
+   Node (`npx slidev`, local, no paid services). `pptx` is planned, not yet
+   implemented. Question 8 is only relevant for `beamer`.
+8. LaTeX engine for slide compilation? (`pdflatex` / `xelatex` / `lualatex`)
+   *(default: `default_latex_engine` from user_defaults)* — ask only when the
+   slides format is `beamer`. Note: xelatex and lualatex support Unicode fonts
+   natively; pdflatex requires T2A/inputenc for Cyrillic.
 
 ### Phase 2d — Offer to save user_defaults
 
 After all content questions are answered, if there are answers that look
-reusable across courses (language, latex engine, audience, style,
-instructor name), and they differ from the current user_defaults (or
+reusable across courses (language, slides format, latex engine, audience,
+style, instructor name), and they differ from the current user_defaults (or
 user_defaults does not exist), ask:
 
 > "Save these answers as your user_defaults for future courses? Future
@@ -128,7 +134,8 @@ For each file, act only if it is `missing` (skip if it already exists):
 
 - **`CLAUDE.md`** — create from `skill/COURSE_CLAUDE_TEMPLATE.md` with all
   collected info embedded in the `## Course context` section, including
-  `Profile: <name>` (default `local-zip`).
+  `Profile: <name>` (default `local-zip`) and `Slides format: <beamer|slidev>`
+  (default `beamer`).
   If `placeholder` — fill in the placeholder fields, preserve everything else.
   Do NOT embed the skill content in `CLAUDE.md` — the skill is installed
   globally in `~/.claude/skills/course-maker/` and is discovered automatically.
@@ -139,13 +146,17 @@ For each file, act only if it is `missing` (skip if it already exists):
   Confirm: "course_conventions.md created for {language}. Review and edit the
   terminology dictionary before starting labs."
 
-- **`slides_preamble.tex`** — determine variant from the engine answer:
-  `pdflatex` → `skill/templates/slides_preamble_pdflatex.tex`,
-  `xelatex` or `lualatex` → `skill/templates/slides_preamble_xelatex.tex`.
-  Default to `pdflatex` if not specified.
-  Copy to `slides_preamble.tex` in the course root.
-  Confirm: "slides_preamble.tex created for {engine}. Edit it to set your theme,
-  colors, and title info before generating slides."
+- **Slide preamble/headmatter** — depends on the slides format:
+  - **`beamer`** → `slides_preamble.tex`. Determine variant from the engine
+    answer: `pdflatex` → `skill/templates/slides_preamble_pdflatex.tex`;
+    `xelatex`/`lualatex` → `skill/templates/slides_preamble_xelatex.tex`.
+    Default `pdflatex`. Copy to `slides_preamble.tex` in the course root.
+    Confirm: "slides_preamble.tex created for {engine}. Edit theme, colors, and
+    title info before generating slides."
+  - **`slidev`** → copy `skill/templates/slides_headmatter_slidev.md` →
+    `slides_headmatter.md` in the course root. Confirm: "slides_headmatter.md
+    created. Edit theme/colors before generating slides. Present/export locally
+    with `npx slidev` (no paid services)."
 
 - **`COURSE_STATE.md`** — create empty state file (header + empty Lectures table).
   Use English structural headings and column names regardless of course language

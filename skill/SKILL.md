@@ -117,8 +117,8 @@ file you did or did not read. Violating any of them is a hard error.
 | `/course-maker plan N` | Step 1 — detailed slide-by-slide plan for lecture N |
 | `/course-maker visuals N` | Step 2 — list of visualizations, TikZ feasibility |
 | `/course-maker figures N` | Step 3 — Python script to generate PNG figures |
-| `/course-maker slides N` | Step 4 — LaTeX/Beamer, chunk 0 (preamble + title) |
-| `/course-maker slides N next` | Step 4 — next block of 5 slides |
+| `/course-maker slides N [format]` | Step 4 — deck chunk 0 (beamer→slides.tex / slidev→slides.md); format from CLAUDE.md or arg |
+| `/course-maker slides N next` | Step 4 — next block of 5 slides (format detected from the existing file) |
 | `/course-maker notes N` | Step 5 — speaker notes, chunk 0 (slides 1–5) |
 | `/course-maker notes N next` | Step 5 — next block of 5 slides |
 | `/course-maker status N` | Show state + history summary for lecture N |
@@ -214,23 +214,33 @@ Read: `references/step3_figures.md`.
 - After a clean run: verify expected PNGs in `lectures/NN/figures/`; list them.
 - Mark `figures → ✅` ONLY after a clean run with PNGs verified. Otherwise → 🔄.
 
-### `/course-maker slides N` (Step 4)
-Read: `references/step4_slides.md`.
+### `/course-maker slides N [format]` (Step 4)
+Resolve the slide format, then read the matching reference:
+- `beamer` → `references/step4_slides.md` (produces `slides.tex`).
+- `slidev` → `references/step4_slides_slidev.md` (produces `slides.md`).
+
+Format resolution: an explicit `format` arg (`beamer`|`slidev`) wins; else the
+`Slides format:` field in `CLAUDE.md` → `## Course context` (default `beamer`).
+When resuming (`slides N next`), ignore the field and detect from the existing
+file: `slides.tex` → beamer, `slides.md` → slidev. (`pptx` is not implemented;
+if requested, say so and stop.)
 
 **CRITICAL — even if reference was skipped:**
-- Output is ALWAYS chunked. A 20-slide Beamer file is 600–900 lines; one-shot
-  generation causes Claude Code to hang.
-- Chunk 0 = preamble + title. Chunk K (K≥1) = slides [5K-4 … 5K].
-  Chunk last = closing slide + `\end{document}`.
-- Append each chunk to `slides.tex` immediately; do not pause between chunks.
-- Use `slides_preamble.tex` from the course root verbatim. If missing, stop
-  and tell the user to run `/course-maker course init`.
+- Output is ALWAYS chunked, for either format. A full deck is 600–900 lines;
+  one-shot generation causes Claude Code to hang.
+- Chunk 0 = preamble/headmatter + title. Chunk K (K≥1) = slides [5K-4 … 5K].
+  Chunk last = closing slide (beamer also appends `\end{document}`).
+- Append each chunk to the deck file (`slides.tex` or `slides.md`) immediately;
+  do not pause between chunks.
+- Use the course's preamble verbatim: `slides_preamble.tex` (beamer) or
+  `slides_headmatter.md` (slidev). If missing, stop and tell the user to run
+  `/course-maker course init`.
 - Only reference PNG files that actually exist in `lectures/NN/figures/`.
 - If any PNG is older than `figures.py`, warn that figures may be stale and
   offer to re-run `/course-maker figures N` first. Warning, not a hard block.
 
-**Resuming:** `/course-maker slides N next` reads `slides.tex`, finds the last
-completed slide, continues from there (auto-chains remaining chunks).
+**Resuming:** `/course-maker slides N next` reads the existing deck file, finds
+the last completed slide, continues from there (auto-chains remaining chunks).
 
 **Revising:** "fix slide 7" → identify which chunk it belongs to, regenerate
 only that chunk, show diff, append corrected version after approval.
@@ -261,7 +271,9 @@ A seminar = a lecture deck + a practical part, in `seminars/NN/`.
 
 ### `/course-maker seminar plan|visuals|figures|slides|notes N`
 Use the matching lecture step reference (`step1_plan.md` … `step5_notes.md`),
-applied to `seminars/NN/`. All lecture CRITICAL rules apply with paths under
+applied to `seminars/NN/`. For `slides`, resolve the format exactly as the
+lecture slides dispatcher does (beamer → `step4_slides.md`, slidev →
+`step4_slides_slidev.md`). All lecture CRITICAL rules apply with paths under
 `seminars/NN/` (chunking for slides/notes; run `figures.py` before figures ✅).
 
 ### `/course-maker seminar practice N`

@@ -14,6 +14,11 @@
 **Course name:** [Full course name]
 **Slug:** [course-slug]
 **Semester / programme:** [e.g. Master's, semester 2, Mathematical Methods for Systems Analysis]
+**Slides format:** beamer
+<!-- beamer (LaTeX/PDF) | slidev (Markdown deck, presented/exported via `npx slidev`).
+     Picks which reference /course-maker slides N uses and which preamble file
+     course init generates (slides_preamble.tex vs slides_headmatter.md).
+     Override per call: /course-maker slides N slidev. pptx is planned. -->
 **Profile:** local-zip
 <!-- LMS adapter from skill/profiles/. Default: local-zip (build a zip and
      upload manually). Other example: github-classroom (gh api sync to GHC).

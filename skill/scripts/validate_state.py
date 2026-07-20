@@ -45,13 +45,16 @@ STATUS_MARKS = ("✅", "🔄", "❌", "⚠️")
 HISTORY_WARN_LINES = 200
 
 # Lecture step column -> path (relative to lectures/<id>/) that must exist when
-# the step is marked done. "figures" is special-cased (directory + staleness).
+# the step is marked done. "figures" and "slides" are special-cased below
+# (figures: directory + staleness; slides: either slides.tex or slides.md).
 LECTURE_FILE_STEPS = {
     "plan": "plan.md",
     "visuals": "visuals.md",
-    "slides": "slides.tex",
     "notes": "speaker_notes.md",
 }
+
+# A done "slides" step is satisfied by either format's deck file.
+SLIDES_FILES = ("slides.tex", "slides.md")
 
 # Lab step column -> list of paths (relative to <LAB_DIR>/) that must exist.
 # plan/validated/published are process states with no single artifact, so they
@@ -182,6 +185,16 @@ def check_lecture_like(root, subdir, header, rows, findings, extra_steps=None):
                 findings.append(("DRIFT", loc, f"{step}: marked ✅ but {rel} is missing"))
             elif mark == NOT_STARTED and target.exists():
                 findings.append(("UNTRACKED", loc, f"{step}: {rel} exists but status is ❌"))
+
+        # slides: satisfied by either slides.tex (beamer) or slides.md (slidev).
+        slides_idx = col_index(header, "slides")
+        if slides_idx is not None:
+            mark = status_of(cell(row, slides_idx))
+            present = [f for f in SLIDES_FILES if (lec_dir / f).exists()]
+            if mark == DONE and not present:
+                findings.append(("DRIFT", loc, "slides: marked ✅ but neither slides.tex nor slides.md exists"))
+            elif mark == NOT_STARTED and present:
+                findings.append(("UNTRACKED", loc, f"slides: {present[0]} exists but status is ❌"))
 
         # figures: needs at least one PNG, and PNGs must not be older than the script.
         fig_idx = col_index(header, "figures")
