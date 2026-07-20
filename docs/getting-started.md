@@ -7,7 +7,10 @@ in a single session.
 
 ## Prerequisites
 
-- Claude Code installed (`npm install -g @anthropic-ai/claude-code`)
+- One agent that supports the [Agent Skills](https://agentskills.io) standard:
+  - Claude Code (`npm install -g @anthropic-ai/claude-code`), or
+  - OpenAI Codex CLI, or
+  - Cursor
 - git
 - LaTeX distribution for compiling slides locally (TeX Live or MiKTeX)
 - Python 3.8+ with numpy, matplotlib, scipy, statsmodels
@@ -16,19 +19,31 @@ in a single session.
 
 ## Step 0: Install the skill
 
+The skill is a single cross-tool Agent Skill (`SKILL.md` + `references/`). Clone
+once, then symlink it into your agent's skills directory — a `git pull` in the
+repo then keeps every tool up to date.
+
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/course-maker
+git clone https://github.com/markpolyak/course-maker
 
-# Option A — symlink (recommended for development and staying up to date)
-# git pull in the repo will automatically update the skill
-ln -s $(pwd)/course-maker/skill ~/.claude/skills/course-maker
+# Claude Code — global (~/.claude/skills):
+ln -s "$(pwd)/course-maker/skill" ~/.claude/skills/course-maker
 
-# Option B — copy (simpler, but requires re-copying after updates)
-cp -r course-maker/skill ~/.claude/skills/course-maker
+# OpenAI Codex CLI — global (~/.agents/skills; legacy ~/.codex/skills also works):
+mkdir -p ~/.agents/skills
+ln -s "$(pwd)/course-maker/skill" ~/.agents/skills/course-maker
 ```
 
-The skill lives in `~/.claude/skills/` and is available in all your Claude Code projects.
+For **Claude Code** and **Codex CLI** the skill is global — available in every
+project. **Cursor has no global skills directory**, so the skill is project-scoped:
+symlink it into each course repo (created in Step 1) and gitignore the link:
+
+```bash
+mkdir -p my-course/.cursor/skills
+ln -s "$(pwd)/course-maker/skill" my-course/.cursor/skills/course-maker
+echo ".cursor/skills/" >> my-course/.gitignore
+```
 
 ---
 

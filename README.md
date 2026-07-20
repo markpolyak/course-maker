@@ -4,7 +4,10 @@ A structured pipeline for preparing complete university course materials with AI
 From a course plan to finished slides, figures, speaker notes, lab assignments, and more —
 with state tracking and minimal iteration.
 
-> Currently supports **Claude Code**. Cursor, Codex, and other agents — planned (see [Roadmap](#roadmap)).
+> The skill is a cross-tool [Agent Skill](https://agentskills.io) (`SKILL.md`),
+> so it runs on **Claude Code**, **OpenAI Codex CLI**, and **Cursor** — one skill,
+> installed per tool (see [Installation](#installation)). Deeper cross-tool parity
+> is tracked in [docs/MULTI_HARNESS_PLAN.md](docs/MULTI_HARNESS_PLAN.md).
 
 ---
 
@@ -35,26 +38,43 @@ Seminars, quizzes, and homework have their own pipelines too — see
 
 ## Installation
 
-**Requirements:** Claude Code, git. For local Beamer compilation: a LaTeX
-distribution. For lab tests: Python 3.11+.
+**Requirements:** one of Claude Code / OpenAI Codex CLI / Cursor, plus git. For
+local Beamer compilation: a LaTeX distribution. For lab tests: Python 3.11+.
 
 ```bash
 # 1. Clone the repository
 git clone https://github.com/markpolyak/course-maker
+```
 
-# 2. Install the skill
-# Option A — symlink (recommended: git pull automatically updates the skill)
-# Run this from the PARENT directory of the cloned repo
-ln -s $(pwd)/course-maker/skill ~/.claude/skills/course-maker
+The same skill (`SKILL.md` + `references/`) works in every tool; only the
+install location differs. Symlink it (a `git pull` then keeps every tool
+up to date). Run these from the PARENT directory of the cloned repo:
 
-# Option B — copy (if you don't plan to modify the skill)
-cp -r course-maker/skill ~/.claude/skills/course-maker
+```bash
+# Claude Code — global (~/.claude/skills):
+ln -s "$(pwd)/course-maker/skill" ~/.claude/skills/course-maker
 
-# 3. Create a new course repository
+# OpenAI Codex CLI — global (~/.agents/skills; legacy ~/.codex/skills also works):
+mkdir -p ~/.agents/skills
+ln -s "$(pwd)/course-maker/skill" ~/.agents/skills/course-maker
+```
+
+**Cursor has no global skills directory** — skills are project-scoped. Symlink
+the skill into each course repo (add `.cursor/skills/` to that repo's
+`.gitignore`):
+
+```bash
+mkdir -p my-course/.cursor/skills
+ln -s "$(pwd)/course-maker/skill" my-course/.cursor/skills/course-maker
+```
+
+Then create a course and initialize it in your agent:
+
+```bash
+# Create a new course repository
 mkdir my-course && cd my-course && git init
 
-# 4. Open in Claude Code and initialize
-claude
+# Open in Claude Code / Codex / Cursor and initialize
 > /course-maker course init
 > /course-maker course plan
 ```
@@ -230,7 +250,7 @@ Quick status:
 - [x] Course health & progress tooling: `doctor`, `stats`, state drift checker, bulky-history warning
 - [ ] Additional slide formats: Slidev and pptx (in addition to Beamer)
 - [ ] Overleaf integration (cloud LaTeX compilation)
-- [ ] Cursor / Codex / Cline adapter (agent-agnostic `AGENTS.md` core)
+- [~] Cross-tool support: skill installs on Claude Code, Codex CLI, and Cursor (Agent Skills standard); full parity (declaudize wording, `AGENTS.md` course layer) tracked in [docs/MULTI_HARNESS_PLAN.md](docs/MULTI_HARNESS_PLAN.md)
 - [ ] Multi-agent harness support (similar to GSD Redux)
 
 ---
