@@ -167,6 +167,29 @@ def test_homework_clean_passes(tmp_path):
     assert "1 homework checked" in out
 
 
+def test_bulky_history_warns_without_failing(tmp_path):
+    """A history.md past the threshold -> BULKY finding, but exit 0 (advisory)."""
+    write_state(tmp_path, lectures_table("| 01 | Intro | ✅ | ❌ | ❌ | ❌ | ❌ | 2026-01-01 |\n"))
+    lec = tmp_path / "lectures" / "01"
+    lec.mkdir(parents=True)
+    (lec / "plan.md").write_text("plan", encoding="utf-8")
+    (lec / "history.md").write_text("\n".join(f"line {i}" for i in range(300)), encoding="utf-8")
+    code, out = run(tmp_path)
+    assert code == 0, out
+    assert "BULKY" in out and "history.md" in out
+
+
+def test_small_history_does_not_warn(tmp_path):
+    write_state(tmp_path, lectures_table("| 01 | Intro | ✅ | ❌ | ❌ | ❌ | ❌ | 2026-01-01 |\n"))
+    lec = tmp_path / "lectures" / "01"
+    lec.mkdir(parents=True)
+    (lec / "plan.md").write_text("plan", encoding="utf-8")
+    (lec / "history.md").write_text("a few\nshort\nlines\n", encoding="utf-8")
+    code, out = run(tmp_path)
+    assert code == 0, out
+    assert "BULKY" not in out
+
+
 def test_homework_dir_may_nest_under_seminar(tmp_path):
     """Dir is a full path from the course root, so homework can live under a
     seminar; the drift is reported against that path."""

@@ -15,11 +15,13 @@ Output is one finding per line, prefixed by severity:
     DRIFT     — status says done (✅) but the artifact is missing
     STALE     — artifact exists but is older than its source (figures)
     UNTRACKED — artifact exists but the status is not-started (❌)
+    BULKY     — a history.md has grown past HISTORY_WARN_LINES (advisory)
     SKIP      — a table row could not be parsed (malformed Markdown)
 The final line is an OK summary.
 
-Exit code: 1 if any DRIFT or STALE finding; 0 otherwise. UNTRACKED and SKIP do
-not fail the run, so the script is safe to wire into external CI as a guard.
+Exit code: 1 if any DRIFT or STALE finding; 0 otherwise. UNTRACKED, BULKY, and
+SKIP do not fail the run, so the script is safe to wire into external CI as a
+guard.
 
 Source of truth for the status-table format and the step -> file mapping is
 references/repository_layout.md. The parser here is deliberately lenient about
@@ -34,6 +36,13 @@ from pathlib import Path
 DONE = "✅"
 NOT_STARTED = "❌"
 STATUS_MARKS = ("✅", "🔄", "❌", "⚠️")
+
+# A per-unit history.md above this many lines gets an advisory BULKY finding.
+# history.md is append-only anti-repeat memory read in full at the start of every
+# step; there is no compaction command, so this is a nudge to trim old *resolved*
+# iterations by hand — keeping every rejection/feedback verbatim. Set well above
+# a normally iterated unit (~60–80 lines) to avoid noise.
+HISTORY_WARN_LINES = 200
 
 # Lecture step column -> path (relative to lectures/<id>/) that must exist when
 # the step is marked done. "figures" is special-cased (directory + staleness).
@@ -283,6 +292,23 @@ def check_homework(root, header, rows, findings):
                 findings.append(("DRIFT", loc, f"{step}: marked ✅ but {rel} is missing"))
 
 
+def check_history_sizes(root, findings):
+    """Advisory: flag any history.md that has grown past HISTORY_WARN_LINES.
+
+    Independent of the status table — globs the whole course tree so it catches
+    lectures, seminars, labs, and homework (wherever a unit's Dir points). Never
+    fails the run; it is a nudge to trim old resolved iterations by hand.
+    """
+    for path in sorted(root.rglob("history.md")):
+        if ".git" in path.parts:
+            continue
+        n = len(path.read_text(encoding="utf-8").splitlines())
+        if n > HISTORY_WARN_LINES:
+            loc = str(path.parent.relative_to(root)) if path.is_relative_to(root) else str(path.parent)
+            findings.append(("BULKY", loc, f"history.md is {n} lines (> {HISTORY_WARN_LINES}) — "
+                                           "consider trimming old resolved iterations (keep rejections verbatim)"))
+
+
 def main():
     parser = argparse.ArgumentParser(description="Cross-check COURSE_STATE.md against on-disk artifacts.")
     parser.add_argument("--root", default=".", help="Course root (default: current directory)")
@@ -332,6 +358,8 @@ def main():
         if header:
             n_homework = len(rows)
             check_homework(root, header, rows, findings)
+
+    check_history_sizes(root, findings)
 
     # Loud guard against a blind run: if no recognized rows were checked, the
     # status table is empty or uses section headings this script does not know.

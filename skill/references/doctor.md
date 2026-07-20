@@ -16,8 +16,14 @@ python ~/.claude/skills/course-maker/scripts/validate_state.py
 (If the skill is installed elsewhere, use that path. The script reads
 `COURSE_STATE.md` and cross-checks every `✅` status against the artifact that
 should exist on disk.) It prints findings prefixed `DRIFT` / `STALE` /
-`UNTRACKED` / `SKIP` and an `OK` summary line. Reproduce its output verbatim,
-then translate each finding into a fix in Step 3.
+`UNTRACKED` / `BULKY` / `SKIP` and an `OK` summary line. Reproduce its output
+verbatim, then translate each finding into a fix in Step 3.
+
+`BULKY` is advisory (it does not fail the run): a unit's `history.md` has grown
+past the warning threshold. There is no compaction command — the remediation is
+to trim old *resolved* iterations by hand, keeping every rejection and piece of
+feedback verbatim (that is the anti-repeat memory the file exists for). Report
+it, but frame it as optional housekeeping, not drift.
 
 **Blind-run check (do not skip).** A `BLIND` finding, or a summary line that
 says `0 items checked`, means the script checked nothing — the `## Lectures` /
