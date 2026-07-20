@@ -537,8 +537,14 @@ Reference: `references/stats.md`.
 
 **Цель:** Снять Beamer/Jupyter монополию.
 
-### Шаг 7.1. PowerPoint output
-`/course-maker slides N --format=pptx` через python-pptx или Marp.
+### Шаг 7.1. Дополнительные форматы слайдов (Slidev + PowerPoint)
+`/course-maker slides N` с выбором формата помимо Beamer:
+- **Slidev** — Markdown-презентация (open-source, локальный Node, экспорт в
+  PDF/PNG локально; без платных сервисов). Приоритетный формат: markdown-native,
+  переиспользует PNG из `figures.py`, чанкится так же.
+- **PowerPoint** — через python-pptx или Marp.
+Формат выбирается дефолтом в `CLAUDE.md` (как LaTeX-движок) + override на вызове.
+Детали интеграции согласуются отдельно.
 
 ### Шаг 7.2. LMS-адаптеры
 `profiles/<X>/lms_adapter.md` как первоклассный концепт: GitHub Classroom, Moodle, Canvas, OpenEdX, local zip.

@@ -227,7 +227,8 @@ Quick status:
 - [x] `## Inviolable rules` block in `SKILL.md` (critical rules survive skipped references)
 - [x] Profile layer: pluggable LMS adapters + user defaults + opt-in grading extensions
 - [x] Syllabus auto-generation from `course_plan.md`
-- [ ] pptx output (in addition to Beamer)
+- [x] Course health & progress tooling: `doctor`, `stats`, state drift checker, bulky-history warning
+- [ ] Additional slide formats: Slidev and pptx (in addition to Beamer)
 - [ ] Overleaf integration (cloud LaTeX compilation)
 - [ ] Cursor / Codex / Cline adapter (agent-agnostic `AGENTS.md` core)
 - [ ] Multi-agent harness support (similar to GSD Redux)
