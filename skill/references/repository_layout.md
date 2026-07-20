@@ -125,6 +125,32 @@ exported `quiz_student.md` / `quiz_variant_*.md` are handed out.
 
 ---
 
+## Homework
+
+```
+homework/
+  01/
+    task.md              ← assignment brief (instructor source; content is student-facing)
+    rubric.md            ← grading criteria (instructor-only unless opted into the handout)
+    homework_student.md  ← assembled student handout (publish output; + .pdf/.tex/.docx on demand)
+    history.md           ← decision log, same role as lectures/NN/history.md
+  02/
+    ...
+```
+
+**`HW_DIR` resolution.** Read `COURSE_STATE.md` `## Homework` table, find the row
+where `#` = N, read the `Dir` column. Unlike labs (a slug under `labs/`), the
+homework `Dir` is a **full relative path from the course root** (default
+`homework/NN/`), so a homework can live anywhere — e.g. `seminars/<name>/homework/`
+in a seminar-centric course. `N` is the homework's own index; `Dir` decouples the
+physical location, so homework `N` need not match lecture/seminar `N`.
+
+**Instructor-only vs student-facing.** `task.md`, `rubric.md`, and `history.md`
+stay with the instructor. Only `homework_student.md` (and its exports) is handed
+out. Homework is manually graded — there is no `starter/`, autograder, or CI.
+
+---
+
 ## State files
 
 ### `COURSE_STATE.md`
@@ -159,14 +185,20 @@ exported `quiz_student.md` / `quiz_variant_*.md` are handed out.
 |---|-------|------|-----------|-----------|---------|
 | 01 | Midterm | ❌ | ❌ | ❌ | — |
 
+## Homework
+
+| # | Dir | Title | task | rubric | published | Updated |
+|---|-----|-------|------|--------|-----------|---------|
+| 01 | homework/01 | ... | ❌ | ❌ | ❌ | — |
+
 Legend: ✅ done · 🔄 in progress · ❌ not started · ⚠️ needs review
 ```
 
 **Structural vocabulary is always English, regardless of course language.**
-Section headings (`## Lectures`, `## Seminars`, `## Labs`, `## Quizzes`), column
-names (`plan`, `visuals`, `figures`, `slides`, `notes`, `notebook`, `spec`,
-`tests`, `questions`, `practice`, `validated`, `published`, `#`, `Dir`, `Title`,
-`Updated`),
+Section headings (`## Lectures`, `## Seminars`, `## Labs`, `## Quizzes`,
+`## Homework`), column names (`plan`, `visuals`, `figures`, `slides`, `notes`,
+`notebook`, `spec`, `tests`, `questions`, `practice`, `task`, `rubric`,
+`validated`, `published`, `#`, `Dir`, `Title`, `Updated`),
 and the status legend
 are language-neutral keys. Only cell *content* (titles) is in the course
 language. This keeps the file machine-readable across all courses — the drift

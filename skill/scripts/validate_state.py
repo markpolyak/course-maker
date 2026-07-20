@@ -60,6 +60,13 @@ QUIZ_FILE_STEPS = {
     "published": "quiz_student.md",
 }
 
+# Homework step column -> path (relative to <HW_DIR>/) that must exist when done.
+HOMEWORK_FILE_STEPS = {
+    "task": "task.md",
+    "rubric": "rubric.md",
+    "published": "homework_student.md",
+}
+
 
 def split_row(line):
     """Split a Markdown table row into stripped cells."""
@@ -243,6 +250,39 @@ def check_quizzes(root, header, rows, findings):
                 findings.append(("DRIFT", loc, f"{step}: marked ✅ but {rel} is missing"))
 
 
+def resolve_hw_dir(root, hw_id, dir_value):
+    """Homework Dir is a full path from the course root (not a slug under a
+    fixed parent, unlike labs), so it can nest under a seminar. Default
+    homework/<NN>."""
+    dir_value = dir_value.strip()
+    if dir_value and dir_value not in ("—", "-"):
+        return root / dir_value
+    try:
+        n = f"{int(hw_id):02d}"
+    except ValueError:
+        n = hw_id
+    return root / "homework" / n
+
+
+def check_homework(root, header, rows, findings):
+    id_idx = col_index(header, "#")
+    dir_idx = col_index(header, "dir")
+    for row in rows:
+        hw_id = cell(row, id_idx).strip()
+        if not hw_id:
+            findings.append(("SKIP", "homework", "row has no # value"))
+            continue
+        hw_dir = resolve_hw_dir(root, hw_id, cell(row, dir_idx))
+        loc = str(hw_dir.relative_to(root)) if hw_dir.is_relative_to(root) else str(hw_dir)
+        for step, rel in HOMEWORK_FILE_STEPS.items():
+            idx = col_index(header, step)
+            if idx is None:
+                continue
+            mark = status_of(cell(row, idx))
+            if mark == DONE and not (hw_dir / rel).exists():
+                findings.append(("DRIFT", loc, f"{step}: marked ✅ but {rel} is missing"))
+
+
 def main():
     parser = argparse.ArgumentParser(description="Cross-check COURSE_STATE.md against on-disk artifacts.")
     parser.add_argument("--root", default=".", help="Course root (default: current directory)")
@@ -285,15 +325,23 @@ def main():
             n_quizzes = len(rows)
             check_quizzes(root, header, rows, findings)
 
+    hw_start = find_section(lines, "Homework")
+    n_homework = 0
+    if hw_start is not None:
+        header, rows = parse_section(lines, hw_start + 1)
+        if header:
+            n_homework = len(rows)
+            check_homework(root, header, rows, findings)
+
     # Loud guard against a blind run: if no recognized rows were checked, the
     # status table is empty or uses section headings this script does not know.
     # Reporting a reassuring "OK ... 0 checked" would be a false all-clear — the
     # whole point of the checker is to NOT give false comfort.
-    if n_lectures == 0 and n_labs == 0 and n_quizzes == 0:
+    if n_lectures == 0 and n_labs == 0 and n_quizzes == 0 and n_homework == 0:
         headings = all_headings(lines)
         found = ", ".join(headings) if headings else "(no ## sections)"
         print("BLIND     COURSE_STATE.md      — no '## Lectures', '## Seminars', "
-              "'## Labs', or '## Quizzes' rows recognized; nothing was checked")
+              "'## Labs', '## Quizzes', or '## Homework' rows recognized; nothing was checked")
         print(f"          sections present: {found}")
         print("OK        0 items checked; blind run (no false all-clear)")
         return 1
@@ -303,8 +351,8 @@ def main():
 
     failing = sum(1 for s, _, _ in findings if s in ("DRIFT", "STALE"))
     other = len(findings) - failing
-    print(f"OK        {n_lectures} lecture/seminar, {n_labs} labs, {n_quizzes} quizzes "
-          f"checked; {failing} drift/stale, {other} other")
+    print(f"OK        {n_lectures} lecture/seminar, {n_labs} labs, {n_quizzes} quizzes, "
+          f"{n_homework} homework checked; {failing} drift/stale, {other} other")
     return 1 if failing else 0
 
 

@@ -468,8 +468,15 @@ Reference: `references/seminar_practice.md` (+ переиспользуемые 
 Пайплайн контрольной/теста: варианты, ключи, рубрика.
 References: `references/quiz_plan.md`, `quiz_generate.md`, `quiz_publish.md`.
 
-### Шаг 5.4. `/course-maker homework N`
-Лёгкий вариант lab-пайплайна — без CI-сборки. Reuse `references/lab_*.md` с флагом `homework: true`.
+### Шаг 5.4. `/course-maker homework N` ✅ реализовано
+Домашнее задание = ручное оценивание, без автогрейдинга/CI/`validate`. Модель
+«task brief + rubric» (не «лаба минус CI» из исходной формулировки): бриф в
+markdown, экспорт в pdf/latex/docx через pandoc по команде `publish` (как в
+`syllabus`). Команды: `homework plan N [dir]`, `homework publish N [format]`,
+`homework status N`. `Dir` — полный путь от корня курса (default `homework/NN/`),
+так что домашка может лежать под семинаром (`seminars/<name>/homework/`).
+Reference: `references/homework.md` (+ `lab_context.md` для authoring-правил).
+Состояние — секция `## Homework`; покрыто `validate_state.py`.
 
 ### Шаг 5.5. `/course-maker lab triage N` ✅ реализовано
 После failed validation (`validated → ⚠️`): read-only диагностика. Читает последнюю

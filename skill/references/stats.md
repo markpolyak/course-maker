@@ -13,6 +13,8 @@ Show course progress as completion bars across pipelines. Read-only.
    - A **lecture is complete** when all of `plan`, `visuals`, `figures`,
      `slides`, `notes` are `✅`.
    - A **lab is complete** when `tests`, `validated`, and `published` are `✅`.
+   - A **quiz is complete** when `plan`, `questions`, and `published` are `✅`.
+   - A **homework is complete** when `task`, `rubric`, and `published` are `✅`.
    - Count `🔄`/`⚠️`/partially-✅ rows as in-progress, not complete.
 
 ## Output

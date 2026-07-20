@@ -156,13 +156,21 @@ file you did or did not read. Violating any of them is a hard error.
 | `/course-maker quiz generate N [next]` | Step 2 — generate question bank (chunked by block) |
 | `/course-maker quiz publish N [format]` | Step 3 — export student-facing version (markdown) |
 
-**If invoked with no arguments** (`/course-maker` alone): read `COURSE_STATE.md`
-and print a summary of all lectures, seminars, labs, and quizzes with their current step
-statuses (✅ / 🔄 / ❌ / ⚠️). End with: "Run `/course-maker help` for available
-commands."
+**Homework commands** (manually graded take-home assignment; brief + rubric, no autograding):
 
-**`/course-maker help`**: print the four command tables (Lecture, Seminar, Lab,
-Quiz) into the chat — the user cannot see `SKILL.md` — then stop.
+| Command | Description |
+|---|---|
+| `/course-maker homework plan N [dir]` | Step 1 — interactive brief + rubric; dir default homework/NN/ (may nest, e.g. seminars/<name>/homework/) |
+| `/course-maker homework publish N [format]` | Step 2 — assemble student handout; markdown default, pdf/latex/docx via pandoc |
+| `/course-maker homework status N` | Status + last 3 history entries |
+
+**If invoked with no arguments** (`/course-maker` alone): read `COURSE_STATE.md`
+and print a summary of all lectures, seminars, labs, quizzes, and homework with their
+current step statuses (✅ / 🔄 / ❌ / ⚠️). End with: "Run `/course-maker help` for
+available commands."
+
+**`/course-maker help`**: print the five command tables (Lecture, Seminar, Lab,
+Quiz, Homework) into the chat — the user cannot see `SKILL.md` — then stop.
 
 ---
 
@@ -349,3 +357,32 @@ Read: `references/quiz_generate.md`. Chunked one block per chunk; resume with
 
 ### `/course-maker quiz publish N [format]` (Step 3)
 Read: `references/quiz_publish.md`. Only `markdown` is implemented for now.
+
+---
+
+## Homework workflows
+
+A homework is a manually graded take-home assignment: a task brief plus an
+instructor-only grading rubric. No `starter/`, autograder, CI, or `validate` —
+that is what a lab is for. Artifacts live in `HW_DIR` (default `homework/NN/`,
+resolved from the `## Homework` table's `Dir` column, which is a full path from
+the course root and may nest under a seminar); state in the `## Homework`
+section. Needs `course init` only — not `lab course-init`.
+
+### `/course-maker homework plan N [dir]` (Step 1)
+Read: `references/lab_context.md` AND `references/homework.md`. Writes `task.md`
++ `rubric.md`. Ask once whether the rubric goes into the student handout and
+record it, so `publish` need not re-ask.
+
+### `/course-maker homework publish N [format]` (Step 2)
+Read: `references/homework.md`. Assembles `homework_student.md` (task + rubric
+only if opted in at plan time); markdown default, pdf/latex/docx via pandoc.
+
+**CRITICAL — even if reference was skipped:** when the rubric is NOT opted into
+the handout, after writing `homework_student.md` verify no instructor-only
+content leaked (`grep -nE "<!-- instructor|<!-- rubric_in_handout"` prints
+nothing, and the rubric text is absent). Fix and re-check until clean.
+
+### `/course-maker homework status N`
+Print: row from `COURSE_STATE.md` `## Homework` for homework N (incl. `Dir`),
+last 3 entries from `HW_DIR/history.md`, any ⚠️ warnings.

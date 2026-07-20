@@ -24,11 +24,12 @@ says `0 items checked`, means the script checked nothing — the `## Lectures` /
 `## Seminars` / `## Labs` headings it understands were not found. Do NOT report
 this as "no drift". Report it as a hard finding: the script's known sections do
 not match this course's `COURSE_STATE.md` (the `sections present:` line lists
-what is actually there, e.g. `Homework`). The checker covers `## Lectures`,
-`## Seminars` (checked the same way as lectures — presentation artifacts in
-`seminars/NN/`; a seminar's practical part is not file-checked), `## Labs`, and
-`## Quizzes`; sessions tracked under other headings are not verified. Say so
-explicitly so the clean-looking result is never mistaken for an all-clear.
+what is actually there, e.g. a translated heading). The checker covers
+`## Lectures`, `## Seminars` (checked the same way as lectures — presentation
+artifacts in `seminars/NN/`; a seminar's practical part is not file-checked),
+`## Labs`, `## Quizzes`, and `## Homework`; sessions tracked under other
+headings are not verified. Say so explicitly so the clean-looking result is
+never mistaken for an all-clear.
 
 Common cause: `COURSE_STATE.md` uses translated headings, or merges two session
 types into one section, instead of the English keys. Structural vocabulary is
