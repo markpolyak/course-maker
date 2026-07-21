@@ -24,22 +24,32 @@ once, then install it into your agent's skills directory either by **symlink**
 (recommended — a `git pull` in the clone updates every tool) or by **copy**
 (self-contained, but re-copy after updates — use `cp -r` instead of `ln -s`).
 
-All three tools install the skill globally — available in every project.
+All three install the skill globally — available in every project.
 
 ```bash
 # Clone the repository
 git clone https://github.com/markpolyak/course-maker
 
-# Claude Code (global ~/.claude/skills):
+# Claude Code:
 ln -s "$(pwd)/course-maker/skill" ~/.claude/skills/course-maker
 
-# Codex CLI and Cursor (both read the global ~/.agents/skills):
+# Codex CLI:
 mkdir -p ~/.agents/skills
 ln -s "$(pwd)/course-maker/skill" ~/.agents/skills/course-maker
 ```
 
-Cursor also reads `~/.cursor/skills/`, and Codex still honors the legacy
-`~/.codex/skills/`, if you prefer those.
+**Cursor needs no separate install** — per its
+[docs](https://cursor.com/docs/skills) it loads skills from eight locations,
+including the Claude Code and Codex directories (`~/.claude/skills`,
+`~/.agents/skills`, `~/.codex/skills`) as well as its own `~/.cursor/skills`. So
+it picks up either symlink above. Only using Cursor? Put the link in
+`~/.cursor/skills/course-maker`.
+
+> Caveat: if you install for **both** Claude Code and Codex, Cursor reads both
+> directories and will discover course-maker **twice**. Cursor's docs don't
+> define dedup/precedence for a skill found in multiple dirs, so you may see a
+> duplicate entry. It's the same skill (both links point to one directory), so
+> it's cosmetic — but keep a single symlink if it bothers you.
 
 ---
 

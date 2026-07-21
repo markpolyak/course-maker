@@ -53,20 +53,21 @@ install location differs. Two ways to install:
 - **Copy** — self-contained, but you must re-copy after each update. Replace
   `ln -s` with `cp -r` in the commands below.
 
-All three tools install globally. Run these from the PARENT directory of the
-cloned repo:
+All three install globally. Symlink the skill into the directory your tool reads
+(run from the PARENT directory of the cloned repo):
 
 ```bash
-# Claude Code (global ~/.claude/skills):
+# Claude Code:
 ln -s "$(pwd)/course-maker/skill" ~/.claude/skills/course-maker
 
-# Codex CLI and Cursor (both read the global ~/.agents/skills):
+# Codex CLI:
 mkdir -p ~/.agents/skills
 ln -s "$(pwd)/course-maker/skill" ~/.agents/skills/course-maker
 ```
 
-(Cursor also reads `~/.cursor/skills/`, and Codex still honors the legacy
-`~/.codex/skills/`, if you prefer those.)
+**Cursor needs no separate install** — it also reads the Claude Code and Codex
+skill directories, so it picks up either symlink above. (Only using Cursor? Put
+the link in `~/.cursor/skills/course-maker`.)
 
 Then create a course and initialize it in your agent:
 

@@ -18,14 +18,18 @@ pandoc) cannot execute there.
   the same across all three. **Our skill already conforms — it ports as-is.**
 - **Install locations differ; the skill does not.** All three support a global
   (user-level) skills directory:
-  - Claude Code — `~/.claude/skills/<name>/`
+  - Claude Code — reads only `~/.claude/skills/<name>/`.
   - Codex CLI — `~/.agents/skills/<name>/` (legacy `~/.codex/skills/`); repo-scoped
-    `.agents/skills/`
-  - Cursor — `~/.agents/skills/<name>/` and `~/.cursor/skills/<name>/` (global);
-    `.agents/skills/` and `.cursor/skills/` (project). Per the official docs:
-    https://cursor.com/docs/skills
-  - **Codex CLI and Cursor both read `~/.agents/skills/`**, so one symlink there
-    serves both; Claude Code needs `~/.claude/skills/`. Two symlinks total.
+    `.agents/skills/`.
+  - Cursor — per the official docs (https://cursor.com/docs/skills) loads from
+    **eight** locations: `~/.agents/skills`, `~/.cursor/skills`, `~/.claude/skills`,
+    `~/.codex/skills` (global) and the four project-level equivalents. It reads
+    the Claude Code and Codex dirs "for compatibility".
+  - Consequence: **Cursor never needs its own symlink** — it piggybacks on the
+    Claude Code / Codex dirs. But because it reads several, installing for **both**
+    Claude Code and Codex makes Cursor discover the skill twice; the docs define
+    no dedup/precedence, so a duplicate listing is possible (cosmetic — same
+    underlying directory).
 - **`AGENTS.md` is a different layer** from the skill: always-on project guidance
   (plain markdown, no frontmatter), read natively by Codex, Cursor, Copilot,
   Gemini, etc. **Claude Code does not read `AGENTS.md`** — it reads `CLAUDE.md`,
@@ -44,9 +48,10 @@ not its content. Course context is single-sourced in `AGENTS.md`.
 
 ## Decisions
 
-- **Global install for all three.** Two symlinks: `~/.claude/skills` (Claude
-  Code) and `~/.agents/skills` (Codex CLI + Cursor, which both read it).
-  Documented in README + getting-started.
+- **Global install for all three.** Symlink per non-Cursor tool you use:
+  `~/.claude/skills` (Claude Code), `~/.agents/skills` (Codex CLI). Cursor needs
+  no dedicated symlink — it reads both. Documented in README + getting-started,
+  with the both-Claude-and-Codex duplicate caveat.
 - Consumer ChatGPT / Custom GPT: **not supported** (no shell/filesystem).
 
 ## Phased plan
@@ -61,8 +66,9 @@ so they read for any agent, without changing behavior:
 - Audit for other Claude-only assumptions (tool names, slash-command phrasing).
 
 ### Phase 1 — install/distribution ✅ shipped
-Single skill, symlinked globally. README + getting-started document two symlinks:
-`~/.claude/skills` (Claude Code) and `~/.agents/skills` (Codex CLI + Cursor).
+Single skill, symlinked globally into the dir each non-Cursor tool reads
+(`~/.claude/skills`, `~/.agents/skills`); Cursor piggybacks on those. Documented
+in README + getting-started.
 
 ### Phase 2 — cross-tool per-course context layer ✅ done
 - `course init` generates **`AGENTS.md`** with the course context (`## Course
