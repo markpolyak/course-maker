@@ -9,7 +9,7 @@ during `lab course-init`). This file is the dispatcher.
 ## Step 0 — Locate the LMS adapter
 
 Read `<course-root>/lms_adapter.md`. This file was copied from
-`skill/profiles/<name>/lms.md` when the user ran
+`profiles/<name>/lms.md` when the user ran
 `/course-maker lab course-init` (where `<name>` is the course profile,
 default `local-zip`).
 
@@ -31,7 +31,7 @@ To install it:
 
 To choose a different LMS workflow, change the Profile field in AGENTS.md
 before re-running lab course-init. Available profiles are listed in
-skill/profiles/.
+profiles/.
 ```
 
 Do not attempt to publish without `lms_adapter.md`. No fallback workflow.

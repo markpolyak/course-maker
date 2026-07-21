@@ -63,7 +63,7 @@ the file does not exist, no defaults are pre-filled (every question is
 asked fresh).
 
 The format of `defaults.yaml` is documented in
-`skill/profiles/README.md` § user_defaults.
+`profiles/README.md` § user_defaults.
 
 ### Phase 2b — Resolve profile (LMS adapter)
 
@@ -71,12 +71,12 @@ Before asking content questions, determine which LMS profile to use:
 
 - If `AGENTS.md` has `Profile:` filled → use that.
 - Otherwise → ask: "Which LMS profile? (default: `local-zip`.
-  Available profiles: list directory names under `skill/profiles/` —
+  Available profiles: list directory names under `profiles/` —
   read each `<name>/README.md` first line for a one-sentence summary.)
   Press Enter for `local-zip`."
 - Record the chosen profile; it will be written to `AGENTS.md` in Phase 3.
 
-The LMS-related defaults (`skill/profiles/<profile>/lms_defaults.yaml`)
+The LMS-related defaults (`profiles/<profile>/lms_defaults.yaml`)
 are read by `lab course-init`, not here. Phase 2 only asks content
 questions.
 
@@ -137,7 +137,7 @@ If the user provides fields:
 For each file, act only if it is `missing` (skip if it already exists):
 
 - **`AGENTS.md`** (course-context source of truth) — create from
-  `skill/COURSE_AGENTS_TEMPLATE.md` with all collected info embedded in the
+  `COURSE_AGENTS_TEMPLATE.md` with all collected info embedded in the
   `## Course context` section, including `Profile: <name>` (default `local-zip`)
   and `Slides format: <beamer|slidev>` (default `beamer`).
   If `placeholder` — fill in the placeholder fields, preserve everything else.
@@ -145,7 +145,7 @@ For each file, act only if it is `missing` (skip if it already exists):
   see the repo README) and is discovered automatically.
 
 - **`CLAUDE.md`** (Claude Code wrapper) — create from
-  `skill/COURSE_CLAUDE_TEMPLATE.md` verbatim: it is just the `@AGENTS.md` import
+  `COURSE_CLAUDE_TEMPLATE.md` verbatim: it is just the `@AGENTS.md` import
   plus a slot for Claude Code-only overrides. Do not duplicate course context
   into it. Codex CLI and Cursor read `AGENTS.md` directly and need no wrapper.
 
@@ -158,18 +158,18 @@ For each file, act only if it is `missing` (skip if it already exists):
 
 - **`course_conventions.md`** — determine template variant from the language answer:
   `ru` for Russian, `en` for English, `en` as default for unsupported languages.
-  Copy `skill/templates/course_conventions_{lang}.md` → `course_conventions.md`.
+  Copy `templates/course_conventions_{lang}.md` → `course_conventions.md`.
   Confirm: "course_conventions.md created for {language}. Review and edit the
   terminology dictionary before starting labs."
 
 - **Slide preamble/headmatter** — depends on the slides format:
   - **`beamer`** → `slides_preamble.tex`. Determine variant from the engine
-    answer: `pdflatex` → `skill/templates/slides_preamble_pdflatex.tex`;
-    `xelatex`/`lualatex` → `skill/templates/slides_preamble_xelatex.tex`.
+    answer: `pdflatex` → `templates/slides_preamble_pdflatex.tex`;
+    `xelatex`/`lualatex` → `templates/slides_preamble_xelatex.tex`.
     Default `pdflatex`. Copy to `slides_preamble.tex` in the course root.
     Confirm: "slides_preamble.tex created for {engine}. Edit theme, colors, and
     title info before generating slides."
-  - **`slidev`** → copy `skill/templates/slides_headmatter_slidev.md` →
+  - **`slidev`** → copy `templates/slides_headmatter_slidev.md` →
     `slides_headmatter.md` in the course root. Confirm: "slides_headmatter.md
     created. Edit theme/colors before generating slides. Present/export locally
     with `npx slidev` (no paid services)."

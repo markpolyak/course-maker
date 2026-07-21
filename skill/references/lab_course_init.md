@@ -30,7 +30,7 @@ Run these checks silently before asking anything:
    needs no per-course substitution. Any grade output is supplied by an
    optional reporter (Phase 2a), not by editing the conftest.
 
-5. **Check `skill/templates/tests.yaml` similarly.**
+5. **Check `templates/tests.yaml` similarly.**
    Also look for a real `tests.yaml` in any existing lab's `starter/.github/workflows/`.
 
 ---
@@ -58,14 +58,14 @@ For each of the three files (`tests_template.py`, `conftest_base.py`, `tests.yam
 
 The universal `conftest_base.py` prints no grade output on its own. Any
 scoring / grade-output is supplied by an optional reporter dropped next to the
-conftest as `grade_report.py` (see `skill/extensions/reporters/README.md`).
+conftest as `grade_report.py` (see `extensions/reporters/README.md`).
 
 Read `grade_reporter` from `AGENTS.md` → `## Lab context` → `### Lab grading`
 (default `none`):
 
 - **`none`** → do nothing. Labs run plain pytest (pass/fail only).
 - **`<name>`** (e.g. `scoring_ci`):
-  1. Copy `skill/extensions/reporters/<name>.py` → `labs/shared/grade_report.py`.
+  1. Copy `extensions/reporters/<name>.py` → `labs/shared/grade_report.py`.
   2. Substitute the labels at the top of `grade_report.py`. Resolve each label
      by precedence — **user_defaults → lab_templates.md → reporter default**:
      - `SCORING_HEADER` ← `default_scoring_header` (user_defaults), else
@@ -82,7 +82,7 @@ Read `grade_reporter` from `AGENTS.md` → `## Lab context` → `### Lab grading
      is created later in Phase 5), leave the reporter default and re-run this
      command after Phase 5.
   3. If `<name>.py` is missing, warn: "grade_reporter `<name>` not found in
-     skill/extensions/reporters/ — labs will run plain pytest."
+     extensions/reporters/ — labs will run plain pytest."
 
 This way the course-language grade strings live in the reporter, not in the
 universal conftest, and every per-lab `grade_report.py` copied from
@@ -90,7 +90,7 @@ universal conftest, and every per-lab `grade_report.py` copied from
 
 `lab_variants` (default `false`) is read by `/course-maker lab notebook N` and
 `lab tests N`: when `true`, Block 0 includes the variant cells from
-`skill/extensions/variants/block0_snippet.md` and the reporter's `DATASETS`
+`extensions/variants/block0_snippet.md` and the reporter's `DATASETS`
 list is populated; when `false`, neither is present.
 
 ---
@@ -107,7 +107,7 @@ If `missing` or `placeholder`, announce:
 Read `AGENTS.md` → `## Course context` → `Profile:` field. Default:
 `local-zip`.
 
-Read `skill/profiles/<profile>/lab_questions.yaml`. Each entry describes
+Read `profiles/<profile>/lab_questions.yaml`. Each entry describes
 one LMS-config question:
 
 ```yaml
@@ -118,7 +118,7 @@ one LMS-config question:
   per_lab: true|false  # true → ask once per existing lab
 ```
 
-Also read `skill/profiles/<profile>/lms_defaults.yaml` — used to resolve
+Also read `profiles/<profile>/lms_defaults.yaml` — used to resolve
 `${name}` references inside `default` fields.
 
 ### Phase 3b — Ask the profile's questions
@@ -185,7 +185,7 @@ Read `AGENTS.md` → `## Course context` → Language field.
 Determine the template variant: `ru` for Russian, `en` for English,
 or `en` as default if the language is unsupported.
 
-Copy `skill/templates/lab_templates_{lang}.md` → `lab_templates.md` in the
+Copy `templates/lab_templates_{lang}.md` → `lab_templates.md` in the
 course root.
 Confirm: "lab_templates.md created for {language}. Review the self-check cell
 and scoring strings before generating notebooks."
@@ -200,10 +200,10 @@ Read `AGENTS.md` → `## Course context` → `Profile:` field. Default:
 If `<course-root>/lms_adapter.md` does not exist (or the user explicitly
 asks to refresh it):
 
-1. Verify `skill/profiles/<profile>/lms.md` exists. If not, fall back to
-   `skill/profiles/local-zip/lms.md` and warn the user that the chosen
+1. Verify `profiles/<profile>/lms.md` exists. If not, fall back to
+   `profiles/local-zip/lms.md` and warn the user that the chosen
    profile is missing the adapter.
-2. Copy `skill/profiles/<profile>/lms.md` → `<course-root>/lms_adapter.md`.
+2. Copy `profiles/<profile>/lms.md` → `<course-root>/lms_adapter.md`.
 3. Confirm: "lms_adapter.md installed from profile `<profile>`. This is
    the workflow `/course-maker lab publish` will follow. Edit it if your
    setup differs from the profile defaults."

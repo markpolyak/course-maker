@@ -28,7 +28,7 @@ Generate `labs/labN/starter/exercises.ipynb`.
    - First two markdown cells: header with instructions + Block 0 divider
    - Block 0: setup / dependency install. When `lab_variants: true` (see
      `AGENTS.md` → `## Lab context` → `### Lab grading`), Block 0 also includes
-     the variant-selection cells from `skill/extensions/variants/block0_snippet.md`
+     the variant-selection cells from `extensions/variants/block0_snippet.md`
      — the variant formula there is verbatim, never change it. When
      `lab_variants: false`, Block 0 has no variant cells.
    - Main blocks with tasks
@@ -70,7 +70,7 @@ in the course root. Follow it precisely.
 
 Key invariants:
 - When `lab_variants: true`, the variant formula MUST be verbatim — see
-  `skill/extensions/variants/README.md`.
+  `extensions/variants/README.md`.
 - Self-check cell MUST follow the exact print format from the template
 - Block 0 has ZERO points
 

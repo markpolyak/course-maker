@@ -39,7 +39,7 @@ If `slides_headmatter.md` is missing, stop immediately and show:
 ```
 slides_headmatter.md not found in the course root.
 Run /course-maker course init to generate it, or copy
-skill/templates/slides_headmatter_slidev.md manually and edit it.
+templates/slides_headmatter_slidev.md manually and edit it.
 ```
 
 ## Slide syntax

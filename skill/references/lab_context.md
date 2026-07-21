@@ -66,7 +66,7 @@ when `lab_variants: true` — the `datasets` array contents and any variant para
 Everything else — verbatim.
 
 **When `lab_variants: true`:** Block 0 includes the variant-selection cells. The variant
-formula is canonical and must be verbatim — see `skill/extensions/variants/README.md`.
+formula is canonical and must be verbatim — see `extensions/variants/README.md`.
 Any change to it breaks grading for all students. When `lab_variants: false`, there are no
 variant cells and no `datasets` array.
 
@@ -78,7 +78,7 @@ Functions returning a graph return `matplotlib.figure.Figure`.
 ## What NOT to do
 
 - **When `lab_variants: true`, never change the variant formula** — it is canonical
-  and verbatim; see `skill/extensions/variants/README.md`.
+  and verbatim; see `extensions/variants/README.md`.
 - **Goal of the lab — one concise sentence.** Do not list everything the student does.
   The goal states the final result, not a list of steps.
   See `course_conventions.md` for bad/good examples in the course language.

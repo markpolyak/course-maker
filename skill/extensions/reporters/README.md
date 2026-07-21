@@ -4,7 +4,7 @@ A **grade reporter** turns the raw pass/fail outcomes of a lab's pytest run into
 whatever end-of-session output a course needs: a points summary, an
 autograder-readable grade line, a JSON blob, or nothing at all.
 
-The universal harness (`skill/templates/conftest_base.py`) deliberately has no
+The universal harness (`templates/conftest_base.py`) deliberately has no
 opinion on grading. At the end of the test session it looks for a
 `grade_report.py` next to the `conftest.py` and, if found, calls:
 
@@ -26,7 +26,7 @@ grade_reporter: scoring_ci   # none | scoring_ci | <your own>
 ```
 
 During `/course-maker lab course-init`, the named reporter is copied from
-`skill/extensions/reporters/<name>.py` into the lab scaffold as
+`extensions/reporters/<name>.py` into the lab scaffold as
 `starter/grade_report.py`. `grade_reporter: none` (the default) copies nothing.
 
 ## Available reporters
@@ -54,7 +54,7 @@ line is omitted and the formula is irrelevant.
 
 ## Writing your own reporter
 
-Create `skill/extensions/reporters/<name>.py` exposing `report(outcomes)`,
+Create `extensions/reporters/<name>.py` exposing `report(outcomes)`,
 reference it as `grade_reporter: <name>` in the course `AGENTS.md`. Keep the
 file self-contained (no imports from other extensions) — it is copied verbatim
 into each lab and edited there per lab.

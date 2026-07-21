@@ -32,7 +32,7 @@ If `slides_preamble.tex` is missing, stop immediately and show:
 ```
 slides_preamble.tex not found in the course root.
 Run /course-maker course init to generate it, or copy
-skill/templates/slides_preamble_pdflatex.tex manually and edit it.
+templates/slides_preamble_pdflatex.tex manually and edit it.
 ```
 
 ## Slide template

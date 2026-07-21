@@ -27,4 +27,4 @@ page, share drive, email distribution list).
 - Sync to any LMS via API.
 - Embed any institution / instructor preferences. Those live in
   `~/.course-maker/defaults.yaml` (user_defaults) — see
-  `skill/profiles/README.md`.
+  `profiles/README.md`.

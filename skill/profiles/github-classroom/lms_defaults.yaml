@@ -2,7 +2,7 @@
 #
 # This file only contains values that the LMS workflow needs.
 # Personal preferences (instructor name, language, latex engine, audience,
-# style) belong in ~/.course-maker/defaults.yaml — see skill/profiles/README.md.
+# style) belong in ~/.course-maker/defaults.yaml — see profiles/README.md.
 
 # Pattern for the GitHub Classroom repo name (or per-student fork name).
 # Variables: {year}, {N}, {slug}, {student}.

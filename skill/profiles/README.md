@@ -18,8 +18,8 @@ user_defaults (e.g. Russian + xelatex + a specific style).
 
 A profile is also **not** a language. The course language and its
 terminology dictionary live in
-`skill/templates/course_conventions_{lang}.md` and
-`skill/templates/lab_templates_{lang}.md`.
+`templates/course_conventions_{lang}.md` and
+`templates/lab_templates_{lang}.md`.
 
 ---
 

@@ -28,7 +28,7 @@ LMS adapter for GitHub Classroom. Publishes lab materials by:
 
 - Embed instructor preferences (language, latex engine, style). Those
   belong in `~/.course-maker/defaults.yaml` (user_defaults) — see
-  `skill/profiles/README.md`.
+  `profiles/README.md`.
 - Embed institution name or audience description. Those are course-level
   and live in `AGENTS.md`.
 

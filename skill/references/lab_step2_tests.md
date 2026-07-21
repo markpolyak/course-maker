@@ -58,7 +58,7 @@ lab produces any scoring output depends on `grade_reporter` in `AGENTS.md` →
   pytest (pass/fail). Skip this step entirely.
 - **`grade_reporter: <name>`** → `lab init` copied
   `labs/shared/grade_report.py` into `labs/labN/starter/`. Edit only its data
-  block (the reporter's contract is in `skill/extensions/reporters/README.md`):
+  block (the reporter's contract is in `extensions/reporters/README.md`):
 
   - `TEST_POINTS` — test function names → points from `lab_spec.md`.
   - `TEST_BLOCKS` — TestClass name → primary test function from `lab_spec.md`.
@@ -71,7 +71,7 @@ lab produces any scoring output depends on `grade_reporter` in `AGENTS.md` →
   the data block are course/lab-specific.
 
   **When `lab_variants: true`:** the variant formula in the reporter is verbatim
-  — see `skill/extensions/variants/README.md`. Never modify it, and keep the
+  — see `extensions/variants/README.md`. Never modify it, and keep the
   reporter's `DATASETS` identical to Block 0's `datasets`.
 
 ### Step 5: Write `tests.py` in `labs/labN/starter/`
@@ -112,7 +112,7 @@ Write tests per `lab_spec.md` — copy patterns, not logic.
 
 **Critical prohibition (when `lab_variants: true`):** keep the variant formula
 verbatim everywhere it appears (Block 0 and the grade reporter) — see
-`skill/extensions/variants/README.md`. When `lab_variants: false`, there is no
+`extensions/variants/README.md`. When `lab_variants: false`, there is no
 such formula.
 
 ### Step 6: Verify Compatibility

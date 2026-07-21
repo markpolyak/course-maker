@@ -37,12 +37,12 @@ file you did or did not read. Violating any of them is a hard error.
 
 - When a lab uses per-student variants (`lab_variants: true`), the variant
   formula is a verbatim invariant wherever it appears (Block 0 and the grade
-  reporter) — see `skill/extensions/variants/README.md`. With
+  reporter) — see `extensions/variants/README.md`. With
   `lab_variants: false` there is no such formula.
 - When a lab uses a grade reporter (`grade_reporter` not `none`), keep its
   grade-output `print()` layout fixed — an external CI may grep it. Only the
   labels (course/language) and the numerator (bonus) change. See
-  `skill/extensions/reporters/README.md`.
+  `extensions/reporters/README.md`.
 - NEVER give students `quizzes/NN/quiz_questions.md` — it holds answers. Before
   marking a quiz `published`, verify the exported student file has no answer
   markers (`grep` for `✓`/answer lines returns nothing).
