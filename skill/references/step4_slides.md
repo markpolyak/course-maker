@@ -22,7 +22,7 @@
 ## Preamble
 
 Read `slides_preamble.tex` from the course root and use it verbatim as the preamble.
-Before writing Chunk 0, replace these placeholders with values from `CLAUDE.md`:
+Before writing Chunk 0, replace these placeholders with values from `AGENTS.md`:
 - `[Course name]` → course name
 - `[Author]` → instructor name
 - `[Institution]` → institution

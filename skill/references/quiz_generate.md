@@ -10,7 +10,7 @@ exports a student-facing version with answers stripped.
 1. `quizzes/NN/history.md` — past iterations, rejected questions.
 2. `quizzes/NN/quiz_plan.md` — header, type legend, structure (blocks, types,
    counts, weights, M variants).
-3. `course_conventions.md`, `CLAUDE.md` → `## Course context` — the bank
+3. `course_conventions.md`, `AGENTS.md` → `## Course context` — the bank
    **content** is written in the course language; this reference file is English.
 4. Taught lectures/seminars for the covered topics, to keep questions in scope.
 

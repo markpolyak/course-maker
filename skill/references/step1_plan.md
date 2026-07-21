@@ -11,7 +11,7 @@ From `course_plan.md`:
 - `## Lectures` → `### Lecture N` — topics, estimated time, prerequisites within course,
   announce-only sections
 
-From `CLAUDE.md` → `## Course context`:
+From `AGENTS.md` → `## Course context`:
 - Audience background
 - Rigor vs intuition preference
 - Which sections to cover fully vs announce-only

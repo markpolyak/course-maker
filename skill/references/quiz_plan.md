@@ -11,13 +11,13 @@ iterate until approved, log decisions to `quizzes/NN/history.md`.
    any topic/weight notes; the `## Overview` for context.
 3. `COURSE_STATE.md` — which lectures/seminars are already taught (so the quiz
    only covers delivered material). Suggest topics from completed sessions.
-4. `CLAUDE.md` → `## Course context` and `course_conventions.md` — language and
+4. `AGENTS.md` → `## Course context` and `course_conventions.md` — language and
    terminology. The plan file is English (skill machinery); the quiz *content*
    (topics, later the questions) is in the course language.
 
 ## Dialog (one question at a time, wait for each answer)
 
-Skip any question already answered in `course_plan.md` or `CLAUDE.md`.
+Skip any question already answered in `course_plan.md` or `AGENTS.md`.
 
 1. **Header metadata:** time limit, weight in the final grade, numeric-answer
    precision (e.g. 3 decimals), any global instructions.

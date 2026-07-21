@@ -10,7 +10,7 @@ user's job — this command never launches it.
 
 ## Resolve the deck format
 
-Detect from the existing file (do not read `CLAUDE.md`):
+Detect from the existing file (do not read `AGENTS.md`):
 - `lectures/NN/slides.tex` → **beamer**
 - `lectures/NN/slides.md` → **slidev**
 

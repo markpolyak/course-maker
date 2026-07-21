@@ -7,7 +7,7 @@ so it lives here as an opt-in extension rather than in the core pipeline.
 
 ## Enabling
 
-In the course `CLAUDE.md`:
+In the course `AGENTS.md`:
 
 ```
 ### Lab grading

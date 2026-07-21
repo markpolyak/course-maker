@@ -30,7 +30,7 @@ LMS adapter for GitHub Classroom. Publishes lab materials by:
   belong in `~/.course-maker/defaults.yaml` (user_defaults) — see
   `skill/profiles/README.md`.
 - Embed institution name or audience description. Those are course-level
-  and live in `CLAUDE.md`.
+  and live in `AGENTS.md`.
 
 If you're a `github-classroom` user with personal defaults (language,
 latex engine, preferred style), `/course-maker course init` will offer to

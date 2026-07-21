@@ -18,7 +18,7 @@ pytest output. So a course that grades manually needs no reporter at all.
 
 ## When a reporter is installed
 
-A reporter is installed only when the course opts in. In the course `CLAUDE.md`:
+A reporter is installed only when the course opts in. In the course `AGENTS.md`:
 
 ```
 ### Lab grading
@@ -55,6 +55,6 @@ line is omitted and the formula is irrelevant.
 ## Writing your own reporter
 
 Create `skill/extensions/reporters/<name>.py` exposing `report(outcomes)`,
-reference it as `grade_reporter: <name>` in the course `CLAUDE.md`. Keep the
+reference it as `grade_reporter: <name>` in the course `AGENTS.md`. Keep the
 file self-contained (no imports from other extensions) — it is copied verbatim
 into each lab and edited there per lab.

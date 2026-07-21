@@ -57,14 +57,23 @@ echo ".cursor/skills/" >> my-course/.gitignore
 
 ```bash
 mkdir my-course && cd my-course && git init
-cp ~/.claude/skills/course-maker/COURSE_CLAUDE_TEMPLATE.md CLAUDE.md
+```
+
+`/course-maker course init` scaffolds the course context as `AGENTS.md` (the
+cross-tool source of truth, read by Codex CLI and Cursor natively) plus a thin
+`CLAUDE.md` that just imports it (`@AGENTS.md`) for Claude Code. To set it up by
+hand instead, copy the template:
+
+```bash
+cp ~/.claude/skills/course-maker/COURSE_AGENTS_TEMPLATE.md AGENTS.md
+printf '@AGENTS.md\n' > CLAUDE.md   # Claude Code wrapper
 ```
 
 ---
 
 ## Step 2: Fill in course context
 
-Open `CLAUDE.md` and fill in `## Course context`. This is the most important step —
+Open `AGENTS.md` and fill in `## Course context`. This is the most important step —
 it's what makes every subsequent prompt precise without you having to repeat yourself.
 
 Key things to specify:
@@ -278,7 +287,7 @@ After post-release fixes:
 /course-maker lab update 1      # fix → re-validate → re-publish
 ```
 
-**Before running `/course-maker lab course-init`:** fill in `## Lab context` in `CLAUDE.md` with
+**Before running `/course-maker lab course-init`:** fill in `## Lab context` in `AGENTS.md` with
 your GitHub org, GitHub Classroom org, and starter repo URLs.
 
 **Before running `/course-maker lab init N`:** for a profile that uses a remote starter repo
@@ -294,7 +303,7 @@ There is no scoring block, no autograder grade line, and no per-student variant
 scheme — so a course that grades manually or has no variants needs no setup at
 all.
 
-Two opt-in features are controlled from `CLAUDE.md` → `## Lab context` →
+Two opt-in features are controlled from `AGENTS.md` → `## Lab context` →
 `### Lab grading`:
 
 ```

@@ -56,7 +56,7 @@ Both options use the same dialog. The difference: [2] assumes the user has
 content ready; [3] means the agent will propose based on subject knowledge after
 collecting the basics. Ask one question at a time, wait for each answer:
 
-1. *(skip if known from CLAUDE.md)* "What is this course about?"
+1. *(skip if known from AGENTS.md)* "What is this course about?"
 2. "What should students be able to do after completing this course?
    One or two concrete outcomes."
 3. "What types of sessions does the course have?

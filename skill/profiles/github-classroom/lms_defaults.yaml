@@ -7,6 +7,6 @@
 # Pattern for the GitHub Classroom repo name (or per-student fork name).
 # Variables: {year}, {N}, {slug}, {student}.
 # {N}-{student} matches GHC fork mode: each accepted assignment becomes
-# <org>/<N>-<student>. Override per-course in CLAUDE.md if your GHC setup
+# <org>/<N>-<student>. Override per-course in AGENTS.md if your GHC setup
 # uses a different pattern.
 ghc_repo_naming: "{N}-{student}"

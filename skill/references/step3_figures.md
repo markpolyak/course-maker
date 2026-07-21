@@ -78,7 +78,7 @@ if __name__ == '__main__':
 ## Style rules
 
 - `dpi=180`, `bbox_inches='tight'`, white background
-- Axis labels in the language specified in `CLAUDE.md` → Course context
+- Axis labels in the language specified in `AGENTS.md` → Course context
 - Spines: remove top and right
 - No grid by default; add light grid only for plots where reading values matters
 - Color palette: use `PALETTE` list above (dark blue, red, orange, light blue, green)

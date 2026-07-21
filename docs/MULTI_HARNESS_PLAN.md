@@ -66,11 +66,13 @@ correct global paths (Claude Code, Codex) and the project-scoped Cursor recipe.
   context`, `## Lab context`, recurring rules, notes) as source of truth, plus a
   thin **`CLAUDE.md`** = `@AGENTS.md` + any Claude-only overrides.
   (`skill/COURSE_AGENTS_TEMPLATE.md` + the CLAUDE template as import wrapper.)
-- Instead of renaming every "CLAUDE.md → ## Course context" reference (≈20
-  files), a single authoritative rule in SKILL.md § Inviolable rules declares the
-  course-context file to be `AGENTS.md` and redirects those mentions; the
-  write-side wizards (`course init`, `lab course-init`) target `AGENTS.md`
-  directly. Opportunistic read-side renames can follow later.
+- Every "CLAUDE.md → ## Course/Lab context" reference across `SKILL.md`,
+  `references/`, `templates/`, `profiles/`, and `extensions/` was renamed to
+  `AGENTS.md` (the real fix — no `#define`-style redirect rule). `CLAUDE.md` is
+  named only where it is literally the wrapper file (its template, the layout
+  entry, and `course init` create/migrate steps). SKILL.md § Inviolable rules
+  states the fact (context file = `AGENTS.md`; `CLAUDE.md` = the `@AGENTS.md`
+  wrapper) without any "treat X as Y" redirection.
 - **Migration** (idempotent): an existing course with inline `CLAUDE.md` and no
   `AGENTS.md` → `course init` offers to split context into `AGENTS.md` and
   rewrite `CLAUDE.md` as the import wrapper (copy-verify-then-trim).

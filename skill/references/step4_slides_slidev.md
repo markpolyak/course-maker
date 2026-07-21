@@ -28,7 +28,7 @@ the output syntax differs.
 
 Read `slides_headmatter.md` from the course root and use it verbatim as the
 opening of Chunk 0. Before writing Chunk 0, replace these placeholders with
-values from `CLAUDE.md` and `plan.md`:
+values from `AGENTS.md` and `plan.md`:
 - `[Course name]` → course name
 - `[Author]` → instructor name
 - `[Institution]` → institution

@@ -11,7 +11,7 @@ template repo via `gh api`. GHC creates per-student forks with squashed
 history, so a direct `git push` to the GHC repo would always conflict —
 that's why we use the contents API instead.
 
-Read `CLAUDE.md` → `## Lab context` to get the GHC org and repo naming
+Read `AGENTS.md` → `## Lab context` to get the GHC org and repo naming
 pattern before starting.
 
 ---
@@ -33,7 +33,7 @@ subtree command fails.
 
 ## Step 1 — Push to starter repo (git subtree)
 
-Get the URL from `CLAUDE.md` Lab context → Starter repos table for lab N.
+Get the URL from `AGENTS.md` Lab context → Starter repos table for lab N.
 
 ```bash
 git subtree push --prefix=<LAB_DIR>starter <url> main
@@ -45,10 +45,10 @@ If the push fails because of diverged history, see "Recovery" below.
 
 ## Step 2 — Sync GHC repo via `gh api`
 
-Resolve `$GHC_REPO` from `CLAUDE.md` Lab context using the naming
+Resolve `$GHC_REPO` from `AGENTS.md` Lab context using the naming
 pattern from `lms_defaults.yaml` (`ghc_repo_naming`, default `{N}-{student}`
 for GHC fork mode). Substitute the variables (`{N}`, `{student}`, etc.)
-from the per-lab context; check `CLAUDE.md` Lab context for the resolved
+from the per-lab context; check `AGENTS.md` Lab context for the resolved
 value for this course.
 
 For each student-facing file in `<LAB_DIR>starter/`:

@@ -27,7 +27,7 @@ Generate `labs/labN/starter/exercises.ipynb`.
 2. Notebook structure — verbatim per the template in `lab_templates.md`:
    - First two markdown cells: header with instructions + Block 0 divider
    - Block 0: setup / dependency install. When `lab_variants: true` (see
-     `CLAUDE.md` → `## Lab context` → `### Lab grading`), Block 0 also includes
+     `AGENTS.md` → `## Lab context` → `### Lab grading`), Block 0 also includes
      the variant-selection cells from `skill/extensions/variants/block0_snippet.md`
      — the variant formula there is verbatim, never change it. When
      `lab_variants: false`, Block 0 has no variant cells.

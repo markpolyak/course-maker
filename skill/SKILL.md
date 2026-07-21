@@ -77,10 +77,9 @@ file you did or did not read. Violating any of them is a hard error.
 
 - The **course-context file is `AGENTS.md`** (course name, audience, style,
   language, `Profile:`, `Slides format:`, `## Lab context`, recurring rules).
-  Claude Code also loads it via the `@AGENTS.md` import in `CLAUDE.md`; Codex CLI
-  and Cursor read `AGENTS.md` directly. Wherever a reference says "`CLAUDE.md` →
-  `## Course context`/`## Lab context`", read — and write — that content in
-  `AGENTS.md`. `CLAUDE.md` holds only the import plus any Claude Code-only overrides.
+  Codex CLI and Cursor read it directly; Claude Code loads it via the
+  `@AGENTS.md` import in `CLAUDE.md`, which otherwise holds only Claude Code-only
+  overrides.
 - NEVER overwrite existing files in init wizards (`course init`,
   `lab course-init`). They are idempotent by design.
 - NEVER auto-advance to the next step after the user approves the current one —
@@ -125,7 +124,7 @@ file you did or did not read. Violating any of them is a hard error.
 | `/course-maker plan N` | Step 1 — detailed slide-by-slide plan for lecture N |
 | `/course-maker visuals N` | Step 2 — list of visualizations, TikZ feasibility |
 | `/course-maker figures N` | Step 3 — Python script to generate PNG figures |
-| `/course-maker slides N [format]` | Step 4 — deck chunk 0 (beamer→slides.tex / slidev→slides.md); format from CLAUDE.md or arg |
+| `/course-maker slides N [format]` | Step 4 — deck chunk 0 (beamer→slides.tex / slidev→slides.md); format from AGENTS.md or arg |
 | `/course-maker slides N next` | Step 4 — next block of 5 slides (format detected from the existing file) |
 | `/course-maker slides N export [pdf\|png]` | Export the existing deck to a file (beamer→PDF, slidev→pdf/png) |
 | `/course-maker notes N` | Step 5 — speaker notes, chunk 0 (slides 1–5) |
@@ -229,7 +228,7 @@ Resolve the slide format, then read the matching reference:
 - `slidev` → `references/step4_slides_slidev.md` (produces `slides.md`).
 
 Format resolution: an explicit `format` arg (`beamer`|`slidev`) wins; else the
-`Slides format:` field in `CLAUDE.md` → `## Course context` (default `beamer`).
+`Slides format:` field in `AGENTS.md` → `## Course context` (default `beamer`).
 When resuming (`slides N next`), ignore the field and detect from the existing
 file: `slides.tex` → beamer, `slides.md` → slidev. (`pptx` is not implemented;
 if requested, say so and stop.)
@@ -270,7 +269,7 @@ Read: `references/step5_notes.md`.
 - Chunk 0 = header + slides 1–5. Chunk K = slides [5K-4 … min(5K, total)].
   Chunk last = timing table + cut candidates.
 - Append each chunk to `speaker_notes.md` immediately; do not pause between chunks (no per-chunk approval — auto-chain to the end).
-- Generate in the course language (from `CLAUDE.md` → Course context).
+- Generate in the course language (from `AGENTS.md` → Course context).
 
 **Resuming:** `/course-maker notes N next` reads the file, continues from the
 last completed slide (auto-chains remaining chunks).

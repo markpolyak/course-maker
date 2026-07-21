@@ -51,7 +51,7 @@ Do NOT touch: submission instructions, Colab setup, contact section.
 ### Step 4: Update the grade reporter (only if the course uses one)
 
 `conftest.py` is the universal harness and needs **no per-lab edit**. Whether a
-lab produces any scoring output depends on `grade_reporter` in `CLAUDE.md` →
+lab produces any scoring output depends on `grade_reporter` in `AGENTS.md` →
 `## Lab context` → `### Lab grading`:
 
 - **`grade_reporter: none`** → there is no `grade_report.py`; labs run plain

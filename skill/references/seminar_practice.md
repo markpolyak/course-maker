@@ -15,7 +15,7 @@ is **not autograded** and has no `conftest.py`/`tests.py` (that is a lab).
 2. `seminars/NN/plan.md` — the seminar's content; identify which points are meant
    to be shown live / practised (vs pure lecture).
 3. `course_plan.md` — seminar N row (title, topic).
-4. `CLAUDE.md` → `## Course context` and `course_conventions.md` — audience,
+4. `AGENTS.md` → `## Course context` and `course_conventions.md` — audience,
    tone, language, terminology. The notebook **content is in the course
    language**; this reference is English.
 

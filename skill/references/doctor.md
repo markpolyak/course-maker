@@ -52,7 +52,7 @@ These need reading intent and cannot be done by the script. Check each:
 1. **Leftover plan TODOs.** `grep -n "<!-- TODO -->" course_plan.md`. Each hit
    is an unfilled section → `/course-maker course plan`.
 2. **Profile ↔ adapter consistency.**
-   - Read `CLAUDE.md` → `## Course context` → `Profile:` (default `local-zip`
+   - Read `AGENTS.md` → `## Course context` → `Profile:` (default `local-zip`
      if absent).
    - Confirm `lms_adapter.md` exists in the course root.
    - If `Profile:` names a profile but `lms_adapter.md` is missing, or the

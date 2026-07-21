@@ -223,7 +223,7 @@ variable_name: np.ndarray = None  # размерность (n,) или пояс�
 ## Grade reporter labels
 
 Used **only when the course sets a grade reporter** (`grade_reporter` not `none`
-in `CLAUDE.md` → `## Lab context`). `/course-maker lab course-init` reads these
+in `AGENTS.md` → `## Lab context`). `/course-maker lab course-init` reads these
 values and substitutes them into the labels at the top of `grade_report.py`
 (`TASKID_LABEL`, `GRADE_OUTPUT_LABEL`, `SCORING_HEADER`). The print() layout in
 the reporter is fixed — only the labels change per course/language. With

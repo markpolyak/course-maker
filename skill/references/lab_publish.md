@@ -20,16 +20,16 @@ Stop and show:
 <course-root>/lms_adapter.md is missing.
 
 This file defines how labs are published for your course. It is installed
-by /course-maker lab course-init from the profile configured in CLAUDE.md
+by /course-maker lab course-init from the profile configured in AGENTS.md
 (Course context → Profile).
 
 To install it:
-  1. Check that CLAUDE.md → Course context → Profile is set
+  1. Check that AGENTS.md → Course context → Profile is set
      (default: local-zip).
   2. Run /course-maker lab course-init.
   3. Re-run /course-maker lab publish N.
 
-To choose a different LMS workflow, change the Profile field in CLAUDE.md
+To choose a different LMS workflow, change the Profile field in AGENTS.md
 before re-running lab course-init. Available profiles are listed in
 skill/profiles/.
 ```

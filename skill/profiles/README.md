@@ -36,9 +36,9 @@ terminology dictionary live in
 
 ## How a profile is selected
 
-The profile name is stored in `CLAUDE.md` → `## Course context` →
+The profile name is stored in `AGENTS.md` → `## Course context` →
 `Profile:`. Default: `local-zip`. The `course init` wizard asks for it on
-first run and writes it into `CLAUDE.md`.
+first run and writes it into `AGENTS.md`.
 
 ## How a profile is applied
 
@@ -111,7 +111,7 @@ format above.
 At the start of `/course-maker course init`, before asking content
 questions. Values are used as **suggested defaults** (press Enter to
 accept, or type to override). The result is written into the course's
-`CLAUDE.md` — the course no longer depends on user_defaults after init.
+`AGENTS.md` — the course no longer depends on user_defaults after init.
 
 ### What is NOT in user_defaults
 

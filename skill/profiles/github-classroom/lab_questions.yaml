@@ -2,10 +2,10 @@
 #
 # /course-maker lab course-init reads this file to know which LMS-config
 # questions to add to the dialog. Each entry becomes a key under
-# CLAUDE.md → ## Lab context.
+# AGENTS.md → ## Lab context.
 #
 # Format:
-#   - id: <key name written into CLAUDE.md>
+#   - id: <key name written into AGENTS.md>
 #     prompt: "<question shown to the user>"
 #     default: "<optional default; may reference lms_defaults.yaml values
 #               via ${ghc_repo_naming} etc.>"

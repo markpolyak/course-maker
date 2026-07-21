@@ -46,7 +46,7 @@ only if the author points `Dir` at that unit's folder.
 ## `/course-maker homework plan N [dir]` (Step 1)
 
 Read `references/lab_context.md` for the shared authoring rules (audience level
-from `CLAUDE.md`, terminology from `course_conventions.md`, factual-claims and
+from `AGENTS.md`, terminology from `course_conventions.md`, factual-claims and
 library-currency discipline). Homework does not use `lab_templates.md` (no
 notebook/test scaffolding).
 
@@ -54,10 +54,10 @@ notebook/test scaffolding).
 
 1. `course_plan.md` — the section for homework N (topic, objectives) if present.
 2. `HW_DIR/history.md` if it exists — rejected ideas, prior decisions.
-3. `CLAUDE.md` → `## Course context` — audience and language.
+3. `AGENTS.md` → `## Course context` — audience and language.
 4. `course_conventions.md` — terminology and language rules.
 
-Homework needs only `course init` to have run (for `CLAUDE.md` and
+Homework needs only `course init` to have run (for `AGENTS.md` and
 `course_conventions.md`). It does **not** require `lab course-init`.
 
 ### Resolve `HW_DIR`

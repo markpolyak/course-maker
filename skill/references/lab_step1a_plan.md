@@ -8,7 +8,7 @@ Read `references/lab_context.md` before starting.
 
 1. Read `course_plan.md` — find the section for lab N (topic, learning objectives).
 2. Read `labs/labN/history.md` if it exists — note any rejected ideas or prior decisions.
-3. Read `## Lab context` from `CLAUDE.md` — course name, audience, GitHub org.
+3. Read `## Lab context` from `AGENTS.md` — course name, audience, GitHub org.
 4. Read `course_conventions.md` from the course root — terminology and language rules.
 5. Read `lab_templates.md` from the course root — task title format and interface format.
 

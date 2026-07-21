@@ -87,16 +87,17 @@ mkdir my-course && cd my-course && git init
 > /course-maker course plan
 ```
 
-`course init` creates `CLAUDE.md`, `course_conventions.md`, `slides_preamble.tex`,
-and the directory layout. `course plan` walks you through filling in
-`course_plan.md` (or imports an existing one).
+`course init` creates `AGENTS.md` (course context), `course_conventions.md`,
+`slides_preamble.tex`, and the directory layout. `course plan` walks you through
+filling in `course_plan.md` (or imports an existing one).
 
 ---
 
 ## Quick start (5 minutes to first slide plan)
 
-1. Run `/course-maker course init` — fills in `CLAUDE.md` and per-course
-   templates from your answers (course name, audience, style, language, LaTeX engine).
+1. Run `/course-maker course init` — fills in `AGENTS.md` (course context) and
+   per-course templates from your answers (course name, audience, style, language,
+   slides format, LaTeX engine).
 2. Run `/course-maker course plan` — interactively creates `course_plan.md`,
    or imports yours if you already have one.
 3. Run `/course-maker plan 1` and review the output.
@@ -130,7 +131,7 @@ which is always loaded and lists the critical rules that survive any skip.
 
 ```
 my-course/
-  CLAUDE.md               ← course-specific context (audience, style, language, profile)
+  AGENTS.md               ← course context (audience, style, language, profile)
   course_plan.md          ← master plan (source of truth)
   syllabus.md             ← student-facing syllabus (generated from course_plan.md)
   COURSE_STATE.md         ← status of all pipelines: ✅ 🔄 ❌ ⚠️

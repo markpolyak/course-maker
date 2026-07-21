@@ -14,7 +14,7 @@ plan changes. It has no state row and no `history.md`.
 ## Context to read first
 
 1. `course_plan.md` — the source of all content.
-2. `CLAUDE.md` → `## Course context` — course name, program, institution,
+2. `AGENTS.md` → `## Course context` — course name, program, institution,
    audience, and language; and a short description if the plan lacks one.
 3. `course_conventions.md` — terminology and language rules.
 
@@ -25,10 +25,10 @@ This reference is English; **write the syllabus itself in the course language.**
 A clean, student-facing document. Map from `course_plan.md`, omitting anything
 internal to the skill:
 
-- **Title block:** course name, program/institution (from `CLAUDE.md`),
+- **Title block:** course name, program/institution (from `AGENTS.md`),
   term/year if present.
 - **Instructors:** names and contacts (from `## Instructors`).
-- **Description / objectives:** from `CLAUDE.md` course context and the plan's
+- **Description / objectives:** from `AGENTS.md` course context and the plan's
   topics. Keep it short.
 - **Prerequisites:** from `## Prerequisites`.
 - **Schedule:** render `## Sessions` as a human-readable table (Week, Type,

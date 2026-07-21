@@ -9,7 +9,7 @@
 1. `lectures/NN/plan.md` — content and timing per slide
 2. `lectures/NN/slides.tex` — exact slide order and titles
    (if it exists; if not, use plan.md order)
-3. `CLAUDE.md` → `## Course context` — audience, tone, language
+3. `AGENTS.md` → `## Course context` — audience, tone, language
 4. `lectures/NN/history.md` — any tone or pacing feedback from previous rounds
 5. `course_conventions.md` (course root) — terminology dictionary and language rules
 
@@ -24,7 +24,7 @@ Not a repetition of slide content.
 
 ## Output format: `lectures/NN/speaker_notes.md`
 
-**Generate all text in the course language** (from CLAUDE.md → Course context).
+**Generate all text in the course language** (from AGENTS.md → Course context).
 The examples below show format and tone — produce the actual notes in the course language.
 
 ````markdown
