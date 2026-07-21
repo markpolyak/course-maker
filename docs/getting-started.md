@@ -24,32 +24,22 @@ once, then install it into your agent's skills directory either by **symlink**
 (recommended — a `git pull` in the clone updates every tool) or by **copy**
 (self-contained, but re-copy after updates — use `cp -r` instead of `ln -s`).
 
+All three tools install the skill globally — available in every project.
+
 ```bash
 # Clone the repository
 git clone https://github.com/markpolyak/course-maker
 
-# Claude Code — global (~/.claude/skills):
+# Claude Code (global ~/.claude/skills):
 ln -s "$(pwd)/course-maker/skill" ~/.claude/skills/course-maker
 
-# OpenAI Codex CLI — global (~/.agents/skills; legacy ~/.codex/skills also works):
+# Codex CLI and Cursor (both read the global ~/.agents/skills):
 mkdir -p ~/.agents/skills
 ln -s "$(pwd)/course-maker/skill" ~/.agents/skills/course-maker
 ```
 
-For **Claude Code** and **Codex CLI** the skill is global — available in every
-project. **Cursor has no global skills directory**, so the skill is project-scoped:
-install it into each course repo (created in Step 1). Copying makes the course
-repo self-contained (the skill travels with it); symlinking needs a gitignore so
-the external link doesn't get committed:
-
-```bash
-mkdir -p my-course/.cursor/skills
-# Copy (self-contained repo):
-cp -r "$(pwd)/course-maker/skill" my-course/.cursor/skills/course-maker
-# — or — Symlink (auto-updates; keep the link out of git):
-ln -s "$(pwd)/course-maker/skill" my-course/.cursor/skills/course-maker
-echo ".cursor/skills/" >> my-course/.gitignore
-```
+Cursor also reads `~/.cursor/skills/`, and Codex still honors the legacy
+`~/.codex/skills/`, if you prefer those.
 
 ---
 

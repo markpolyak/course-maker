@@ -53,28 +53,20 @@ install location differs. Two ways to install:
 - **Copy** — self-contained, but you must re-copy after each update. Replace
   `ln -s` with `cp -r` in the commands below.
 
-Run these from the PARENT directory of the cloned repo:
+All three tools install globally. Run these from the PARENT directory of the
+cloned repo:
 
 ```bash
-# Claude Code — global (~/.claude/skills):
+# Claude Code (global ~/.claude/skills):
 ln -s "$(pwd)/course-maker/skill" ~/.claude/skills/course-maker
 
-# OpenAI Codex CLI — global (~/.agents/skills; legacy ~/.codex/skills also works):
+# Codex CLI and Cursor (both read the global ~/.agents/skills):
 mkdir -p ~/.agents/skills
 ln -s "$(pwd)/course-maker/skill" ~/.agents/skills/course-maker
 ```
 
-**Cursor has no global skills directory** — skills are project-scoped, so install
-into each course repo's `.cursor/skills/`:
-
-```bash
-mkdir -p my-course/.cursor/skills
-# Symlink (external clone; gitignore the link so it doesn't travel with the repo):
-ln -s "$(pwd)/course-maker/skill" my-course/.cursor/skills/course-maker
-echo ".cursor/skills/" >> my-course/.gitignore
-# — or — Copy, to make the course repo self-contained (skill travels with it):
-cp -r "$(pwd)/course-maker/skill" my-course/.cursor/skills/course-maker
-```
+(Cursor also reads `~/.cursor/skills/`, and Codex still honors the legacy
+`~/.codex/skills/`, if you prefer those.)
 
 Then create a course and initialize it in your agent:
 

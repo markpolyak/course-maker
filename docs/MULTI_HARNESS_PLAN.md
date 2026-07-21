@@ -16,12 +16,16 @@ pandoc) cannot execute there.
   (`name` + `description` frontmatter) plus `references/`, `scripts/`, `assets/`.
   Progressive disclosure (preload name+description, load the body on demand) is
   the same across all three. **Our skill already conforms — it ports as-is.**
-- **Install locations differ; the skill does not:**
-  - Claude Code — global `~/.claude/skills/<name>/`
-  - Codex CLI — global `~/.agents/skills/<name>/` (legacy `~/.codex/skills/`);
-    repo-scoped `.agents/skills/`
-  - Cursor — **no global skills dir**; project-scoped `.cursor/skills/<name>/`
-    only. Global sharing is a per-project symlink / dotfiles workaround.
+- **Install locations differ; the skill does not.** All three support a global
+  (user-level) skills directory:
+  - Claude Code — `~/.claude/skills/<name>/`
+  - Codex CLI — `~/.agents/skills/<name>/` (legacy `~/.codex/skills/`); repo-scoped
+    `.agents/skills/`
+  - Cursor — `~/.agents/skills/<name>/` and `~/.cursor/skills/<name>/` (global);
+    `.agents/skills/` and `.cursor/skills/` (project). Per the official docs:
+    https://cursor.com/docs/skills
+  - **Codex CLI and Cursor both read `~/.agents/skills/`**, so one symlink there
+    serves both; Claude Code needs `~/.claude/skills/`. Two symlinks total.
 - **`AGENTS.md` is a different layer** from the skill: always-on project guidance
   (plain markdown, no frontmatter), read natively by Codex, Cursor, Copilot,
   Gemini, etc. **Claude Code does not read `AGENTS.md`** — it reads `CLAUDE.md`,
@@ -40,10 +44,9 @@ not its content. Course context is single-sourced in `AGENTS.md`.
 
 ## Decisions
 
-- **Global install** for Claude Code and Codex CLI (symlink into `~/.claude/skills`
-  and `~/.agents/skills`). Documented in README + getting-started.
-- **Cursor is project-scoped** by design — symlink into each course repo's
-  `.cursor/skills/` and gitignore it. No global option exists; documented honestly.
+- **Global install for all three.** Two symlinks: `~/.claude/skills` (Claude
+  Code) and `~/.agents/skills` (Codex CLI + Cursor, which both read it).
+  Documented in README + getting-started.
 - Consumer ChatGPT / Custom GPT: **not supported** (no shell/filesystem).
 
 ## Phased plan
@@ -58,8 +61,8 @@ so they read for any agent, without changing behavior:
 - Audit for other Claude-only assumptions (tool names, slash-command phrasing).
 
 ### Phase 1 — install/distribution ✅ shipped
-Single skill, symlinked per tool. README + getting-started updated with the
-correct global paths (Claude Code, Codex) and the project-scoped Cursor recipe.
+Single skill, symlinked globally. README + getting-started document two symlinks:
+`~/.claude/skills` (Claude Code) and `~/.agents/skills` (Codex CLI + Cursor).
 
 ### Phase 2 — cross-tool per-course context layer ✅ done
 - `course init` generates **`AGENTS.md`** with the course context (`## Course
@@ -91,17 +94,17 @@ correct global paths (Claude Code, Codex) and the project-scoped Cursor recipe.
   the long-standing failure mode. Inline Inviolable rules / CRITICAL blocks
   mitigate it, but full parity on a weaker model is not guaranteed. State this
   explicitly in docs.
-- Cursor's project-scoping means the skill is not "install once" there; the
-  per-repo symlink is the accepted workaround.
 - Standards are young (2025–2026) and paths may shift (e.g. Codex legacy
-  `~/.codex/skills`); re-verify install paths when tooling updates.
+  `~/.codex/skills`); re-verify install paths against official docs when tooling
+  updates. (An earlier draft of this plan wrongly claimed Cursor had no global
+  skills dir, based on a third-party blog; the official docs show `~/.agents/skills`
+  and `~/.cursor/skills` are global — prefer primary sources.)
 
 ## Sources
 
 - Codex — Build skills: https://learn.chatgpt.com/docs/build-skills
 - Codex issue #10493 (user-scope `~/.agents/skills`): https://github.com/openai/codex/issues/10493
-- Cursor skills storage (project-scoped only): https://www.agensi.io/learn/where-are-cursor-skills-stored
-- Cursor rules vs SKILL.md: https://www.agensi.io/learn/cursor-rules-vs-skill-md-complete-guide
+- Cursor — Skills (official; global `~/.agents/skills` + `~/.cursor/skills`): https://cursor.com/docs/skills
 - Claude Code `@AGENTS.md` import patterns: https://gist.github.com/yurukusa/d36197848911f025add142abefcde685
 - Claude Code issue #6235 (AGENTS.md support): https://github.com/anthropics/claude-code/issues/6235
 - AGENTS.md standard adoption: https://codersera.com/blog/agents-md-vs-claude-md-vs-cursor-rules-comparison-2026/
