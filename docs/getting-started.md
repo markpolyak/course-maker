@@ -45,11 +45,10 @@ including the Claude Code and Codex directories (`~/.claude/skills`,
 it picks up either symlink above. Only using Cursor? Put the link in
 `~/.cursor/skills/course-maker`.
 
-> Caveat: if you install for **both** Claude Code and Codex, Cursor reads both
-> directories and will discover course-maker **twice**. Cursor's docs don't
-> define dedup/precedence for a skill found in multiple dirs, so you may see a
-> duplicate entry. It's the same skill (both links point to one directory), so
-> it's cosmetic — but keep a single symlink if it bothers you.
+> Note: Cursor reads both the Claude Code and Codex dirs, so installing for both
+> means it finds course-maker in two places. In practice Cursor de-duplicates —
+> with symlinks to the same directory it shows the skill **once** (observed). The
+> docs don't document this, so don't rely on it, but a double install is fine.
 
 ---
 

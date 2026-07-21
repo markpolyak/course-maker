@@ -1,7 +1,7 @@
 # Multi-harness support plan (Claude Code · Codex CLI · Cursor)
 
 **Date:** 2026-07-21
-**Status:** Phases 0–2 done; Phase 3 = only the manual Codex/Cursor smoke remains.
+**Status:** Phases 0–3 done — skill verified loading on Claude Code, Codex CLI, and Cursor.
 
 Goal: run course-maker on **Claude Code**, **OpenAI Codex CLI**, and **Cursor**
 from a single source of truth, without forking the skill or duplicating content.
@@ -26,10 +26,9 @@ pandoc) cannot execute there.
     `~/.codex/skills` (global) and the four project-level equivalents. It reads
     the Claude Code and Codex dirs "for compatibility".
   - Consequence: **Cursor never needs its own symlink** — it piggybacks on the
-    Claude Code / Codex dirs. But because it reads several, installing for **both**
-    Claude Code and Codex makes Cursor discover the skill twice; the docs define
-    no dedup/precedence, so a duplicate listing is possible (cosmetic — same
-    underlying directory).
+    Claude Code / Codex dirs. Installing for both Claude Code and Codex means
+    Cursor finds the skill in two dirs; the docs define no dedup, but in practice
+    Cursor shows it **once** (observed with symlinks to the same directory).
 - **`AGENTS.md` is a different layer** from the skill: always-on project guidance
   (plain markdown, no frontmatter), read natively by Codex, Cursor, Copilot,
   Gemini, etc. **Claude Code does not read `AGENTS.md`** — it reads `CLAUDE.md`,
@@ -90,9 +89,10 @@ in README + getting-started.
 - ✅ Static test (`tests/static/test_agents_wrapper.py`): the CLAUDE template
   imports `AGENTS.md`, does not re-inline context, and the AGENTS template
   carries the context — guards the two files from drift.
-- ⏳ Manual smoke on Codex CLI and Cursor (needs those tools; instructor-run):
-  `course init` → a lecture step → a lab step; confirm the skill loads and
-  references are read.
+- ✅ Manual smoke (instructor-run, 2026-07): skill installed via symlinks in
+  `~/.claude/skills` + `~/.agents/skills`; discovered and available in Claude
+  Code, Codex CLI, and Cursor. Cursor de-duplicates the double install (shows the
+  skill once). Cross-tool load path confirmed.
 
 ## Risks / limitations
 
