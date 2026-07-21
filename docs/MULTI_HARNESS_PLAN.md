@@ -52,6 +52,14 @@ not its content. Course context is single-sourced in `AGENTS.md`.
   no dedicated symlink — it reads both. Documented in README + getting-started,
   with the both-Claude-and-Codex duplicate caveat.
 - Consumer ChatGPT / Custom GPT: **not supported** (no shell/filesystem).
+- The **Claude chat app (claude.ai / Claude Desktop)**: **not supported for the
+  pipeline.** It does support custom Skills (uploaded as a zip in Settings →
+  Features), but they run in a sandboxed cloud VM — not on your machine — so there
+  is no local course repo, git, or LaTeX/pandoc/pytest/jupyter toolchain, and the
+  VM is ephemeral (state files can't persist in your repo). Only pure text steps
+  (e.g. drafting a plan) would work; the real pipeline can't. Note: **Claude *Code*
+  for Desktop** is just Claude Code and is fully supported. (Official runtime/
+  surface docs: https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview)
 
 ## Phased plan
 
