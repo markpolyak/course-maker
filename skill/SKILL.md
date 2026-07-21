@@ -75,6 +75,12 @@ file you did or did not read. Violating any of them is a hard error.
 
 ### Process
 
+- The **course-context file is `AGENTS.md`** (course name, audience, style,
+  language, `Profile:`, `Slides format:`, `## Lab context`, recurring rules).
+  Claude Code also loads it via the `@AGENTS.md` import in `CLAUDE.md`; Codex CLI
+  and Cursor read `AGENTS.md` directly. Wherever a reference says "`CLAUDE.md` →
+  `## Course context`/`## Lab context`", read — and write — that content in
+  `AGENTS.md`. `CLAUDE.md` holds only the import plus any Claude Code-only overrides.
 - NEVER overwrite existing files in init wizards (`course init`,
   `lab course-init`). They are idempotent by design.
 - NEVER auto-advance to the next step after the user approves the current one —
@@ -93,7 +99,7 @@ file you did or did not read. Violating any of them is a hard error.
 - ALWAYS check `git diff` on the prerequisite file at the start of a subsequent
   step. If the user manually edited it, log the edit in `history.md` before
   proceeding.
-- ALWAYS read `CLAUDE.md` → `## Course context` → `Profile:` field at the
+- ALWAYS read `AGENTS.md` → `## Course context` → `Profile:` field at the
   start of `course init`, `lab course-init`, and `lab publish`. Default
   profile is `local-zip` if the field is absent. The profile is the LMS
   adapter only; instructor preferences come from

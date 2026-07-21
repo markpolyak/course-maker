@@ -14,7 +14,7 @@ Run these checks silently before asking anything:
    A directory counts as an existing lab if it contains `starter/` or
    `history.md`. Record each found dir and its contents.
 
-2. **Check `CLAUDE.md` for `## Lab context`.**
+2. **Check `AGENTS.md` for `## Lab context`.**
    - `missing` — section does not exist.
    - `placeholder` — contains strings like `[org-name]`, `[classroom-org]`, `[org]`.
    - `filled` — none of the above apply.
@@ -22,7 +22,7 @@ Run these checks silently before asking anything:
 3. **Check `COURSE_STATE.md` for a `## Labs` table.**
    - `missing` — no such section.
 
-4. **Read the grade-reporting config from `CLAUDE.md` → `## Lab context`
+4. **Read the grade-reporting config from `AGENTS.md` → `## Lab context`
    → `### Lab grading`.**
    - `grade_reporter` — default `none`.
    - `lab_variants` — default `false`.
@@ -60,7 +60,7 @@ The universal `conftest_base.py` prints no grade output on its own. Any
 scoring / grade-output is supplied by an optional reporter dropped next to the
 conftest as `grade_report.py` (see `skill/extensions/reporters/README.md`).
 
-Read `grade_reporter` from `CLAUDE.md` → `## Lab context` → `### Lab grading`
+Read `grade_reporter` from `AGENTS.md` → `## Lab context` → `### Lab grading`
 (default `none`):
 
 - **`none`** → do nothing. Labs run plain pytest (pass/fail only).
@@ -95,23 +95,23 @@ list is populated; when `false`, neither is present.
 
 ---
 
-## Phase 3 — Dialog: CLAUDE.md `## Lab context`
+## Phase 3 — Dialog: AGENTS.md `## Lab context`
 
 Skip this phase if the section is already `filled`.
 
 If `missing` or `placeholder`, announce:
-"Filling in `## Lab context` in `CLAUDE.md`. I'll ask one question at a time."
+"Filling in `## Lab context` in `AGENTS.md`. I'll ask one question at a time."
 
 ### Phase 3a — Load profile questions
 
-Read `CLAUDE.md` → `## Course context` → `Profile:` field. Default:
+Read `AGENTS.md` → `## Course context` → `Profile:` field. Default:
 `local-zip`.
 
 Read `skill/profiles/<profile>/lab_questions.yaml`. Each entry describes
 one LMS-config question:
 
 ```yaml
-- id: <key>            # written to CLAUDE.md under ## Lab context
+- id: <key>            # written to AGENTS.md under ## Lab context
   prompt: "<text>"     # shown to the user verbatim
   default: ""          # may reference lms_defaults.yaml values via ${name}
   required: true|false
@@ -144,13 +144,13 @@ If the user runs this command to also set up a new lab, additionally ask:
 
 ### Phase 3c — Write `## Lab context`
 
-Write the collected answers into `CLAUDE.md` → `## Lab context`. Field
+Write the collected answers into `AGENTS.md` → `## Lab context`. Field
 names come from the `id` of each `lab_questions.yaml` entry. For per-lab
 questions, write a table: one row per lab, one column per per-lab field
 (e.g. `starter_repo_url`).
 
 The actual publish workflow lives in `<course-root>/lms_adapter.md` (copied
-in Phase 5a). The `## Lab context` section in `CLAUDE.md` holds only the
+in Phase 5a). The `## Lab context` section in `AGENTS.md` holds only the
 identifiers that workflow looks up at publish time.
 
 ---
@@ -181,7 +181,7 @@ Then write the Labs table into `COURSE_STATE.md`.
 
 ## Phase 5 — Copy lab templates
 
-Read `CLAUDE.md` → `## Course context` → Language field.
+Read `AGENTS.md` → `## Course context` → Language field.
 Determine the template variant: `ru` for Russian, `en` for English,
 or `en` as default if the language is unsupported.
 
@@ -194,7 +194,7 @@ and scoring strings before generating notebooks."
 
 ## Phase 5a — Install the LMS adapter
 
-Read `CLAUDE.md` → `## Course context` → `Profile:` field. Default:
+Read `AGENTS.md` → `## Course context` → `Profile:` field. Default:
 `local-zip`.
 
 If `<course-root>/lms_adapter.md` does not exist (or the user explicitly

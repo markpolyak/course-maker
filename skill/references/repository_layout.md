@@ -9,7 +9,9 @@ that need to locate or create files.
 
 ```
 <course-root>/
-  CLAUDE.md               ← this skill + course-specific context (includes Profile:)
+  AGENTS.md               ← course context (source of truth): audience, style,
+                            language, Profile:, Slides format:, ## Lab context
+  CLAUDE.md               ← Claude Code wrapper: `@AGENTS.md` import + Claude-only overrides
   course_plan.md          ← master course plan (source of truth)
   syllabus.md             ← student-facing syllabus (generated from course_plan.md)
   COURSE_STATE.md         ← status table for all lectures/labs

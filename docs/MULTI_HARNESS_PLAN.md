@@ -1,7 +1,7 @@
 # Multi-harness support plan (Claude Code · Codex CLI · Cursor)
 
 **Date:** 2026-07-21
-**Status:** install path shipped; deeper parity planned.
+**Status:** Phases 0–2 done; Phase 3 = only the manual Codex/Cursor smoke remains.
 
 Goal: run course-maker on **Claude Code**, **OpenAI Codex CLI**, and **Cursor**
 from a single source of truth, without forking the skill or duplicating content.
@@ -48,7 +48,7 @@ not its content. Course context is single-sourced in `AGENTS.md`.
 
 ## Phased plan
 
-### Phase 0 — declaudize wording (small; content-neutral)
+### Phase 0 — declaudize wording ✅ done
 Generalize the few Claude Code-specific phrasings in `SKILL.md` / `references/`
 so they read for any agent, without changing behavior:
 - Chunking rationale: "one-shot generation causes Claude Code to hang" →
@@ -61,22 +61,27 @@ so they read for any agent, without changing behavior:
 Single skill, symlinked per tool. README + getting-started updated with the
 correct global paths (Claude Code, Codex) and the project-scoped Cursor recipe.
 
-### Phase 2 — cross-tool per-course context layer
-- `course init` generates **`AGENTS.md`** with the course context (current
-  `## Course context`, `## Lab context`, recurring rules, etc.) as source of
-  truth, plus a thin **`CLAUDE.md`** = `@AGENTS.md` + any Claude-only overrides.
-- Add `skill/COURSE_AGENTS_TEMPLATE.md`; make the CLAUDE template the import wrapper.
-- Point references that read "course context" at `AGENTS.md` (Claude Code still
-  sees it via the `CLAUDE.md` import; Codex/Cursor read `AGENTS.md` natively).
+### Phase 2 — cross-tool per-course context layer ✅ done
+- `course init` generates **`AGENTS.md`** with the course context (`## Course
+  context`, `## Lab context`, recurring rules, notes) as source of truth, plus a
+  thin **`CLAUDE.md`** = `@AGENTS.md` + any Claude-only overrides.
+  (`skill/COURSE_AGENTS_TEMPLATE.md` + the CLAUDE template as import wrapper.)
+- Instead of renaming every "CLAUDE.md → ## Course context" reference (≈20
+  files), a single authoritative rule in SKILL.md § Inviolable rules declares the
+  course-context file to be `AGENTS.md` and redirects those mentions; the
+  write-side wizards (`course init`, `lab course-init`) target `AGENTS.md`
+  directly. Opportunistic read-side renames can follow later.
 - **Migration** (idempotent): an existing course with inline `CLAUDE.md` and no
   `AGENTS.md` → `course init` offers to split context into `AGENTS.md` and
-  rewrite `CLAUDE.md` as the import wrapper.
+  rewrite `CLAUDE.md` as the import wrapper (copy-verify-then-trim).
 
 ### Phase 3 — verify + keep in sync
-- Manual smoke on Codex CLI and Cursor: run `course init` → a lecture step →
-  a lab step; confirm the skill loads and references are read.
-- A static test (like `tests/static`) asserting the generated `CLAUDE.md`
-  correctly imports `AGENTS.md` and the two do not drift.
+- ✅ Static test (`tests/static/test_agents_wrapper.py`): the CLAUDE template
+  imports `AGENTS.md`, does not re-inline context, and the AGENTS template
+  carries the context — guards the two files from drift.
+- ⏳ Manual smoke on Codex CLI and Cursor (needs those tools; instructor-run):
+  `course init` → a lecture step → a lab step; confirm the skill loads and
+  references are read.
 
 ## Risks / limitations
 

@@ -11,12 +11,16 @@ what is already in place and only creates or asks about what is missing.
 
 Run these checks silently before asking anything:
 
-1. **Check `CLAUDE.md`.**
-   - `missing` — file does not exist.
-   - `placeholder` — exists but contains strings like `[Course Name]`, `[course-slug]`,
-     `[org-name]`.
-   - `filled` — exists with real content. Read the following fields from it if present:
-     course name, slug, language, audience, style preferences, **`Profile:`**.
+1. **Check the course-context files (`AGENTS.md` = source of truth, `CLAUDE.md`
+   = `@AGENTS.md` wrapper).**
+   - `missing` — neither exists.
+   - `placeholder` — `AGENTS.md` exists but contains strings like `[Course Name]`,
+     `[course-slug]`, `[org-name]`.
+   - `filled` — `AGENTS.md` has real content. Read these fields if present:
+     course name, slug, language, audience, style preferences, `Slides format:`,
+     **`Profile:`**.
+   - `needs-migration` — a `CLAUDE.md` with inline `## Course context` exists but
+     there is **no** `AGENTS.md` (a pre-cross-tool course). Handle in Phase 3.
 
 2. **Check `COURSE_STATE.md`.**
    - `missing` — file does not exist.
@@ -65,12 +69,12 @@ The format of `defaults.yaml` is documented in
 
 Before asking content questions, determine which LMS profile to use:
 
-- If `CLAUDE.md` has `Profile:` filled → use that.
+- If `AGENTS.md` has `Profile:` filled → use that.
 - Otherwise → ask: "Which LMS profile? (default: `local-zip`.
   Available profiles: list directory names under `skill/profiles/` —
   read each `<name>/README.md` first line for a one-sentence summary.)
   Press Enter for `local-zip`."
-- Record the chosen profile; it will be written to `CLAUDE.md` in Phase 3.
+- Record the chosen profile; it will be written to `AGENTS.md` in Phase 3.
 
 The LMS-related defaults (`skill/profiles/<profile>/lms_defaults.yaml`)
 are read by `lab course-init`, not here. Phase 2 only asks content
@@ -78,7 +82,7 @@ questions.
 
 ### Phase 2c — Collect missing info
 
-Skip any question whose answer is already in `CLAUDE.md` (filled state).
+Skip any question whose answer is already in `AGENTS.md` (filled state).
 Ask only what is needed to fill the missing pieces. Ask one question at
 a time. Use user_defaults values as suggested defaults where available.
 
@@ -132,13 +136,25 @@ If the user provides fields:
 
 For each file, act only if it is `missing` (skip if it already exists):
 
-- **`CLAUDE.md`** — create from `skill/COURSE_CLAUDE_TEMPLATE.md` with all
-  collected info embedded in the `## Course context` section, including
-  `Profile: <name>` (default `local-zip`) and `Slides format: <beamer|slidev>`
-  (default `beamer`).
+- **`AGENTS.md`** (course-context source of truth) — create from
+  `skill/COURSE_AGENTS_TEMPLATE.md` with all collected info embedded in the
+  `## Course context` section, including `Profile: <name>` (default `local-zip`)
+  and `Slides format: <beamer|slidev>` (default `beamer`).
   If `placeholder` — fill in the placeholder fields, preserve everything else.
-  Do NOT embed the skill content in `CLAUDE.md` — the skill is installed
-  globally in `~/.claude/skills/course-maker/` and is discovered automatically.
+  Do NOT embed the skill content — the skill is installed separately (per tool;
+  see the repo README) and is discovered automatically.
+
+- **`CLAUDE.md`** (Claude Code wrapper) — create from
+  `skill/COURSE_CLAUDE_TEMPLATE.md` verbatim: it is just the `@AGENTS.md` import
+  plus a slot for Claude Code-only overrides. Do not duplicate course context
+  into it. Codex CLI and Cursor read `AGENTS.md` directly and need no wrapper.
+
+- **Migration** (`needs-migration` from Phase 1): a course with inline
+  `## Course context` in `CLAUDE.md` and no `AGENTS.md`. Ask the user, then:
+  move the `## Course context` / `## Lab context` / `## Notes from past lectures`
+  sections out of `CLAUDE.md` into a new `AGENTS.md`, and replace `CLAUDE.md`
+  with the `@AGENTS.md` wrapper. Never lose content — copy first, verify, then
+  trim `CLAUDE.md`.
 
 - **`course_conventions.md`** — determine template variant from the language answer:
   `ru` for Russian, `en` for English, `en` as default for unsupported languages.
