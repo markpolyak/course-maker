@@ -19,15 +19,29 @@ in a single session.
 
 ## Step 0: Install the skill
 
-The skill is a single cross-tool Agent Skill (`SKILL.md` + `references/`). Clone
-once, then install it into your agent's skills directory either by **symlink**
-(recommended — a `git pull` in the clone updates every tool) or by **copy**
-(self-contained, but re-copy after updates — use `cp -r` instead of `ln -s`).
+The skill is a single cross-tool Agent Skill (`SKILL.md` + `references/`).
+Install it globally — available in every project — either from a release zip or
+from a clone.
 
-All three install the skill globally — available in every project.
+**Option A — release zip (any tool; required for Cowork).** Download
+`course-maker-vX.Y.Z.zip` from the
+[latest release](https://github.com/markpolyak/course-maker/releases/latest): a
+self-contained, versioned `course-maker/` folder.
 
 ```bash
-# Clone the repository
+# claude.ai / Cowork: upload the zip as-is via Settings → Features (Skills). Don't unzip.
+
+# Claude Code / Codex / Cursor: unzip into the skills dir (the course-maker/ folder is inside):
+unzip course-maker-v1.3.0.zip -d ~/.claude/skills/    # Claude Code
+unzip course-maker-v1.3.0.zip -d ~/.agents/skills/    # Codex CLI
+# Re-download and re-unzip to update.
+```
+
+**Option B — clone + symlink (for development / tracking `main`).** A `git pull`
+then updates every tool at once (use `cp -r` instead of `ln -s` for a
+self-contained copy). Not applicable to Cowork.
+
+```bash
 git clone https://github.com/markpolyak/course-maker
 
 # Claude Code:

@@ -41,22 +41,38 @@ Seminars, quizzes, and homework have their own pipelines too — see
 **Requirements:** one of Claude Code / OpenAI Codex CLI / Cursor, plus git. For
 local Beamer compilation: a LaTeX distribution. For lab tests: Python 3.11+.
 
+The same skill (`SKILL.md` + `references/`) works in every tool; only how you
+install it differs. Pick one of two ways.
+
+### Option A — release zip (any tool; the only way for Cowork)
+
+Download `course-maker-vX.Y.Z.zip` from the
+[latest release](https://github.com/markpolyak/course-maker/releases/latest). It
+is a self-contained, versioned copy of the skill — a single `course-maker/`
+folder — with the version stamped into it.
+
+- **claude.ai / Claude Cowork:** upload the zip as-is via **Settings → Features**
+  (Skills). Do not unzip.
+- **Claude Code / Codex / Cursor:** unzip it into the tool's skills directory.
+  The archive already contains the `course-maker/` folder, so it lands in the
+  right place:
+
+  ```bash
+  unzip course-maker-v1.3.0.zip -d ~/.claude/skills/   # Claude Code
+  unzip course-maker-v1.3.0.zip -d ~/.agents/skills/   # Codex CLI
+  unzip course-maker-v1.3.0.zip -d ~/.cursor/skills/   # Cursor (only if not using the above)
+  ```
+
+  Re-download and re-unzip to update.
+
+### Option B — clone + symlink (for development / tracking `main`)
+
+Best if you want a `git pull` to update every tool at once, or you're editing
+the skill. Not applicable to Cowork. Run from the PARENT directory of the clone:
+
 ```bash
-# 1. Clone the repository
 git clone https://github.com/markpolyak/course-maker
-```
 
-The same skill (`SKILL.md` + `references/`) works in every tool; only the
-install location differs. Two ways to install:
-
-- **Symlink** (recommended) — a `git pull` in the clone then updates every tool.
-- **Copy** — self-contained, but you must re-copy after each update. Replace
-  `ln -s` with `cp -r` in the commands below.
-
-All three install globally. Symlink the skill into the directory your tool reads
-(run from the PARENT directory of the cloned repo):
-
-```bash
 # Claude Code:
 ln -s "$(pwd)/course-maker/skill" ~/.claude/skills/course-maker
 
@@ -64,6 +80,8 @@ ln -s "$(pwd)/course-maker/skill" ~/.claude/skills/course-maker
 mkdir -p ~/.agents/skills
 ln -s "$(pwd)/course-maker/skill" ~/.agents/skills/course-maker
 ```
+
+Replace `ln -s` with `cp -r` for a self-contained copy (re-copy after updates).
 
 **Cursor needs no separate install** — it also reads the Claude Code and Codex
 skill directories, so it picks up either symlink above. (Only using Cursor? Put

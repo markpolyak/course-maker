@@ -22,5 +22,8 @@ tests/e2e/fixtures/course/lectures/01/figures/*.png
 # Throwaway test virtualenv
 .venv-test/
 
+# Release artifacts built by scripts/package.sh
+dist/
+
 # e2e conversation transcripts
 tests/e2e/logs/

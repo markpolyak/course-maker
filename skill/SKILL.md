@@ -1,5 +1,7 @@
 ---
 name: course-maker
+metadata:
+  version: "0.0.0-dev"
 description: >
   Pipeline for preparing university course materials: lecture slides, visualizations,
   Python figure scripts, LaTeX/Beamer presentations, speaker notes, and lab assignments.
