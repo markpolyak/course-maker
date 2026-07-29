@@ -131,6 +131,23 @@ Before finalizing, mentally check each slide:
 - [ ] Every `\begin{frame}` has a matching `\end{frame}`
 - [ ] Blank line after every `\end{frame}`
 
+## Chunking protocol (identical to the Slidev path)
+
+Output is ALWAYS chunked — do not generate the whole deck in one shot.
+
+- **Chunk 0** = preamble (filled) + title slide + outline slide.
+- **Chunk K (K≥1)** = slides `[5K-4 … 5K]`.
+- **Chunk last** = closing slide + `\end{document}`.
+
+Append each chunk to `slides.tex` immediately; do not pause between chunks
+(auto-chain to the end). **Chunking is not a review cycle:** the user approves
+the finished deck, not each chunk. Never print a chunk for review instead of
+writing it — LaTeX is unreadable in a terminal; the deck is reviewed by
+compiling it (`/course-maker slides N export pdf`).
+
+**Resuming:** `/course-maker slides N next` reads `slides.tex`, finds the last
+completed slide, and continues from there.
+
 ## Title and closing slides
 
 Always include:

@@ -96,7 +96,8 @@ file you did or did not read. Violating any of them is a hard error.
 - ALWAYS update `COURSE_STATE.md` at the end of every command, even if the
   step is only partially done.
 - ALWAYS present output for review and wait for explicit approval before
-  saving to the file and updating state.
+  saving to the file and updating state. One approval per step, never per
+  chunk — chunked output appends as it goes.
 - ALWAYS check `git diff` on the prerequisite file at the start of a subsequent
   step. If the user manually edited it, log the edit in `history.md` before
   proceeding.

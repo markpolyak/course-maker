@@ -79,6 +79,22 @@ If time is short, slide X can be skipped without breaking the logical flow:
 announce that the topic is out of scope and give a reference.
 ````
 
+## Chunking protocol (identical to the slides path)
+
+Output is ALWAYS chunked — do not generate the whole file in one shot.
+
+- **Chunk 0** = header + slides 1–5.
+- **Chunk K (K≥1)** = slides `[5K-4 … min(5K, total)]`.
+- **Chunk last** = timing table + what-can-be-cut section.
+
+Append each chunk to `speaker_notes.md` immediately; do not pause between
+chunks (auto-chain to the end). **Chunking is not a review cycle:** the user
+approves the finished notes, not each chunk. Do not ask for approval between
+chunks.
+
+**Resuming:** `/course-maker notes N next` reads `speaker_notes.md`, finds the
+last completed slide, and continues from there.
+
 ## Formatting conventions
 
 - `[*Stage direction in italic brackets*]` — director's note: where to point,
