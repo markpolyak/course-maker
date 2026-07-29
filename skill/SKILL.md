@@ -88,6 +88,9 @@ file you did or did not read. Violating any of them is a hard error.
   wait for the next explicit command.
 - NEVER suggest short-form commands (`/lecture …`, `/lab …`); always the full
   form `/course-maker …`.
+- NEVER put the pipeline's own concerns into student-facing text — how the
+  material was produced, preparation for other sessions, or data being "real"
+  rather than invented. Those are instructions to you, not content.
 - NEVER cite numerical dataset characteristics (size, sampling rate, value
   range, number of classes) without verification via web search.
 - ALWAYS read `lectures/NN/history.md` (or `<LAB_DIR>history.md`) before
