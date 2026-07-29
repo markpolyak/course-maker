@@ -46,7 +46,8 @@ information was not found, insert `<!-- TODO -->`. Show the draft and ask:
 > "Here's what I extracted. What should I correct or add?"
 
 Iterate until the user approves. Save the original file as `course_plan_source.*`
-(preserve extension). Write approved draft to `course_plan.md`.
+(preserve extension). Write approved draft to `course_plan.md`, then run the
+lint gate (below).
 
 ---
 
@@ -79,7 +80,8 @@ collecting the basics. Ask one question at a time, wait for each answer:
 10. "Instructor name(s) and contact info?
     (press Enter to skip — can fill later)"
 
-After collecting answers, generate a draft `course_plan.md`, show it, iterate, save.
+After collecting answers, generate a draft `course_plan.md`, show it, iterate,
+save, then run the lint gate (below).
 
 ---
 
@@ -88,7 +90,7 @@ After collecting answers, generate a draft `course_plan.md`, show it, iterate, s
 Show a list of TODO sections found in the existing `course_plan.md`.
 For each missing section, offer to fill it now or skip.
 Fill approved sections through focused dialog (1–3 questions per section).
-Save after each section approved.
+Save after each section approved, then run the lint gate (below).
 
 ---
 
@@ -96,7 +98,9 @@ Save after each section approved.
 
 1. Ask: "What needs to change?" — accept free-form description.
 2. Propose the specific edits to make, wait for approval.
-3. Apply approved edits to `course_plan.md`.
+3. Apply approved edits to `course_plan.md`, then run the lint gate (below).
+   A structural edit is exactly what desynchronizes counters and subsections,
+   so do not proceed to the cascade until the linter is free of `ERROR`.
 4. Cross-check with `COURSE_STATE.md` — **only for structural/content changes**
    (Sessions table rows, Lectures subsections, topic lists). Skip cascade for
    metadata-only changes (grading weights, instructor info, prerequisites,
@@ -108,6 +112,37 @@ Save after each section approved.
    - Append a note to each affected `history.md`.
 5. Report: what was changed, which materials are now marked ⚠️ and need review.
    If no structural changes — report what was updated, no ⚠️ flags.
+
+---
+
+## Lint gate — after every write to `course_plan.md`
+
+Every phase above ends by writing the file. After each write, run:
+
+```bash
+python ~/.claude/skills/course-maker/scripts/lint_plan.py
+```
+
+(If the skill is installed elsewhere, use that path.) The linter is read-only.
+It checks the file against the format below: Overview counters against the
+Sessions table, lecture rows against their `### Lecture N` subsections, Notes
+pointers, and remaining `<!-- TODO -->` sections.
+
+- **`ERROR` — fix before reporting the phase as done.** The usual cause is an
+  edit that touched one half of a pair: a session row added without bumping its
+  Overview counter, or a lecture renumbered without its subsection. Fix and
+  re-run until no `ERROR` remains. Do not hand back a plan that fails the
+  linter.
+- **`WARN` — report, do not silently fix.** These need the user's judgement.
+
+Unfilled `<!-- TODO -->` sections warn by design and are expected in a fresh
+draft or mid-course; in Phase 2 do not present them as a problem. Phase 3
+exists precisely to fill them.
+
+Why this matters: `/course-maker stats` reads the Overview counters as the
+planned totals and `/course-maker syllabus` renders the plan for students, so a
+counter that has drifted from the Sessions table misreports both without
+failing anything visibly.
 
 ---
 

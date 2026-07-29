@@ -45,19 +45,42 @@ separate `## Lectures` / `## Seminars` / `## Labs` sections with English column
 names, keeping titles in the course language — not merely to translate the
 heading. A combined or translated heading will not match.
 
+### Plan structure
+
+Then lint the plan itself and show its raw output:
+
+```bash
+python ~/.claude/skills/course-maker/scripts/lint_plan.py
+```
+
+This is the other half of the facts layer. `validate_state.py` compares
+`COURSE_STATE.md` against files on disk; `lint_plan.py` never looks at disk and
+checks that `course_plan.md` is internally consistent — Overview counters
+against the Sessions table, lecture rows against their `### Lecture N`
+subsections, `labs/` / `quizzes/` / `no pipeline` pointers in Notes, and
+leftover `<!-- TODO -->` sections. It prints `ERROR` / `WARN` findings and an
+`OK` summary line; exit 1 means at least one `ERROR`.
+
+Reproduce its output verbatim. Every finding here is fixed by the same command,
+`/course-maker course plan`, so what Step 3 must carry is the offending row or
+counter, not the command name.
+
+A plan that disagrees with itself is not cosmetic: `/course-maker stats` reads
+the Overview counters as planned totals and `/course-maker syllabus` renders
+the plan for students, so a counter that has drifted from the Sessions table
+silently misreports both.
+
 ## Step 2 — semantic checks (judgement)
 
-These need reading intent and cannot be done by the script. Check each:
+These need reading intent and cannot be done by the scripts. Check each:
 
-1. **Leftover plan TODOs.** `grep -n "<!-- TODO -->" course_plan.md`. Each hit
-   is an unfilled section → `/course-maker course plan`.
-2. **Profile ↔ adapter consistency.**
+1. **Profile ↔ adapter consistency.**
    - Read `AGENTS.md` → `## Course context` → `Profile:` (default `local-zip`
      if absent).
    - Confirm `lms_adapter.md` exists in the course root.
    - If `Profile:` names a profile but `lms_adapter.md` is missing, or the
      adapter does not match the named profile → `/course-maker lab course-init`.
-3. **Generated config files present.** These are referenced by later steps;
+2. **Generated config files present.** These are referenced by later steps;
    flag any that are missing:
    - `course_conventions.md`, `slides_preamble.tex` → `/course-maker course init`
    - `lab_templates.md` → `/course-maker lab course-init`
@@ -76,8 +99,10 @@ State drift (from validate_state.py):
   ℹ lectures/07 slides: file exists, status ❌       → re-run /course-maker slides 7
                                                        or correct COURSE_STATE.md
 
-Plan:
-  ✗ course_plan.md has 2 unfilled TODO sections      → /course-maker course plan
+Plan (from lint_plan.py):
+  ✗ Overview Lectures: 12 vs 13 Lecture rows         → /course-maker course plan
+  ✗ Sessions line 19: Lecture 6 has no subsection    → /course-maker course plan
+  ⚠ unfilled TODO sections: Grading, Instructors     → /course-maker course plan
 
 Config:
   ✓ course_conventions.md, slides_preamble.tex, lab_templates.md present
@@ -86,8 +111,8 @@ Config:
 Summary: 1 drift, 1 stale, 1 untracked, 1 plan gap. No config issues.
 ```
 
-Map severities: `DRIFT` and missing files → ✗; `STALE` → ⚠; `UNTRACKED` and
-informational notes → ℹ; passing checks → ✓.
+Map severities: `DRIFT`, `ERROR`, and missing files → ✗; `STALE` and `WARN` →
+⚠; `UNTRACKED` and informational notes → ℹ; passing checks → ✓.
 
 Do not modify any file. End by reminding the user that doctor only reports —
 they run the suggested commands themselves.
