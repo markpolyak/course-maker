@@ -8,6 +8,16 @@ Standalone: run from a course root, or pass --root.
 The linter is read-only. It prints one finding per line, followed by an OK
 summary. ERROR findings make the command exit with status 1; WARN findings do
 not affect the exit status.
+
+Source of truth for the plan format is references/course_plan.md. Two of its
+conventions drive the trickier checks here:
+
+- `### Lecture N` numbers lectures in their own sequence, not by the `#` column
+  of the Sessions table. In the reference example the second lecture is session
+  `#3`, so the k-th Lecture row is matched against `### Lecture k`.
+- The canonical heading separator is an em dash. Other separators still match,
+  so a stray hyphen never masquerades as a missing subsection, but they earn a
+  WARN.
 """
 
 import argparse
@@ -24,7 +34,11 @@ OVERVIEW_LABELS = {
     "Lab": "Labs",
     "Quiz": "Quizzes",
 }
-LECTURE_HEADING = re.compile(r"^###\s+Lecture\s+(\d+)\s+—\s+.+$", re.IGNORECASE)
+LECTURE_HEADING = re.compile(
+    r"^###\s+Lecture\s+(?P<number>\d+)\s*(?P<separator>[—–\-:])\s*(?P<title>.+?)\s*$",
+    re.IGNORECASE,
+)
+CANONICAL_SEPARATOR = "—"
 ESTIMATED_TIME = re.compile(r"^\*\*Estimated time:\*\*", re.IGNORECASE)
 NOTE_POINTER = re.compile(r"(?:labs|quizzes)/\S+|\bno\s+pipeline\b", re.IGNORECASE)
 
@@ -62,6 +76,7 @@ def parse_sessions(lines, start, end, findings):
     """Parse Session data rows and report malformed table rows."""
     table_started = False
     rows = []
+    seen_numbers = {}
     for line_number in range(start + 1, end + 1):
         if line_number == end:
             break
@@ -82,6 +97,10 @@ def parse_sessions(lines, start, end, findings):
         session_type = cells[2] if len(cells) > 2 else ""
         if not number.isdigit():
             findings.append(("ERROR", location, f"# must be a number, found {number!r}"))
+        elif number in seen_numbers:
+            findings.append(("ERROR", location, f"# {number} is already used on line {seen_numbers[number]}"))
+        else:
+            seen_numbers[number] = line_number + 1
         if session_type not in SESSION_TYPES:
             findings.append(("ERROR", location, f"Type must be one of {', '.join(sorted(SESSION_TYPES))}, found {session_type!r}"))
         rows.append((line_number + 1, cells, number, session_type))
@@ -101,13 +120,27 @@ def overview_counts(lines, start, end, findings):
     return counts
 
 
-def lecture_sections(lines, start, end):
-    """Return lecture number -> heading line number for canonical lecture headings."""
+def lecture_sections(lines, start, end, findings):
+    """Return lecture number -> heading line, reporting duplicates and odd separators.
+
+    A non-canonical separator still counts as a match: reporting "no matching
+    subsection" for a heading that is plainly there would send the reader
+    hunting for the wrong problem.
+    """
     sections = {}
     for index in range(start + 1, end):
         match = LECTURE_HEADING.match(lines[index].strip())
-        if match:
-            sections.setdefault(int(match.group(1)), index)
+        if match is None:
+            continue
+        number = int(match.group("number"))
+        location = f"Lectures line {index + 1}"
+        separator = match.group("separator")
+        if separator != CANONICAL_SEPARATOR:
+            findings.append(("WARN", location, f"Lecture {number} heading separator is {separator!r}, expected an em dash"))
+        if number in sections:
+            findings.append(("ERROR", location, f"Lecture {number} subsection is declared twice (first on line {sections[number] + 1})"))
+            continue
+        sections[number] = index
     return sections
 
 
@@ -154,10 +187,13 @@ def lint(root):
         if session_type in counts and counts[session_type] != actual:
             findings.append(("ERROR", "Overview", f"{OVERVIEW_LABELS[session_type]}: {counts[session_type]} does not match {actual} {session_type} session rows"))
 
-    lecture_rows = {
-        int(number) for _, _, number, kind in rows
-        if kind == "Lecture" and number.isdigit()
-    }
+    # Lectures are numbered in their own sequence: the k-th Lecture row in
+    # Sessions is `### Lecture k`, whatever its `#` column says.
+    lecture_rows = {}
+    for line_number, _, _, kind in rows:
+        if kind == "Lecture":
+            lecture_rows[len(lecture_rows) + 1] = line_number
+
     sections = {}
     lectures_end = len(lines)
     if lectures_start is None:
@@ -165,12 +201,12 @@ def lint(root):
             findings.append(("ERROR", "Lectures", "## Lectures section not found"))
     else:
         lectures_end = section_end(lines, lectures_start)
-        sections = lecture_sections(lines, lectures_start, lectures_end)
+        sections = lecture_sections(lines, lectures_start, lectures_end, findings)
 
-    for number in sorted(lecture_rows - set(sections)):
-        findings.append(("ERROR", "Lectures", f"Lecture {number} session has no matching subsection"))
-    for number in sorted(set(sections) - lecture_rows):
-        findings.append(("ERROR", "Lectures", f"Lecture {number} subsection has no matching session row"))
+    for number in sorted(set(lecture_rows) - set(sections)):
+        findings.append(("ERROR", f"Sessions line {lecture_rows[number]}", f"Lecture {number} session has no matching subsection"))
+    for number in sorted(set(sections) - set(lecture_rows)):
+        findings.append(("ERROR", f"Lectures line {sections[number] + 1}", f"Lecture {number} subsection has no matching session row"))
     for number, heading_index in sections.items():
         next_heading = next(
             (index for index in range(heading_index + 1, lectures_end)
