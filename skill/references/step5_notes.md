@@ -22,10 +22,58 @@ for pacing, emphasis, and interaction with the audience.
 **Are not:** A bullet-point summary of the slide. Not a formal transcript.
 Not a repetition of slide content.
 
+## Modes
+
+`/course-maker notes N [minimal|medium|detailed]`. Resolve in this order: the
+command argument, else `Notes mode:` in `AGENTS.md` → `## Course context`, else
+`medium`. The mode sets how much of the delivery is written out — it changes
+nothing about the format, the section structure, or the tone rules below.
+
+| Mode | Written out | Use when |
+|------|-------------|----------|
+| `minimal` | Opening and closing lines, definitions and statements; the rest as cues and stage directions | You know the material cold and need prompts, not a script |
+| `medium` (default) | Full text for motivation, definitions, and derivations; cues for routine passages | Normal preparation |
+| `detailed` | Near-verbatim script throughout | First delivery, a substitute lecturer, or turning the lecture into text |
+
+**Verbatim is reserved for wording that matters** — opening and closing lines,
+definitions and theorem statements, transitions between blocks, and the framing
+sentence of a hard derivation. Those stay written out in every mode, `minimal`
+included; everything else scales with the mode. So a greeting is a deliberate
+opening line, not a leftover — but never pair a written-out greeting with a
+slide body reduced to bullet points. That hybrid is the defect this section
+exists to prevent.
+
+## Volume must match the planned timing
+
+Notes that read as a summary while `plan.md` allots the slide 4 minutes are the
+most common defect in this step. Anchor volume to time:
+
+    target words for a slide ≈ factor × speech rate × planned minutes
+
+Speech rate comes from `AGENTS.md` → `## Course context` → `Speech rate:`.
+If the field is absent, assume 110 wpm and say so in the final report.
+
+| Mode | factor | 4-min slide at 110 wpm |
+|------|--------|------------------------|
+| `minimal` | 0.15–0.25 | 65–110 words |
+| `medium` | 0.35–0.55 | 155–240 words |
+| `detailed` | 0.85–1.10 | 375–485 words |
+
+Bands are **per slide, not a global total** — a total that balances out still
+hides one slide of three sentences sitting next to one of three paragraphs.
+
+Two limits of this estimate. Do not silently compensate for them; mention them
+when they apply:
+- A derivation slide spends time at the board in silence, so it needs fewer
+  words per minute than a narrative slide.
+- Per-slide timing comes from `plan.md`. If a slide has no timing there, split
+  its block's time evenly across the block's slides and say that you did.
+
 ## Output format: `lectures/NN/speaker_notes.md`
 
 **Generate all text in the course language** (from AGENTS.md → Course context).
-The examples below show format and tone — produce the actual notes in the course language.
+The examples below show format and tone at `medium` density — produce the
+actual notes in the course language, at the resolved mode's density.
 
 ````markdown
 # Lecture N — Speaker notes   ← translate heading to course language
@@ -94,6 +142,25 @@ chunks.
 
 **Resuming:** `/course-maker notes N next` reads `speaker_notes.md`, finds the
 last completed slide, and continues from there.
+
+## Final self-check (after the last chunk)
+
+Count the words actually written per slide and report **in chat**, not in
+`speaker_notes.md` — that file is the lecturer's, keep the arithmetic out of it:
+
+```
+Mode: medium · speech rate: 110 wpm (from AGENTS.md)
+
+| Slide | Words | Planned | Target band |   |
+|-------|-------|---------|-------------|---|
+| 7     | 40    | 4 min   | 155–240     | ⚠ |
+| 8     | 210   | 2 min   | 75–120      | ⚠ |
+```
+
+Name the mode and the speech rate used, so the numbers can be judged. Flag
+every slide outside its band and offer to expand or trim those — do not rewrite
+them unasked. If most slides land short, say so plainly: that is the summary
+drift this step is prone to, and the fix is regeneration, not patching.
 
 ## Formatting conventions
 
