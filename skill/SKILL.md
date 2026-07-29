@@ -196,10 +196,11 @@ Read: `references/course_plan.md`.
 Read: `references/course_update.md`.
 
 ### `/course-maker doctor`
-Read: `references/doctor.md`. Read-only: runs `scripts/validate_state.py` for the
-facts layer, adds semantic checks (plan TODOs, profile/adapter consistency,
-generated config files), and reports each finding with the command that fixes
-it. Never edits files.
+Read: `references/doctor.md`. Read-only: runs `scripts/validate_state.py` (state
+vs disk) and `scripts/lint_plan.py` (`course_plan.md` self-consistency) for the
+facts layer, adds semantic checks (profile/adapter consistency, generated config
+files), and reports each finding with the command that fixes it. Never edits
+files.
 
 ### `/course-maker stats`
 Read: `references/stats.md`. Read-only: progress bars across pipelines from
