@@ -96,7 +96,8 @@ file you did or did not read. Violating any of them is a hard error.
 - ALWAYS update `COURSE_STATE.md` at the end of every command, even if the
   step is only partially done.
 - ALWAYS present output for review and wait for explicit approval before
-  saving to the file and updating state.
+  saving to the file and updating state. One approval per step, never per
+  chunk — chunked output appends as it goes.
 - ALWAYS check `git diff` on the prerequisite file at the start of a subsequent
   step. If the user manually edited it, log the edit in `history.md` before
   proceeding.
@@ -129,7 +130,7 @@ file you did or did not read. Violating any of them is a hard error.
 | `/course-maker slides N [format]` | Step 4 — deck chunk 0 (beamer→slides.tex / slidev→slides.md); format from AGENTS.md or arg |
 | `/course-maker slides N next` | Step 4 — next block of 5 slides (format detected from the existing file) |
 | `/course-maker slides N export [pdf\|png]` | Export the existing deck to a file (beamer→PDF, slidev→pdf/png) |
-| `/course-maker notes N` | Step 5 — speaker notes, chunk 0 (slides 1–5) |
+| `/course-maker notes N [mode]` | Step 5 — speaker notes, chunk 0 (slides 1–5); mode = minimal/medium/detailed, from AGENTS.md or arg |
 | `/course-maker notes N next` | Step 5 — next block of 5 slides |
 | `/course-maker status N` | Show state + history summary for lecture N |
 
@@ -264,8 +265,10 @@ LaTeX engine, or Node for Slidev) is missing, say how to install it — never fa
 silently. Presenting a Slidev deck live (`npx slidev`) is the user's job; never
 launch it.
 
-### `/course-maker notes N` (Step 5)
-Read: `references/step5_notes.md`.
+### `/course-maker notes N [mode]` (Step 5)
+Read: `references/step5_notes.md`. Mode (`minimal`/`medium`/`detailed`) = arg,
+else `Notes mode:` in `AGENTS.md`, else `medium`; it sets how much of the
+delivery is written out.
 
 **CRITICAL — even if reference was skipped:**
 - Output is ALWAYS chunked, same protocol as slides.

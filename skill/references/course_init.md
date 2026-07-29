@@ -107,12 +107,17 @@ Questions (ask only if not already known):
    *(default: `default_latex_engine` from user_defaults)* — ask only when the
    slides format is `beamer`. Note: xelatex and lualatex support Unicode fonts
    natively; pdflatex requires T2A/inputenc for Cyrillic.
+9. Speech rate, for sizing speaker notes against the planned timing?
+   *(default: `default_speech_rate` from user_defaults)* — with no default,
+   offer: `[1]` typical academic pace, ~110 wpm; `[2]` measure it from a past
+   lecture (its text and its known duration); `[3]` enter a number. Written to
+   `AGENTS.md` as `Speech rate:`.
 
 ### Phase 2d — Offer to save user_defaults
 
 After all content questions are answered, if there are answers that look
 reusable across courses (language, slides format, latex engine, audience,
-style, instructor name), and they differ from the current user_defaults (or
+style, instructor name, speech rate), and they differ from the current user_defaults (or
 user_defaults does not exist), ask:
 
 > "Save these answers as your user_defaults for future courses? Future

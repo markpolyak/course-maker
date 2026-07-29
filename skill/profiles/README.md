@@ -55,8 +55,8 @@ first run and writes it into `AGENTS.md`.
 
 The skill supports a **user_defaults** file that holds preferences shared
 across all courses an instructor teaches: language, LaTeX engine, default
-audience description, default style, instructor name, and — if you use a grade
-reporter — your autograder's grade labels. These pre-fill the
+audience description, default style, instructor name, speech rate, and — if you
+use a grade reporter — your autograder's grade labels. These pre-fill the
 `/course-maker course init` dialog so you only answer them once for your
 whole career.
 
@@ -84,6 +84,8 @@ default_latex_engine: ""       # pdflatex / xelatex / lualatex  (beamer only)
 default_audience: ""           # one paragraph; what students know coming in
 default_style: ""              # one paragraph; rigor vs intuition, formula handling
 default_instructor: ""         # name(s) for title slide / syllabus
+default_speech_rate: ""        # words per minute of your delivery, e.g. "110"
+                               # sizes speaker notes against the planned timing
 
 # Grade-reporter labels — used only if you set grade_reporter (e.g. scoring_ci).
 # Put your autograder's exact grade phrase here so it stays in your personal

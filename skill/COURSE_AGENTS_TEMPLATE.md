@@ -20,6 +20,13 @@
      Picks which reference /course-maker slides N uses and which preamble file
      course init generates (slides_preamble.tex vs slides_headmatter.md).
      Override per call: /course-maker slides N slidev. pptx is planned. -->
+**Notes mode:** medium
+<!-- minimal | medium | detailed — how much of the spoken delivery
+     /course-maker notes N writes out. Override per call:
+     /course-maker notes 5 detailed. -->
+**Speech rate:** 110 wpm
+<!-- Words per minute of your actual delivery. /course-maker notes N uses it to
+     size the notes against the per-slide timing in plan.md. -->
 **Profile:** local-zip
 <!-- LMS adapter from skill/profiles/. Default: local-zip (build a zip and
      upload manually). Other example: github-classroom (gh api sync to GHC).
