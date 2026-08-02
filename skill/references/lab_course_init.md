@@ -26,12 +26,12 @@ Run these checks silently before asking anything:
    → `### Lab grading`.**
    - `grade_reporter` — default `none`.
    - `lab_variants` — default `false`.
-   `conftest_base.py` ships as a real, universal harness (no placeholder); it
+   `conftest_base.py` ships as a complete, universal harness (no placeholder); it
    needs no per-course substitution. Any grade output is supplied by an
    optional reporter (Phase 2a), not by editing the conftest.
 
 5. **Check `templates/tests.yaml` similarly.**
-   Also look for a real `tests.yaml` in any existing lab's `starter/.github/workflows/`.
+   Also look for a populated `tests.yaml` in any existing lab's `starter/.github/workflows/`.
 
 ---
 
@@ -41,17 +41,17 @@ Create `labs/shared/` if it does not exist.
 
 For each of the three files (`tests_template.py`, `conftest_base.py`, `tests.yaml`):
 
-- **If** the skill template is a placeholder **AND** a real file exists in an
+- **If** the skill template is a placeholder **AND** a populated file exists in an
   existing lab's `starter/` (or `starter/.github/workflows/` for tests.yaml):
-  → Copy the real file to `labs/shared/` directly. Do not use the placeholder.
-  → Tell the user: "Found real `<file>` in `<source path>` — using it."
+  → Copy that file to `labs/shared/` directly. Do not use the placeholder.
+  → Tell the user: "Found populated `<file>` in `<source path>` — using it."
 
 - **Else if** the skill template is not a placeholder:
   → Copy it to `labs/shared/`.
 
-- **Else** (placeholder and no real file found):
+- **Else** (placeholder and no populated file found):
   → Create the placeholder in `labs/shared/` and tell the user:
-  "Could not find a real `<file>`. Placeholder written to `labs/shared/<file>` —
+  "Could not find a populated `<file>`. Placeholder written to `labs/shared/<file>` —
   replace it before running `/course-maker lab tests N`."
 
 ### Phase 2a — Install the grade reporter (optional)

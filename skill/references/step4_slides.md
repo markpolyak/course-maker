@@ -163,6 +163,10 @@ Always include:
 
 ## Iteration logging
 
+Wording the user rejects twice also goes to `Never Use` in
+`course_conventions.md`, not just to `history.md` — that file is read by every
+step that writes text, so the lesson is not relearned on the next lecture.
+
 When the user reports a compilation error or layout issue, before fixing,
 append to `history.md`:
 

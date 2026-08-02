@@ -85,7 +85,7 @@ provided number (if any) is ignored.
 - Dataset must be loaded from the source specified in Block 0 of the notebook
 - If the dataset fails to download — report this explicitly, describe the error, do not continue
   with invented data
-- Never generate synthetic data instead of the real dataset under any pretext
+- Never generate synthetic data instead of the dataset from the source under any pretext
 
 **Task completion:**
 - Complete ALL tasks from the notebook — not just those checked by tests

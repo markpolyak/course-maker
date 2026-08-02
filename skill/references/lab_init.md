@@ -87,7 +87,7 @@ Let `LAB_DIR = labs/<slug>/` if slug given, else `labs/labN/`.
 
 - If `labs/shared/conftest_base.py` or `labs/shared/tests.yaml` are placeholders,
   step 5 or 6 produces a placeholder in `<LAB_DIR>starter/`. The user must
-  replace them with real content before `/course-maker lab tests N`.
+  replace the placeholders before `/course-maker lab tests N`.
 - Any constraint on `<url>` (e.g. github-classroom requires the starter repo to
   already exist, or `git subtree add` fails) is documented in the profile's
   `lms_adapter.md` "Lab init — starter setup" section, not here — step 4 is

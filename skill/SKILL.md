@@ -53,7 +53,7 @@ file you did or did not read. Violating any of them is a hard error.
 
 - During `/course-maker lab validate`: NEVER read `lab_spec.md`, `tests.py`,
   `conftest.py`, `tests_template.py`, or `history.md` until all student tasks
-  are complete. The simulation must reflect what a real student sees.
+  are complete. The simulation must reflect what the student sees.
 - NEVER start `lab validate` if `<LAB_DIR>starter/` has uncommitted changes —
   the notebook will be modified during validation and the clean version will be
   lost. Stop and ask the user to commit first.
@@ -91,6 +91,12 @@ file you did or did not read. Violating any of them is a hard error.
 - NEVER put the pipeline's own concerns into student-facing text — how the
   material was produced, preparation for other sessions, or data being "real"
   rather than invented. Those are instructions to you, not content.
+- Adjectives asserting authenticity ("real", "honest", "genuine", and their
+  translations) are empty for a student — name the property or drop the word.
+  A "real run" is a run; a "real dataset" is the dataset.
+- Wording the user rejects goes to `history.md`; on a second rejection of the
+  same word or phrasing, also append it to `Never Use` in
+  `course_conventions.md` — history is per unit, conventions are course-wide.
 - NEVER cite numerical dataset characteristics (size, sampling rate, value
   range, number of classes) without verification via web search.
 - ALWAYS read `lectures/NN/history.md` (or `<LAB_DIR>history.md`) before

@@ -34,6 +34,9 @@ Edit this table to match the terms used in your course. Add rows as needed.
 - "form" to mean array shape — use "shape" or "dimensionality"
 - "fit" as a noun without context — use "training" or "model fitting"
 - Jargon abbreviations without introducing them at first mention
+- "real" as an intensifier ("a real run", "real training", "real numbers") —
+  name the property ("a run on the full dataset", "training on the downloaded
+  data") or drop the word: a run is a run
 - "honest" / "fair" as a verdict on a result ("an honest estimate", "fair
   numbers") — name the actual property instead: "held-out estimate", "no
   feature leakage", "reproducible computation". Keep the word only where it is

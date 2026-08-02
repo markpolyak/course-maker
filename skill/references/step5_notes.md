@@ -189,3 +189,7 @@ drift this step is prone to, and the fix is regeneration, not patching.
 If the user says "too formal", "too casual", "too long for this slide":
 - Fix only the affected slides
 - Append to history.md what the issue was and what register was adjusted
+- If the user rejects a specific word or phrasing for the second time, also add
+  it to `Never Use` in `course_conventions.md`. history.md is read only for
+  this lecture; conventions are read by every step that writes text, so the
+  lesson carries to slides, quizzes, and labs instead of being relearned

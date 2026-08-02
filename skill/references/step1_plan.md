@@ -83,7 +83,7 @@ without breaking the logical flow:]
   for 90 minutes and near 30 for 135. Content slides exclude title, outline,
   and closing. Leaving the band is fine when the material demands it; say why
   in the plan.
-- Calibrate to the instructor's real pace instead of the 4.5 default: if
+- Calibrate to the instructor's observed pace instead of the 4.5 default: if
   earlier `lectures/*/plan.md` exist, read their `**Total time:**` and
   `**Slides:**` and use their median minutes per content slide. A lecturer who
   moves fast has already produced denser plans — follow the course's own
