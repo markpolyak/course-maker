@@ -156,9 +156,9 @@ Always include:
   (e.g. "Outline" in English — translate to course language)
 - Closing slide: summary of key takeaways. A single mention of the next lecture topic is allowed here if it flows naturally — but not required.
 
-## Forward reference rules (strictly enforced)
+## Cross-reference rules (strictly enforced)
 
-- **No forward references within the presentation.** Do not write "we will cover this later", "see slide X for details", "more on this ahead" on any slide except the closing one.
+- **A slide never cites another slide by number or position, in either direction.** Name the content the student already saw; a slide must stand on its own when read out of order. For a comparison, put both items on one slide or restate what is needed.
 - **Next-lecture references: maximum 1 per entire presentation.** Allowed only on the closing slide. Omit entirely if there is no compelling reason to mention it. Three or more mentions anywhere in the deck is a hard error.
 
 ## Iteration logging

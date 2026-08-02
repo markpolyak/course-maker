@@ -178,7 +178,7 @@ drift this step is prone to, and the fix is regeneration, not patching.
   spectrum — essentially, how spread out the signal's energy is. Now the formula:"
 - Ask questions where natural: "What do you think will happen if...?"
   but don't over-do it — max 1–2 per block.
-- No forward references to later slides ("we will return to this", "see slide X") — forbidden except on the closing slide.
+- Never send the audience to another slide by number or position, in either direction — name the content instead.
 - Next-lecture mentions: **maximum 1 per entire set of notes**, only on the closing slide, omit if not necessary.
 - Pacing cues are not optional: at least one `[*Pause*]` or
   `[*Let them write*]` per complex derivation. Write cues in course language.

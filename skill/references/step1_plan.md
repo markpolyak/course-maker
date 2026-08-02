@@ -102,5 +102,5 @@ without breaking the logical flow:]
 - Putting too many formulas on one slide
 - Forgetting a "what we learned" closing slide
 - Not specifying which slides are "announce-only" when the plan says so
-- Forward references to later slides ("we will cover this on slide X", "more detail in the next section") — forbidden on any slide except the closing one
+- Slide descriptions that point at another slide by number or position — name the content instead; every slide must stand on its own
 - References to the next lecture: **maximum 1 per entire lecture**, only on the closing slide, and only if genuinely useful; omitting them entirely is preferred

@@ -68,8 +68,8 @@ file you did or did not read. Violating any of them is a hard error.
   List the directory before generating slides.
 - NEVER mark `figures → ✅` without running `figures.py` and verifying that the
   expected PNG files were created.
-- NEVER add forward references to later slides. At most one mention of the next
-  lecture, only on the closing slide, only if it flows naturally.
+- NEVER cite another slide by number or position, either direction — name the
+  content instead. At most one next-lecture mention, on the closing slide only.
 - Output for `slides`, `notes`, `quiz generate`, and `seminar practice` is ALWAYS
   chunked (blocks of 5 slides, or one quiz block / notebook section per chunk).
   Never generate the entire file in one shot — a full file exceeds a single
