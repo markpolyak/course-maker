@@ -28,7 +28,7 @@ If a slide has `[formula]` but no `[figure]` tag, don't invent a figure.
 
 | # | Slide | Description | TikZ |
 |---|-------|-------------|------|
-| V01 | 4 | ACF plot for AR(2) process — decaying oscillating bars | No — needs real data |
+| V01 | 4 | ACF plot for AR(2) process — decaying oscillating bars | No — needs computed data |
 | V02 | 7 | Block diagram: AR → MA → ARMA nesting | Yes |
 | V03 | 9 | Comparison: stationary vs non-stationary trajectory | No — needs simulated data |
 | V04 | 12 | Unit circle with roots plotted | Yes |
@@ -38,7 +38,7 @@ TikZ column values:
 - **Yes** — straightforward geometric or schematic diagram, no data needed
 - **Hard** — possible in TikZ but error-prone (e.g. complex positioning,
   many nodes); prefer Python unless the user specifically wants TikZ
-- **No — needs real data** — plot requires numpy/scipy computation
+- **No — needs computed data** — plot requires numpy/scipy computation
 - **No — needs simulation** — requires a random process to be generated
 
 ## After writing the table

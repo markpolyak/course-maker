@@ -16,7 +16,7 @@ Run these checks silently before asking anything:
    - `missing` — neither exists.
    - `placeholder` — `AGENTS.md` exists but contains strings like `[Course Name]`,
      `[course-slug]`, `[org-name]`.
-   - `filled` — `AGENTS.md` has real content. Read these fields if present:
+   - `filled` — `AGENTS.md` has content, not placeholders. Read these fields if present:
      course name, slug, language, audience, style preferences, `Slides format:`,
      **`Profile:`**.
    - `needs-migration` — a `CLAUDE.md` with inline `## Course context` exists but
