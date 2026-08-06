@@ -126,10 +126,10 @@ Append each chunk to `slides.md` immediately; do not pause between chunks
 - **Closing slide** = key takeaways. A single mention of the next lecture is
   allowed here if it flows naturally — not required.
 
-## Forward reference rules (strictly enforced)
+## Cross-reference rules (strictly enforced)
 
-- No forward references within the deck ("we will cover this later", "see slide
-  X") except on the closing slide.
+- A slide never cites another slide by number or position, in either direction.
+  Name the content instead; a slide must stand on its own.
 - Next-lecture references: at most 1, only on the closing slide. Three or more
   anywhere is a hard error.
 
