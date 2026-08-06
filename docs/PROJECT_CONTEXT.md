@@ -77,54 +77,67 @@ support both slash-command invocation and autonomous triggering based on descrip
 |---|---|---|
 | `slides` and `notes` commands hang on 20-slide lectures | Fixed | Chunked generation (5 slides per chunk) |
 | Skill triggered by slash invocation only via `/course-maker` | By design | Claude Code skills work this way; `.claude/commands/` is the legacy format |
-| Manual edits to files not auto-detected mid-pipeline | Partial | `/course-maker course update` does `git diff`; step-by-step detection is in IMPROVEMENT_PLAN.md wave 6 |
+| Manual edits to files not auto-detected mid-pipeline | Fixed (wave 1) | `## Inviolable rules` block in `SKILL.md`: "ALWAYS check `git diff` on the prerequisite file at the start of a subsequent step" |
 | Critical rules pass through skipped reference files | Fixed (wave 1) | `## Inviolable rules` block in `SKILL.md` is loaded unconditionally |
 | Skill not bootstrappable from a clean clone (placeholder templates) | Fixed (wave 2) | `conftest_base.py`, `tests.yaml`, `tests_template.py` ship as working universal templates |
+| `COURSE_STATE.md` drift from actual files | Fixed (wave 6) | `scripts/validate_state.py` + `/course-maker doctor` |
+| `history.md` grows unbounded | Deferred (wave 6, step 6.3) | Advisory `BULKY` warning at 200+ lines instead; full compaction risks losing rejected-idea memory |
 
 ---
 
 ## Roadmap (priority order)
 
 **The authoritative roadmap is `docs/IMPROVEMENT_PLAN.md`** (added 2026-06).
-It defines 7 execution waves with atomic steps; waves 1 and 2 are completed,
-waves 3+ are pending. The list below preserves the original design intent for
-context; consult IMPROVEMENT_PLAN.md for current status and priorities.
+It defines 7 execution waves with atomic steps. **Waves 1–6 are completed;
+wave 7 is the only wave still pending.** The list below preserves the original
+design intent for context; consult IMPROVEMENT_PLAN.md for the authoritative,
+step-by-step status.
 
-### Original design intent
+### Original design intent — current status
 
-1. **Test on a real new course** — still relevant; iteration logs from real
+1. **Test on a real new course** — ongoing by nature; iteration logs from real
    teaching go into per-lecture `history.md` and surface improvements to
-   `references/step*.md`.
+   `references/step*.md`. `examples/regularization-course/` is an active
+   real-course run (not yet committed as the example).
 
 2. **`step4_slides.md` expansion** — add a catalog of specific Beamer compilation
    errors encountered in practice, with exact fixes. The anti-overfull checklist
-   exists; error-specific entries grow as real bugs are encountered.
+   exists; error-specific entries grow as real bugs are encountered. Ongoing,
+   not tracked as a discrete IMPROVEMENT_PLAN step.
 
-3. **Example materials** — `examples/` exists as a stub. A real example must be
-   produced by running the skill, not hand-assembled (see lesson in commit
-   `e41d224`).
+3. **Example materials** — done in spirit but not yet populated: `examples/`
+   ships an honest stub (`e41d224`, wave 2 step 2.6) explaining that a real
+   example must come from an actual skill run rather than being hand-assembled.
+   `examples/regularization-course/` (untracked, in progress) is that real run.
 
 4. **Lab assignment pipeline** — done (see CHANGELOG `2026-05-28` and earlier).
-   Outputs Jupyter notebook + pytest suite, GHC sync via `gh api`, variant via
-   `dataset_id = (Student_ID - 1) % len(DATASETS)`. Peer-review variant is not
-   yet implemented.
+   Outputs Jupyter notebook + pytest suite, LMS sync via the `github-classroom`
+   profile's `gh api` adapter, variant assignment is opt-in via
+   `skill/extensions/variants/` (wave 4 revision, not a universal invariant
+   anymore). Peer-review variant is not yet implemented.
 
-5. **Syllabus auto-generation** — from `course_plan.md` → formatted PDF syllabus.
-   Pending (IMPROVEMENT_PLAN.md wave 5, step 5.1).
+5. **Syllabus auto-generation** — done (IMPROVEMENT_PLAN.md wave 5, step 5.1).
+   `/course-maker syllabus [pdf|latex|docx]`, `references/syllabus.md`.
 
-6. **pptx output** — alternative to Beamer for non-LaTeX users.
-   Pending (IMPROVEMENT_PLAN.md wave 7, step 7.1).
+6. **Non-Beamer slide output** — half done: Slidev shipped as a second slide
+   format (`7c18865`, `references/step4_slides_slidev.md`, format resolved
+   from `AGENTS.md`/arg/existing file). pptx is explicitly not implemented
+   (`SKILL.md` line ~246). IMPROVEMENT_PLAN.md wave 7 step 7.1 doesn't yet
+   have a `✅ реализовано` marker for the Slidev half — worth adding there too.
 
-### Long-term
+### Long-term (wave 7, pending)
 
 7. **Agent-agnostic core** — multi-harness support (Cursor, Codex, Cline)
    via shared `core/` + per-harness adapter files. See "Architecture for
-   multi-agent support" section below. IMPROVEMENT_PLAN.md groups this under
-   the broader profiles/adapters work in waves 4 and 7.
+   multi-agent support" section below. **Partially superseded:** cross-tool
+   support for Claude Code, Codex, and Cursor already shipped (`AGENTS.md`
+   course-context layer, #2 in CHANGELOG/git log) without the full `core/`
+   refactor described below — that refactor remains a future option if a
+   harness needs deeper divergence, not a current blocker.
 
 8. **Overleaf integration** — compile slides in the cloud instead of locally.
    Independent of agent-agnostic work; targets users without a local LaTeX
-   distribution. No design notes yet.
+   distribution. No design notes yet; not in IMPROVEMENT_PLAN.md.
 
 ---
 
@@ -176,46 +189,82 @@ course-maker/                       ← repo root
   CHANGELOG.md                      ← release notes
   CLAUDE.md                         ← in-repo conventions for the skill itself
   LICENSE
+  Makefile
+  pytest.ini
   .gitignore
 
   skill/                            ← the skill (symlinked or copied to ~/.claude/skills/course-maker/)
-    SKILL.md                        ← main dispatcher (≤350 lines) + Inviolable rules
-    COURSE_CLAUDE_TEMPLATE.md       ← template CLAUDE.md for new course repos
+    SKILL.md                        ← main dispatcher (~420 lines) + Inviolable rules
+    COURSE_CLAUDE_TEMPLATE.md       ← template CLAUDE.md for new Claude Code course repos
+    COURSE_AGENTS_TEMPLATE.md       ← template AGENTS.md for new Codex/Cursor course repos
     references/
       repository_layout.md          ← directory structure + state file formats
       course_init.md                ← /course-maker course init
       course_plan.md                ← /course-maker course plan
-      step1_plan.md ... step5_notes.md   ← lecture pipeline
+      course_update.md              ← /course-maker course update (git diff detection)
+      step1_plan.md ... step5_notes.md   ← lecture pipeline (beamer)
+      step4_slides_slidev.md        ← lecture pipeline, Slidev format variant of step4
+      slides_export.md              ← /course-maker slides N export [pdf|png]
+      seminar_practice.md           ← /course-maker seminar practice N (reuses step1..step5)
       lab_context.md                ← required reading for any /course-maker lab * command
       lab_course_init.md            ← /course-maker lab course-init
       lab_init.md                   ← /course-maker lab init
+      lab_update.md                 ← /course-maker lab update
       lab_step1a_plan.md            ← /course-maker lab plan
       lab_step1b_notebook.md        ← /course-maker lab notebook
       lab_step1b_spec.md            ← /course-maker lab spec (plan/notebook auto-detect)
       lab_step1b_datasets.md        ← /course-maker lab datasets
       lab_step2_tests.md            ← /course-maker lab tests
       lab_step3_validate.md         ← /course-maker lab validate
+      lab_triage.md                 ← /course-maker lab triage N (read-only, post-failed-validation)
       lab_publish.md                ← /course-maker lab publish
+      quiz_plan.md, quiz_generate.md, quiz_publish.md  ← /course-maker quiz pipeline
+      homework.md                   ← /course-maker homework pipeline
+      syllabus.md                   ← /course-maker syllabus [pdf|latex|docx]
+      doctor.md                     ← /course-maker doctor (drift + consistency checks)
+      stats.md                      ← /course-maker stats (progress overview)
     templates/
       course_conventions_{en,ru}.md ← per-language terminology and rules
       lab_templates_{en,ru}.md      ← per-language notebook header + grade labels
       slides_preamble_{pdflatex,xelatex}.tex
-      conftest_base.py              ← working universal pytest conftest
+      slides_headmatter_slidev.md   ← Slidev deck headmatter template
+      conftest_base.py              ← working universal pytest conftest (no-op report() seam)
       tests_template.py             ← style reference for generated tests.py
       tests.yaml                    ← working GitHub Actions CI
+    profiles/                       ← LMS adapters (wave 4), selected via `profile:` in course AGENTS.md
+      README.md
+      github-classroom/             ← lms.md + lab_questions.yaml + lms_defaults.yaml + README.md
+      local-zip/                    ← same shape, no external LMS
+    extensions/                     ← opt-in layers orthogonal to LMS/instructor (wave 4 follow-up)
+      reporters/                    ← scoring_ci.py: opt-in grade-output reporter, wired via `grade_reporter:`
+      variants/                     ← opt-in per-student dataset variant system, wired via `lab_variants: true`
+    scripts/
+      lint_plan.py                  ← course_plan.md linter, wired into `course plan` and `doctor`
+      validate_state.py             ← COURSE_STATE.md vs. actual files drift checker
 
   docs/
     README.md (project)             ← repository overview (in repo root)
     getting-started.md              ← full walkthrough
+    contributing.md
+    releasing.md
+    EXAMPLE_COURSE_PLAN.md
+    MULTI_HARNESS_PLAN.md           ← cross-tool (Codex/Cursor) support plan and status
     PROJECT_CONTEXT.md              ← this file
     IMPROVEMENT_PLAN.md             ← authoritative roadmap (7 waves)
-    archive/                        ← completed planning documents
+    archive/                        ← completed planning documents (LAB_PIPELINE_PLAN.md, TEMPLATE_MIGRATION_PLAN.md)
 
-  examples/                         ← stub; real examples must be produced by running the skill
-    README.md
+  examples/
+    README.md                       ← status: stub, explains why a hand-assembled example is wrong
+    regularization-course/          ← untracked; real course run in progress (see Roadmap #1, #3)
 
   scripts/
     nonlatin.py                     ← lints skill/ for non-Latin text
+    package.sh                      ← packaging/release helper
+
+  tests/
+    static/                         ← Level 0: repo-wide static checks (English-only, no-personalization, etc.)
+    unit/                           ← Level 1: unit tests for skill/scripts/*.py
+    e2e/                            ← Level 3: opt-in end-to-end pipeline runs (COURSE_MAKER_E2E=1)
 ```
 
 ---

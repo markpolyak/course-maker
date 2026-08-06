@@ -537,7 +537,7 @@ Reference: `references/stats.md`.
 
 **Цель:** Снять Beamer/Jupyter монополию.
 
-### Шаг 7.1. Дополнительные форматы слайдов (Slidev + PowerPoint)
+### Шаг 7.1. Дополнительные форматы слайдов (Slidev + PowerPoint) — Slidev ✅ реализовано, PowerPoint не реализовано
 `/course-maker slides N` с выбором формата помимо Beamer:
 - **Slidev** — Markdown-презентация (open-source, локальный Node, экспорт в
   PDF/PNG локально; без платных сервисов). Приоритетный формат: markdown-native,
@@ -545,6 +545,13 @@ Reference: `references/stats.md`.
 - **PowerPoint** — через python-pptx или Marp.
 Формат выбирается дефолтом в `CLAUDE.md` (как LaTeX-движок) + override на вызове.
 Детали интеграции согласуются отдельно.
+
+> **Замечание после реализации:** Slidev сделан (коммит `7c18865 Add Slidev as
+> a second slide format (Step 4)`) — `references/step4_slides_slidev.md`,
+> `templates/slides_headmatter_slidev.md`, формат резолвится из
+> `AGENTS.md`/аргумента/существующего файла (`slides.tex` → beamer, `slides.md`
+> → slidev). PowerPoint по-прежнему не реализован — `SKILL.md` явно
+> документирует `pptx` как нереализованный.
 
 ### Шаг 7.2. LMS-адаптеры
 `profiles/<X>/lms_adapter.md` как первоклассный концепт: GitHub Classroom, Moodle, Canvas, OpenEdX, local zip.
