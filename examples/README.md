@@ -7,12 +7,15 @@ Claude, otherwise the artifacts don't reflect what the pipeline generates
 
 ## `regularization-course/`
 
-A real 2-lecture course ("Regularization in Machine Learning") produced end
-to end by the skill. Shows every lecture-pipeline artifact for two lectures
-(`plan.md`, `visuals.md`, `figures/figures.py` + generated PNGs, `slides.tex`
-+ compiled `slides.pdf`, `speaker_notes.md`, `history.md`), plus a lab
-(`labs/lab1/`) through the `plan → notebook → spec → tests` steps, and the
-top-level course files (`AGENTS.md`/`CLAUDE.md`, `course_plan.md`,
+A 2-lecture course ("Regularization in Machine Learning") produced end to end
+by the skill. It is entirely synthetic — course, institution ("Claude
+Cowork"), and iteration history were generated in Claude Cowork, not taught by
+a real instructor to real students — which is also why it needed no PII
+cleanup before being committed here. Shows every lecture-pipeline artifact for
+two lectures (`plan.md`, `visuals.md`, `figures/figures.py` + generated PNGs,
+`slides.tex` + compiled `slides.pdf`, `speaker_notes.md`, `history.md`), plus
+a lab (`labs/lab1/`) through the `plan → notebook → spec → tests` steps, and
+the top-level course files (`AGENTS.md`/`CLAUDE.md`, `course_plan.md`,
 `course_conventions.md`, `lab_templates.md`, `COURSE_STATE.md`,
 `lms_adapter.md` for the `local-zip` profile).
 
