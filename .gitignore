@@ -15,6 +15,14 @@ __pycache__/
 .DS_Store
 Thumbs.db
 
+# LaTeX build byproducts (keep only .tex source and final .pdf)
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+
 # Test fixtures: PNGs are generated at e2e setup from the committed figures.py,
 # not stored as binaries.
 tests/e2e/fixtures/course/lectures/01/figures/*.png
