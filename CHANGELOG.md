@@ -1,5 +1,417 @@
 # Changelog
 
+## [2026-08-08] — Russian README; sharpened pitch
+
+### Added
+
+**`README.ru.md`** — a full Russian adaptation (not a literal translation) for
+sharing with Russian-speaking instructor communities, cross-linked with the
+English README.
+
+### Changed
+
+**README framing** (both languages). The opening hook, "Why", and "What it does"
+now sell the problem solved (weeks of manual preparation; a chat that loses
+context between sessions) and the full breadth of the pipelines — lectures,
+seminars, labs, quizzes, homework — rather than lecture slides alone. The
+opening no longer implies a `course_plan.md` must already exist: creating the
+plan is itself part of the pipeline. Claude-specific phrasing ("Claude doesn't
+remember…", "causes Claude Code to hang") is now tool-neutral, and the
+requirements section reads as "any Agent Skill-compatible agent, tested on
+Claude Code, Cowork, Codex CLI, and Cursor" instead of a closed list of three.
+
+## [2026-08-07] — `examples/` populated from a pipeline run; slide cross-references banned by content
+
+### Added
+
+**`examples/regularization-course/`** — the real population of `examples/`
+(wave 2, step 2.6). `examples/README.md` had said since `e41d224` that a genuine
+example must come from an actual pipeline run rather than being hand-assembled;
+this is that run: a 2-lecture course produced end to end (plan, visuals, figures
++ PNGs, slides, speaker notes, history for both lectures) plus a lab through
+plan/notebook/spec/tests. The course content is synthetic (institution "Claude
+Cowork"), so there was no PII to strip — `examples/README.md` says so explicitly,
+along with what the example does not cover (no validated/published lab, no
+seminars/quizzes/homework). Scratch files the course's own `history.md` flags as
+unwanted and LaTeX build byproducts were dropped and gitignored repo-wide.
+
+### Changed
+
+**Slide cross-references are banned by content, not by direction**
+(`step4_slides.md`, `step4_slides_slidev.md`, `SKILL.md`). Two earlier attempts
+to stop "compare with slide 20" failed for two reasons visible in the rule text
+itself: each statement spelled out the exact phrasings to avoid (which supplies a
+template rather than a prohibition — the same mechanism seen with "real"), and
+all of them constrained *direction*, leaving a numbered pointer backwards
+legitimate. The rule is now positive and direction-free: a slide never cites
+another by number or position; continuity comes from naming the content; for a
+comparison, put both items on one slide. No example phrasings are given.
+
+**`docs/PROJECT_CONTEXT.md`** — roadmap, known-issues, and file tree brought in
+line with the actual repository (the tree predated `skill/profiles/`,
+`skill/extensions/`, and most of the current `references/`).
+
+## [2026-08-02] — Stop priming "real"; rejected wording gets a course-wide home
+
+### Fixed
+
+**Authenticity adjectives leaking into generated material.** The skill was
+feeding them: "real" appeared 15 times in its own agent-facing instructions ("a
+real file", "needs real data", "what a real student sees"), and the model read
+that as the register of the task. Three layers, none of which hardcode one
+model's tics:
+
+1. **Drop the priming** — all 15 sites now say what they mean ("populated file",
+   "computed data", "the dataset from the source", "observed pace"). The only
+   surviving "real" is the rule that bans it. Meaning is unchanged, including the
+   ban on substituting synthetic data.
+2. **One positive rule instead of a growing blocklist** — adjectives asserting
+   authenticity are empty for a student: name the property or drop the word.
+3. **Close the feedback loop** — rejected wording only ever reached `history.md`,
+   which is per unit, so the lesson was relearned every lecture. A word rejected
+   twice now also goes to `Never Use` in `course_conventions.md` — course-wide,
+   and read by every step that writes text.
+
+Taste stays out of the shared skill: `course_conventions.md` is a course
+artifact, and the only layer where language-specific bans can live at all, since
+`skill/` is English-only.
+
+## [2026-07-29] — Course plan linter; chunk approval; notes modes; slide count
+
+### Added
+
+**`skill/scripts/lint_plan.py`** — a linter for `course_plan.md` (P1 item 25),
+with unit coverage. It checks the Sessions table and per-lecture subsections;
+ERROR/WARN findings with a summary line. Two follow-ups fixed real defects: the
+k-th `### Lecture` row is matched by lecture sequence, not by the session `#`
+column (a valid plan reported two false ERRORs, since the canonical example's
+second lecture is session #3); en dash, hyphen, and colon are accepted as
+heading separators; duplicate `#` values and duplicate lecture subsections are
+reported instead of collapsing silently.
+
+**Linter wired into the pipeline.** It existed but nothing called it, so a plan
+could drift unnoticed until `stats` reported wrong totals or `syllabus` shipped a
+stale description to students. `course plan` now runs it after every write (all
+four phases end in a save): ERROR must be fixed before the phase is reported
+done, WARN is reported. TODO warnings are expected in a fresh draft and
+explicitly not a blocker in Phase 2. `doctor` runs it as the second half of the
+facts layer, replacing the `grep "<!-- TODO -->"` semantic check — one plan check
+in one place, so the grep and the linter cannot drift apart.
+
+**Speaker-notes modes** (`step5_notes.md`). `step5_notes.md` gave no volume
+target at all, so generation drifted to a summary while the template's spoken
+opening ("Good morning…") stayed — notes that read as an outline but start like a
+script and match no timing in `plan.md`. Three modes (`minimal` / `medium` /
+`detailed`) set how much of the delivery is written out; resolution is
+arg → `Notes mode:` in `AGENTS.md` → `medium`. Volume is anchored **per slide**
+as factor × speech rate × planned minutes (rate asked once in `course init`,
+stored in `AGENTS.md`, 110 wpm assumed if absent), so unevenness cannot average
+out across the deck. Verbatim text is scoped to wording that matters — openings,
+closings, definitions, transitions, the framing of a derivation — in every mode,
+which makes a greeting deliberate instead of a leftover and forbids the
+greeting + bullet-point-body hybrid outright. After the last chunk the agent
+reports words vs band per slide and offers to fix outliers.
+
+### Fixed
+
+**Per-chunk approval in `slides` and `notes`.** The Inviolable rule "wait for
+explicit approval before saving" was unqualified, so it outranked the
+dispatchers' "do not pause between chunks" whenever a reference did not restate
+the latter; `7a64cab` had patched `notes` at the dispatcher level but left the
+conflicting global rule in place, and the auto-chain instruction lived only in
+the Slidev reference — the Beamer and notes paths, read in full at execution
+time, had nothing to counter it. Both now carry the same chunking protocol, and
+the global rule states that approval is per step, not per chunk. Also made
+explicit that a chunk is never printed for review instead of being written:
+LaTeX is unreadable in a terminal, and the deck is reviewed by compiling it.
+
+**Slide count derived from planned duration** (`step4_slides.md`,
+`step1_plan.md`). "Maximum 20 content slides" was unconditional, so a 135-minute
+session got the same ceiling as a 90-minute one — 9 minutes per slide, which no
+pace justifies. The duration was already available and unused. The count now
+follows a target of 3–6 minutes per content slide (~4.5 by default), which
+reproduces exactly 20 slides at 90 minutes and gives 30 at 135. Pace is not a new
+setting: when earlier lectures have `plan.md`, their `**Total time:**` and
+`**Slides:**` give the instructor's observed minutes per slide, and that median
+replaces the default. Hardcoded 85–90 min in the plan template and the timing
+table total also removed.
+
+**Pipeline vocabulary in student-facing material.** Slides were picking up the
+skill's own register: process commentary ("before using this material in future
+sessions"), data-authenticity asides, and "honest" as a blanket verdict on
+results. Nothing in the skill emitted those strings — the agent was echoing its
+own instructions into the artifact, and no rule forbade it. Adds an Inviolable
+rule against pipeline concerns appearing in student-facing text, plus a
+`Never Use` entry in both `course_conventions` templates for "honest"/"fair" as a
+verdict (the precise property — "held-out estimate", "no feature leakage" — says
+what is meant). The templates apply to newly initialized courses; existing
+courses need the line added to their own `course_conventions.md`.
+
+## [2026-07-23] — Release process
+
+### Added
+
+`scripts/package.sh`, a release GitHub Actions workflow, and `docs/releasing.md`
+— packaging the skill as a distributable zip. README, getting-started, and the
+Makefile updated accordingly.
+
+## [2026-07-21] — Multi-harness support; Slidev; slides export
+
+The skill is a cross-tool Agent Skill: the same `SKILL.md` runs on Claude Code,
+Codex CLI, and Cursor — only the install location differs. This session made that
+true in wording, in the course-context layer, and in the docs, and added a second
+slide format.
+
+### Added
+
+**Slidev as a second slide format** (`references/step4_slides_slidev.md`,
+`templates/slides_headmatter_slidev.md`). A Markdown deck presented and exported
+locally via Node (`npx slidev`) — no paid services — reusing the `figures.py` PNG
+pipeline unchanged. Format selection: `Slides format:` in the course context
+(default `beamer`), overridable per call (`/course-maker slides N slidev`); on
+resume the format is detected from the existing deck file (`slides.tex` vs
+`slides.md`). Same chunking and forward-reference discipline as the Beamer path;
+notes stay in step 5. `course init` asks the format, makes the LaTeX-engine
+question beamer-only, and generates either `slides_preamble.tex` or
+`slides_headmatter.md`; `user_defaults` gains `default_slides_format`.
+`validate_state.py`: a done `slides` step is satisfied by `slides.tex` **or**
+`slides.md`.
+
+**`/course-maker slides N export [pdf|png]`** (`references/slides_export.md`) —
+mechanical export of an existing deck; no approval, no state change. Detects the
+format from the file present (`slides.tex` → Beamer PDF via latexmk/engine;
+`slides.md` → `npx slidev export`). A missing export tool produces installation
+instructions rather than a silent failure. Presenting a Slidev deck live remains
+the user's job — the skill never launches it.
+
+**`AGENTS.md` as the course-context layer.** Course context becomes cross-tool:
+`AGENTS.md` is the single source of truth (read natively by Codex CLI and
+Cursor), and `CLAUDE.md` is a thin `@AGENTS.md` import wrapper (Claude Code) with
+a slot for Claude-only overrides. `skill/COURSE_AGENTS_TEMPLATE.md` holds the
+course/lab context, recurring rules, and notes; `COURSE_CLAUDE_TEMPLATE.md` is
+reduced to the wrapper. `course_init.md` detects both files, generates both, and
+migrates pre-cross-tool courses idempotently (copy inline context into
+`AGENTS.md`, then trim `CLAUDE.md`). Guarded by
+`tests/static/test_agents_wrapper.py`. A first pass used an indirection rule
+("wherever a reference says CLAUDE.md → context, read AGENTS.md"); that was a
+`#define TRUE FALSE`-style redirect and was replaced by the real rename across
+`SKILL.md`, `references/`, `templates/`, `profiles/`, and `extensions/`.
+`CLAUDE.md` is now named only where it is literally the wrapper file.
+
+**`docs/MULTI_HARNESS_PLAN.md`** — verified facts, the two-layer architecture
+(skill vs course context), decisions, phased plan, risks, and sources.
+
+### Changed
+
+**Declaudized wording** (Phase 0). Claude Code-specific phrasings generalized
+without behavior change: the chunking rationale ("causes Claude Code to hang" →
+"exceeds a single generation/context budget and stalls the agent"), the
+`lab validate` fresh-context step (now names all three tools instead of assuming
+`/clear`), and "Claude" → "the agent" in instruction prose.
+
+**Install documentation.** Two global symlinks — `~/.claude/skills` (Claude Code)
+and `~/.agents/skills` (Codex CLI + Cursor) — with copying documented as the
+self-contained alternative. An earlier note, based on a third-party blog, wrongly
+claimed Cursor is project-scoped only; the official docs
+(https://cursor.com/docs/skills) show Cursor loads skills from global locations
+including the Claude Code and Codex directories, so it piggybacks and needs no
+symlink of its own. Cursor de-duplicates the double install, so the documented
+duplicate caveat was softened to match observed behavior. Manual smoke by the
+instructor confirmed the skill loads in all three tools.
+
+**Bundled-resource paths are skill-root-relative.** Internal references pointed
+at `skill/templates/…`, `skill/extensions/…`, `skill/profiles/…`, which matches
+the repository layout but not the installed skill (whose root has no `skill/`
+subdirectory); the hosts tolerated it only via fuzzy file resolution. All 22
+such paths de-prefixed and verified to resolve. Files copied into a user's course
+repo keep the `skill/…` form, since a bare `extensions/…` would be meaningless
+there.
+
+**Claude chat app (claude.ai / Desktop) marked out of scope.** It supports custom
+skills via zip upload, but runs them in a sandboxed cloud VM — no local course
+repo, git, or LaTeX/pandoc/pytest toolchain, and an ephemeral filesystem. Claude
+Code for Desktop is just Claude Code and remains fully supported.
+
+## [2026-07-20] — Wave 5 (partial): homework; wave 6 closed out
+
+### Added
+
+**`/course-maker homework` pipeline** (`references/homework.md`) — a light
+take-home pipeline distinct from labs: a task brief plus an instructor-only
+rubric, manually graded, with no `starter/`, autograder, CI, or `validate`. The
+model is "task brief + rubric", not "lab minus CI". `homework plan N [dir]`
+produces `task.md` + `rubric.md`; `homework publish N [format]` assembles
+`homework_student.md` (markdown default, pdf/latex/docx via pandoc, like
+`syllabus`) and strips instructor-only content with a leak check — the rubric
+reaches the student handout only if opted into at plan time. `HW_DIR` resolves
+from a `Dir` column holding a full path from the course root, so homework can
+nest under a seminar (`seminars/<name>/homework/`). State: a `## Homework`
+section, drift-checked by `validate_state.py` (task/rubric/published, with
+nested-`Dir` resolution) and covered by `doctor` and `stats`.
+
+**`docs/EXAMPLE_COURSE_PLAN.md`** — a step-by-step plan (with prompts) for
+producing a real `examples/` course from an actual pipeline run.
+
+### Changed
+
+**`history.md` compaction reframed** (wave 6, step 6.3). A full
+`/course-maker compact-history` command is **deferred**: at realistic per-unit
+sizes the pain is hypothetical, and lossy compaction risks dropping exactly the
+rejected-idea detail that `history.md` exists to preserve. The cheap, risk-free
+alternative: `validate_state.py` emits an advisory `BULKY` finding when any
+`history.md` exceeds `HISTORY_WARN_LINES` (200), never changing the exit code;
+`doctor` frames it as optional housekeeping — trim resolved iterations by hand,
+keep rejections verbatim. Two unit tests.
+
+**README drift fixed.** The README was behind both the command surface and the
+wave 4 profile refactor: added the Seminar, Quiz, and Homework command tables and
+`doctor`/`stats`/`syllabus`; made `lab publish`/`lab init` LMS-agnostic
+(`lms_adapter.md`, optional URL) instead of hardcoding GitHub Classroom + git
+subtree; updated the repository layout and roadmap.
+
+## [2026-07-09] — Nightly e2e trigger disabled
+
+### Fixed
+
+**Unattended e2e runs.** The nightly cron was firing on its own and sending
+daily "Run failed: e2e" mail even though e2e is manual-only. Commented out rather
+than removed, so the disabled configuration stays visible.
+
+## [2026-07-02] — Neutralized the Russian grade-label default
+
+### Changed
+
+The `ru` template shipped a specific external-CI gradebook phrase as the default
+grade-output label, so every Russian course inherited one instructor's autograder
+contract. It is replaced with a generic label; an instructor's exact phrase now
+lives in their personal `user_defaults`, outside the shared repository:
+`profiles/README.md` documents optional `default_grade_output_label` /
+`default_taskid_label` / `default_scoring_header`, and `lab course-init` Phase 2a
+resolves each reporter label by precedence
+user_defaults → `lab_templates.md` → reporter default. The personal string no
+longer appears anywhere under `skill/` (only in historical docs). This closes
+wave 2, step 2.4.
+
+Also documented (2026-07-01): labs default to plain pytest pass/fail — no scoring
+block, no autograder line, no per-student variants — with a getting-started
+walkthrough for enabling an autograded course with variants.
+
+## [2026-06-29] — Wave 4 revision (2/2): rewiring, guards, LMS-owned starter setup
+
+### Changed
+
+**Lab references rewired around the two flags.** The per-student variant formula
+no longer appears inline in any universal file; every mention is conditional
+("when `lab_variants: true`, see `extensions/variants/README.md`"), across
+`lab_context`, `lab_step1a_plan`, `lab_step1b_notebook`, `lab_step1b_spec`
+(Datasets / Variant Variables marked variants-only), and `lab_step3_validate`
+(which also lost a stray master's-student audience hardcode). Grade labels moved
+to the reporter: `lab_step2_tests` Step 4 edits `grade_report.py` instead of
+`conftest.py`, and the "conftest.py Strings" section of `lab_templates_{en,ru}`
+became "Grade reporter labels".
+
+**Inviolable rules made conditional** (`SKILL.md`). The two global `NEVER`
+grading invariants presupposed that every lab has per-student variants and an
+external-CI grade format. The variant formula is now an invariant only when
+`lab_variants: true`, and the grade-output layout is fixed only when a grade
+reporter is configured — removing the last inline copy of the formula from the
+universal files. The quiz-answers invariant is unchanged.
+
+**`tests.yaml` stops presenting `STUDENT_ID` and grade capture as universal.**
+Both are conditional: `STUDENT_ID` matters only with variants (harmless
+otherwise), and grade-line capture only with a reporter. A generic course gets
+plain pytest pass/fail as the CI outcome.
+
+**Starter setup moved out of `lab_init` into the LMS profile.** `lab_init.md`
+unconditionally ran `git subtree add … <url>`, which is the GitHub Classroom
+model (a separate public starter repo); a local-zip course has no such repo or
+URL. Step 4 now delegates to `lms_adapter.md` § "Lab init — starter setup":
+`github-classroom/lms.md` attaches the public starter repo via `git subtree add`,
+`local-zip/lms.md` just creates a local `starter/`. The `<url>` argument is
+optional, required only for remote-starter profiles.
+
+**Anti-personalization guard hardened.**
+`test_no_variant_formula_in_universal_files` drops its `xfail` and becomes a hard
+guard now that the formula is gone from universal files; the English-only guard
+now also scans `skill/extensions/*.md`, since the opt-in reporter and variant
+docs are skill machinery.
+
+## [2026-06-28] — Wave 4 revision (1/2): grading as opt-in extensions
+
+The grading layer was extracted **not** into a profile (as wave 4 step 4.4
+assumed) but into a third axis, `skill/extensions/`. Rationale: an autograder
+contract and a variant scheme are orthogonal to both the LMS and the instructor —
+autograding can run locally, and one instructor may teach one course with
+variants and another without.
+
+### Added
+
+**`skill/extensions/reporters/scoring_ci.py`** — the scoring block removed from
+`conftest_base.py`, exposed as `report(outcomes)` per the reporter seam. It
+preserves the previous output verbatim (boxed scoring block, per-block markers,
+grade line, bonus tally) and the external-CI grade-line contract, so a course
+that opts in grades exactly as before. The TASKID line is printed only when
+`DATASETS` is non-empty, making the reporter independent of the variant
+extension. `README.md` documents the contract, selection (`grade_reporter:` in
+the course context), installation, and how to write your own.
+
+**`skill/extensions/variants/`** — the per-student variant system, gated by
+`lab_variants: true` rather than baked into Block 0 of every lab, since many labs
+give every student the same task. `README.md` states when to enable it, what
+changes on and off, and the canonical formula
+`dataset_id = (student_id - 1) % len(datasets)` as an invariant that holds only
+while variants are in use; `block0_snippet.md` carries the Block 0 cells with
+language-neutral code (localized prose still comes from `lab_templates.md`).
+
+### Changed
+
+**`conftest_base.py` reduced to a universal harness.** It had mixed a universal
+pytest harness (notebook import, fixtures, outcome tracking) with one
+instructor's grading contract: a fixed `pytest_sessionfinish` scoring block,
+TASKID/GRADE/SCORING labels, and the variant formula. Everything personal is
+stripped; the harness collects per-test outcomes and, at session end, hands them
+to an optional `grade_report.py` (`report(outcomes)`) sitting next to it. With no
+reporter, plain pytest — nothing extra printed. The universal harness now
+presupposes neither an autograder nor a variant scheme.
+
+**`grade_reporter` / `lab_variants` flags wired into `lab course-init`.** Both
+default to the generic path (`none` / `false`). Phase 2a no longer substitutes
+labels into `conftest_base.py` (they are gone from the harness); instead, when a
+reporter is selected, it copies `extensions/reporters/<name>.py` to
+`labs/shared/grade_report.py` and substitutes course-language labels there.
+`lab init` copies `grade_report.py` into each lab's `starter/` when present.
+Phase 1 stops hunting for a placeholder conftest — it ships real now.
+
+**Lab audience universalized.** `lab_context.md` hardcoded a master's-level role
+for every course; the audience level and background now come from the course
+context, matching the lecture pipeline (wave 4, step 4.4).
+
+## [2026-06-26] — Automated test suite; `/course-maker lab triage`
+
+### Added
+
+**`tests/` — a three-level harness**, replacing manual command-by-command
+checking:
+- **Level 0 (`tests/static`)** — deterministic skill checks: English-only guard,
+  command↔reference structure integrity, py/yaml syntax, and an
+  anti-personalization tracker (no personal literals hardcoded).
+- **Level 1 (`tests/unit`)** — contract tests for `validate_state.py` (exit codes
+  and DRIFT/STALE/UNTRACKED/BLIND findings) and `nonlatin.py`.
+- **Level 3 (`tests/e2e`)** — opt-in behavioural smoke tests (`COURSE_MAKER_E2E=1`)
+  that drive the skill against a fixture course and assert deterministic
+  post-conditions for figures, slides, and quiz publish. Each run captures the
+  turn-by-turn conversation to `tests/e2e/logs/<command>.jsonl` (gitignored) and
+  prints the path; `COURSE_MAKER_E2E_MODEL` pins the model for reproducibility.
+
+Wiring: `Makefile`, `tests/requirements.txt`, `tests/README.md`, `pytest.ini`,
+and CI workflows (checks on push/PR; e2e on dispatch).
+
+**`/course-maker lab triage N`** (`references/lab_triage.md`, wave 5 step 5.5) —
+after a `⚠️` validation, reads the latest Step 3 history entry, classifies each
+issue to its root-cause step (plan / notebook / spec / datasets / tests), and
+names the command to run next (earliest pipeline step first). Read-only: edits
+nothing, changes no state.
+
 ## [2026-06-18] — Wave 5 (partial): seminar pipeline
 
 A seminar = a lecture deck plus a practical part, all in `seminars/NN/` (the

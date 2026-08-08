@@ -31,10 +31,11 @@ lecture preparation rather than software development.
 ### One repository per course (not one repo for all courses)
 
 **Rationale:** Multiple courses run simultaneously at different paces. Separate repos
-avoid branch conflicts, allow per-course `CLAUDE.md` context, and make it easy to
+avoid branch conflicts, allow per-course context, and make it easy to
 give collaborators access per-course. Downside: the skill must be copied or symlinked
-to each repo. Mitigation: skill lives in `~/.claude/skills/` (global), course repos
-just need `CLAUDE.md` pointing to it.
+to each repo. Mitigation: the skill is installed globally (`~/.claude/skills/` for
+Claude Code, `~/.agents/skills/` for Codex CLI and Cursor); a course repo only needs
+its own `AGENTS.md` course context (plus the thin `CLAUDE.md` wrapper).
 
 ### State stored in Markdown files (not a database)
 
@@ -63,8 +64,12 @@ Same pattern for speaker notes.
 
 The skill uses Anthropic's native skill format: `SKILL.md` with YAML frontmatter
 (name + description for triggering) + a `references/` subdirectory for
-step-specific instructions loaded on demand. This keeps `SKILL.md` under ~350 lines
-while full detail lives in reference files.
+step-specific instructions loaded on demand. This keeps `SKILL.md` around ~420 lines
+(target raised 300 → 350 → 420 as pipelines were added; see IMPROVEMENT_PLAN.md
+success criterion 2) while full detail lives in reference files.
+
+The same `SKILL.md` is a cross-tool Agent Skill: it also runs on Codex CLI and
+Cursor, which read the course context from `AGENTS.md` natively.
 
 **Current trigger:** `/course-maker` (the skill name). In Claude Code, skills
 support both slash-command invocation and autonomous triggering based on description.
@@ -95,20 +100,22 @@ step-by-step status.
 
 ### Original design intent — current status
 
-1. **Test on a real new course** — ongoing by nature; iteration logs from real
+1. **Test on an actual new course** — ongoing by nature; iteration logs from
    teaching go into per-lecture `history.md` and surface improvements to
-   `references/step*.md`. `examples/regularization-course/` is an active
-   real-course run (not yet committed as the example).
+   `references/step*.md`. `examples/regularization-course/` is a full pipeline
+   run, committed as the repository's example (`0fc0d85`).
 
 2. **`step4_slides.md` expansion** — add a catalog of specific Beamer compilation
    errors encountered in practice, with exact fixes. The anti-overfull checklist
    exists; error-specific entries grow as real bugs are encountered. Ongoing,
    not tracked as a discrete IMPROVEMENT_PLAN step.
 
-3. **Example materials** — done in spirit but not yet populated: `examples/`
-   ships an honest stub (`e41d224`, wave 2 step 2.6) explaining that a real
-   example must come from an actual skill run rather than being hand-assembled.
-   `examples/regularization-course/` (untracked, in progress) is that real run.
+3. **Example materials** — done (wave 2, step 2.6). `examples/` first shipped a
+   stub (`e41d224`) stating that the example must come from an actual skill run
+   rather than being hand-assembled; `examples/regularization-course/`
+   (`0fc0d85`) is that run — a 2-lecture course produced end to end plus a lab
+   through plan/notebook/spec/tests, with fully synthetic content (no PII to
+   strip). Not covered: a validated/published lab, seminars, quizzes, homework.
 
 4. **Lab assignment pipeline** — done (see CHANGELOG `2026-05-28` and earlier).
    Outputs Jupyter notebook + pytest suite, LMS sync via the `github-classroom`
@@ -121,9 +128,10 @@ step-by-step status.
 
 6. **Non-Beamer slide output** — half done: Slidev shipped as a second slide
    format (`7c18865`, `references/step4_slides_slidev.md`, format resolved
-   from `AGENTS.md`/arg/existing file). pptx is explicitly not implemented
-   (`SKILL.md` line ~246). IMPROVEMENT_PLAN.md wave 7 step 7.1 doesn't yet
-   have a `✅ реализовано` marker for the Slidev half — worth adding there too.
+   from `AGENTS.md`/arg/existing file), plus `/course-maker slides N export`
+   for both formats (`281ca1d`). pptx is explicitly not implemented
+   (`SKILL.md`, slides dispatcher). Marked accordingly in IMPROVEMENT_PLAN.md
+   wave 7 step 7.1.
 
 ### Long-term (wave 7, pending)
 
@@ -186,6 +194,7 @@ This means the refactor in Step 1 above will be minimal when the time comes.
 ```
 course-maker/                       ← repo root
   README.md                         ← GitHub repository README
+  README.ru.md                      ← Russian adaptation of the README
   CHANGELOG.md                      ← release notes
   CLAUDE.md                         ← in-repo conventions for the skill itself
   LICENSE
@@ -194,7 +203,7 @@ course-maker/                       ← repo root
   .gitignore
 
   skill/                            ← the skill (symlinked or copied to ~/.claude/skills/course-maker/)
-    SKILL.md                        ← main dispatcher (~420 lines) + Inviolable rules
+    SKILL.md                        ← main dispatcher (~430 lines) + Inviolable rules
     COURSE_CLAUDE_TEMPLATE.md       ← template CLAUDE.md for new Claude Code course repos
     COURSE_AGENTS_TEMPLATE.md       ← template AGENTS.md for new Codex/Cursor course repos
     references/
@@ -254,8 +263,8 @@ course-maker/                       ← repo root
     archive/                        ← completed planning documents (LAB_PIPELINE_PLAN.md, TEMPLATE_MIGRATION_PLAN.md)
 
   examples/
-    README.md                       ← status: stub, explains why a hand-assembled example is wrong
-    regularization-course/          ← untracked; real course run in progress (see Roadmap #1, #3)
+    README.md                       ← what the example covers, and why it comes from an actual run
+    regularization-course/          ← committed pipeline run: 2 lectures + 1 lab (see Roadmap #1, #3)
 
   scripts/
     nonlatin.py                     ← lints skill/ for non-Latin text
@@ -273,7 +282,7 @@ course-maker/                       ← repo root
 
 - Language: skill instructions in English (for reliable LLM instruction-following);
   all generated materials (slides, speaker notes, figures) use whatever language
-  is specified in `CLAUDE.md` → Course context — any language is supported
+  is specified in `AGENTS.md` → Course context — any language is supported
 - Slide chunk size: 5 slides per chunk (chosen empirically; may need tuning
   for very dense slides with lots of TikZ)
 - Figure naming: `figNN_snake_case.png` where NN matches the V-number in `visuals.md`
@@ -286,7 +295,7 @@ course-maker/                       ← repo root
 
 1. **Optimal chunk size for slides.** 5 slides is conservative. Some lectures may
    have dense slides (many TikZ diagrams) where 5 is still too much; others could
-   handle 8–10. Consider making chunk size configurable in `CLAUDE.md` course context.
+   handle 8–10. Consider making chunk size configurable in the `AGENTS.md` course context.
 
 2. **Peer review pipeline.** The professor uses structured peer review for ЛР2 and ЛР4
    (theory.md + two reviewers per student). This is a separate workflow from lecture prep

@@ -262,11 +262,23 @@ profiles/                     ← новое: профили преподава�
 
 План разбит на **волны**. Каждая волна — логически связанная группа изменений, после которой состояние репозитория консистентно. Внутри волны — атомарные шаги, каждый — один коммит.
 
-## Волна 1. Архитектура SKILL.md (P1)
+## Сводка состояния (сверка с репозиторием, 2026-08-08)
+
+| Волна | Состояние | Что осталось |
+|---|---|---|
+| 1. SKILL.md | ✅ шаги 1.1–1.6 выполнены | `SKILL.md` = 432 строки при пороге 420; одно правило из списка 1.4 (загрузка `course_conventions.md`/`lab_templates.md`) живёт в references, а не в Inviolable rules |
+| 2. Bootstrap | ✅ выполнена | — (пример назван `regularization-course`, а не `stochastic-processes`) |
+| 3. Документация | ✅ выполнена | 3.4 переоткрывался (CHANGELOG отставал на 44 коммита) — догнан 2026-08-08; следить регулярно, а не разово |
+| 4. Профили | ✅ выполнена в пересмотренной архитектуре (LMS-профили + user_defaults + extensions) | — |
+| 5. Пайплайны | ✅ шаги 5.1–5.5 отмечены выполненными | — |
+| 6. QoL | ✅ выполнена (6.3 отложен осознанно, 6.6 отклонён) | — |
+| 7. Форматы | ⏳ частично: Slidev есть, pptx / LMS-адаптеры сверх двух / доп. языки / R-MATLAB — нет | 7.1 (pptx), 7.2, 7.3, 7.4 |
+
+## Волна 1. Архитектура SKILL.md (P1) — ✅ выполнена (проверено 2026-08-08)
 
 **Цель:** SKILL.md сокращён до ≤300 строк, критические правила выделены явно, workflow'ы вынесены.
 
-### Шаг 1.1. Создать `references/course_init.md`
+### Шаг 1.1. Создать `references/course_init.md` ✅ реализовано
 Перенести Phase 1–4 команды `/course-maker course init` из SKILL.md.
 В SKILL.md оставить:
 ```
@@ -277,14 +289,14 @@ Read: references/course_init.md
 - Phase 2 questions skipped only if answer is in CLAUDE.md
 ```
 
-### Шаг 1.2. Создать `references/course_plan.md`
+### Шаг 1.2. Создать `references/course_plan.md` ✅ реализовано
 Перенести Phase 1–4 команды `/course-maker course plan` из SKILL.md.
 В SKILL.md — тонкий диспетчер + CRITICAL.
 
-### Шаг 1.3. Создать `references/lab_course_init.md`
+### Шаг 1.3. Создать `references/lab_course_init.md` ✅ реализовано
 Перенести Phase 1–6 команды `/course-maker lab course-init` из SKILL.md.
 
-### Шаг 1.4. Добавить глобальный блок `## Inviolable rules` в SKILL.md
+### Шаг 1.4. Добавить глобальный блок `## Inviolable rules` в SKILL.md ✅ реализовано (с расхождениями)
 Собрать из существующих SKILL.md и references/ топ-15 критических правил:
 - NEVER modify `dataset_id = (Student_ID - 1) % len(DATASETS)`
 - NEVER read `history.md` during lab validate
@@ -302,25 +314,45 @@ Read: references/course_init.md
 - ALWAYS use full command form when suggesting next command
 - ALWAYS load `course_conventions.md` and `lab_templates.md` for lab commands
 
-### Шаг 1.5. Добавить правило наблюдаемости
+> **Состояние (2026-08-08):** блок `## Inviolable rules` есть в `SKILL.md`
+> (секции Observability / Grading invariants / Validation isolation / Slides &
+> figures / Process). Формулировки эволюционировали вместе с волной 4:
+> формула вариантов — инвариант только при `lab_variants: true`, layout
+> grade-output — только при подключённом `grade_reporter`.
+> **Единственный пункт списка выше, которого нет в глобальном блоке:** «ALWAYS
+> load `course_conventions.md` and `lab_templates.md` for lab commands» — это
+> правило живёт в context-gathering каждого lab-reference (например
+> `lab_step2_tests.md` § context), а не в SKILL.md. Считать закрытым или
+> поднять в Inviolable rules — открытое решение.
+
+### Шаг 1.5. Добавить правило наблюдаемости ✅ реализовано
 В `## Inviolable rules`:
 ```
 In the first chat message of each step, list which reference files
 you read and name the sections you consulted.
 ```
 
-### Шаг 1.6. Привести в порядок диспетчеры всех команд
+### Шаг 1.6. Привести в порядок диспетчеры всех команд ✅ реализовано
 Для каждой команды в SKILL.md: оставить только заголовок, ссылку на references/, опциональный inline-блок CRITICAL.
 
 **Критерий готовности волны 1:** `wc -l skill/SKILL.md` < 300. Все workflow'ы — в references/.
 
+> **Проверка 2026-08-08:** все workflow'ы вынесены (31 файл в `references/`), в
+> SKILL.md остались диспетчеры + inline-CRITICAL. По строкам: **432** —
+> исходный порог 300 не выдержан, поднятый порог 420 (см. «Критерии
+> успешности», п. 2) превышен на 12 строк. Рост дали новые пайплайны
+> (seminar / quiz / homework / triage / stats / doctor / slides export) и
+> inline-CRITICAL блоки, которые сознательно не сворачиваются. Действие:
+> либо ещё раз поднять порог, либо сжать оставшиеся пустые диспетчеры в
+> таблицу command→reference (CRITICAL-блоки не трогать).
+
 ---
 
-## Волна 2. Bootstrap-блокеры (P0)
+## Волна 2. Bootstrap-блокеры (P0) — ✅ выполнена (проверено 2026-08-08)
 
 **Цель:** Скил работает out-of-the-box для нового пользователя.
 
-### Шаг 2.1. Реальный `conftest_base.py`
+### Шаг 2.1. Реальный `conftest_base.py` ✅ реализовано (переработан в волне 4)
 Заменить placeholder в `skill/templates/conftest_base.py` рабочим универсальным шаблоном:
 - `import_student_notebook` — реализация через `nbformat` + exec
 - `student_module` fixture
@@ -329,7 +361,14 @@ you read and name the sections you consulted.
 - Английские комментарии, английские сообщения по умолчанию
 - Параметризуемые строки: `TASKID_LABEL`, `GRADE_OUTPUT_FORMAT` — читаются из переменных в начале файла
 
-### Шаг 2.2. Реальный `tests.yaml`
+> **Состояние (2026-08-08):** placeholder'ов в `skill/` не осталось. Итоговый
+> `skill/templates/conftest_base.py` (176 строк) — универсальный harness
+> (импорт ноутбука + `student_module` + сбор outcomes + шов `report(outcomes)`),
+> без scoring и без grade-строк: они переехали в
+> `skill/extensions/reporters/scoring_ci.py`, где и живут `TASKID_LABEL` /
+> `GRADE_OUTPUT_LABEL` / `SCORING_HEADER` (см. замечание к волне 4).
+
+### Шаг 2.2. Реальный `tests.yaml` ✅ реализовано
 Заменить placeholder в `skill/templates/tests.yaml` рабочим GitHub Actions workflow:
 - Setup Python
 - Install requirements.txt
@@ -337,21 +376,32 @@ you read and name the sections you consulted.
 - Run pytest
 - Upload artifacts
 
-### Шаг 2.3. Перевести `tests_template.py` на английский
+### Шаг 2.3. Перевести `tests_template.py` на английский ✅ реализовано
 Все docstrings, классы, сообщения об ошибках — английский.
 Удалить русские строки. Класс-имена оставить (TestVariableExample и т.п.).
 
-### Шаг 2.4. Расхардкодить grade output строку
+> **Проверка:** кириллицы нет ни в одном файле `skill/`, кроме заведомо
+> русских локалей (`course_conventions_ru.md`, `lab_templates_ru.md`).
+> Закреплено гардом English-only в `tests/static/` (расширен на
+> `skill/extensions/`).
+
+### Шаг 2.4. Расхардкодить grade output строку ✅ реализовано
 В `conftest_base.py`: использовать константу из `lab_templates.md`.
 В `lab_step2_tests.md`: удалить требование verbatim русской строки, заменить на «format from `lab_templates.md`».
 Обновить «critical invariants» в комментариях `conftest_base.py`.
 
-### Шаг 2.5. Убрать упоминания несуществующих команд
+> **Состояние:** сделано двумя итерациями — вынос в reporter (2026-06-28/29) и
+> нейтрализация ru-дефолта метки (`7d276ce`, 2026-07-02). Личная CI-фраза
+> теперь только в `~/.course-maker/defaults.yaml`. `lab_step2_tests.md`
+> говорит про метки из `lab_templates.md`, verbatim-требование осталось
+> только к layout `print()` при подключённом репортере.
+
+### Шаг 2.5. Убрать упоминания несуществующих команд ✅ реализовано
 - `COURSE_CLAUDE_TEMPLATE.md`: убрать упоминание `/skill update`. Заменить пояснением, что скил подхватывается из `~/.claude/skills/`.
 - `docs/getting-started.md`: убрать пример с `/course-maker lab reverse-spec`.
 - Проверить, что в SKILL.md нет упоминания reverse-spec (уже в git status видно `D lab_reverse_spec.md`).
 
-### Шаг 2.6. Создать `examples/stochastic-processes/`
+### Шаг 2.6. Создать `examples/stochastic-processes/` ✅ реализовано (другим курсом)
 Хотя бы один полный пример курса:
 - `CLAUDE.md` с заполненным контекстом
 - `course_plan.md`
@@ -360,41 +410,87 @@ you read and name the sections you consulted.
 
 Опция: вынести из существующего реального курса (с разрешения автора), почистив персональные данные.
 
-**Критерий готовности волны 2:** `git clone` → `course init` → `lab init` → `lab tests` работает без «paste from real lab» workaround'а.
+> **Состояние (коммит `0fc0d85`, 2026-08-07):** пример называется
+> `examples/regularization-course/` (не `stochastic-processes`) и получен из
+> прогона скила на настоящем курсе, а не собран вручную. Содержит
+> `AGENTS.md` + `CLAUDE.md`, `course_plan.md`, `COURSE_STATE.md`,
+> `course_conventions.md`, `lab_templates.md`, `lms_adapter.md`,
+> `lectures/01` (полный набор: plan, visuals, figures + PNG, slides.tex,
+> slides.pdf, speaker_notes, history) и `lectures/02`, плюс
+> `labs/lab1` со `starter/` и `labs/shared/`.
+> Ранее живший здесь честный стаб (`e41d224`) заменён.
+
+**Критерий готовности волны 2:** `git clone` → `course init` → `lab init` → `lab tests` работает без «paste from real lab» workaround'а. — **выполнен**: placeholder'ов нет, шаблоны рабочие, `lab course-init` больше не отсылает к «существующей лаборатории».
 
 ---
 
-## Волна 3. Дрейф документации (P1)
+## Волна 3. Дрейф документации (P1) — ✅ выполнена (шаг 3.4 переоткрывался, догнан 2026-08-08)
 
 **Цель:** Документация согласована с актуальным состоянием скила.
 
-### Шаг 3.1. Обновить `docs/PROJECT_CONTEXT.md`
+### Шаг 3.1. Обновить `docs/PROJECT_CONTEXT.md` ✅ реализовано
 - Исправить layout (`course-maker/skill/SKILL.md` вместо `course-maker/SKILL.md`).
 - Обновить статусы в «Known issues».
 - Добавить пометку о завершении lab-pipeline (он уже сделан).
 
-### Шаг 3.2. Архивировать завершённые планы
+> **Состояние:** layout исправлен, «Known issues» размечены по волнам, дерево
+> файлов и roadmap синхронизированы с этим планом (`3850354`, 2026-08-07).
+> Догнано 2026-08-08: пункты 1 и 3 § «Original design intent» больше не
+> называют `examples/regularization-course/` untracked (с `0fc0d85` он в
+> репозитории), пункт 6 учитывает `slides export`, курсовой контекст везде
+> назван `AGENTS.md`, порог размера `SKILL.md` приведён к 420, в дерево
+> добавлены `README.ru.md` и актуальное описание `examples/`.
+
+### Шаг 3.2. Архивировать завершённые планы ✅ реализовано
 - `docs/TEMPLATE_MIGRATION_PLAN.md` → `docs/archive/TEMPLATE_MIGRATION_PLAN.md` (миграция завершена).
 - `docs/LAB_PIPELINE_PLAN.md` → `docs/archive/LAB_PIPELINE_PLAN.md` (пайплайн реализован).
 
-### Шаг 3.3. Обновить `README.md`
+> Оба файла лежат в `docs/archive/` вместе с `docs/archive/README.md`.
+
+### Шаг 3.3. Обновить `README.md` ✅ реализовано
 - Удалить упоминание `examples/stochastic-processes/` (если examples/ ещё не готов) или согласовать с реальностью.
 - Привести таблицу команд в соответствие с актуальным SKILL.md.
 
-### Шаг 3.4. Привести даты в `CHANGELOG.md` в порядок
+> **Состояние:** README ссылается на реальный `examples/regularization-course/`;
+> таблица команд покрывает все семейства из SKILL.md (course / plan / visuals /
+> figures / slides / notes / status / seminar / lab / quiz / homework /
+> syllabus / doctor / stats / help). Добавлен `README.ru.md` (`c4cc9f3`).
+
+### Шаг 3.4. Привести даты в `CHANGELOG.md` в порядок ✅ реализовано (догнан 2026-08-08)
 - Проверить согласованность с `git log` (а не с интуицией про «будущие» даты).
 - Добавить в CHANGELOG отсутствующие записи за коммиты, которые произошли
   между последней записью и текущим состоянием.
 
-### Шаг 3.5. Решить судьбу `docs/LAB_PIPELINE_PLAN.md` (русский язык)
+> **История:** к 2026-08-08 CHANGELOG отставал на 44 коммита — последняя запись
+> была `## [2026-06-18] — Wave 5 (partial): seminar pipeline`. Пробел закрыт
+> одиннадцатью записями (2026-06-26 … 2026-08-08): тестовый харнесс и
+> `lab triage`, ревизия волны 4 (extensions: reporter + variants), нейтрализация
+> ru-метки, homework-пайплайн, решение по compaction, multi-harness/`AGENTS.md`,
+> Slidev + slides export, release-процесс, линтер плана, правила про
+> per-chunk approval / notes modes / число слайдов / лексику пайплайна,
+> `examples/regularization-course`, `README.ru.md`.
+> Дат «из будущего» нет — записи согласованы с `git log`.
+> **Регулярность:** этот шаг по природе не «одноразовый» — CHANGELOG
+> расходится с `git log` каждый раз, когда работа идёт сериями PR'ов без
+> записи. Дешёвая проверка: `git log --since=<дата последней записи> --oneline`.
+
+### Шаг 3.5. Решить судьбу `docs/LAB_PIPELINE_PLAN.md` (русский язык) ✅ решено — архив
 - Либо архив (см. 3.2).
 - Либо перевод на английский, если документ всё ещё активный.
 
+> Выбран архив; перевод не делался (документ неактивен).
+
 **Критерий готовности волны 3:** Любой пункт документации согласован с актуальным состоянием кода. Нет упоминаний несуществующих команд / файлов.
+
+> **Проверка 2026-08-08:** упоминаний `/skill update`, `lab reverse-spec`,
+> `SKILL:START`/`SKILL:END` в актуальной документации нет (остались только в
+> исторических записях CHANGELOG и в описательной части этого плана — это
+> нормально). После догона CHANGELOG и правок в `PROJECT_CONTEXT.md`
+> критерий выполнен.
 
 ---
 
-## Волна 4. Профили преподавателей (P3, но архитектурно фундаментальная)
+## Волна 4. Профили преподавателей (P3, но архитектурно фундаментальная) — ✅ выполнена (в пересмотренной архитектуре, проверено 2026-08-08)
 
 **Цель:** Разделить персональный слой и универсальное ядро. Это разблокирует honest universalization без потери поддержки персональных сценариев.
 
@@ -415,7 +511,11 @@ you read and name the sections you consulted.
 > - Гард `tests/static/test_anti_personalization.py::test_no_variant_formula_in_universal_files` снят с `xfail` и стал жёстким; English-only гард расширен на `skill/extensions/`.
 > - #2 (нейтрализация ru-дефолта метки) выполнено (2026-07-02): дефолт в `lab_templates_ru.md` заменён на нейтральный `ПРЕДВАРИТЕЛЬНАЯ ОЦЕНКА`; user_defaults расширен полями `default_grade_output_label` / `default_taskid_label` / `default_scoring_header`; `lab course-init` Phase 2a подставляет метки по приоритету user_defaults → lab_templates.md → reporter default. Персональная CI-фраза теперь живёт только в личном `~/.course-maker/defaults.yaml`, вне репозитория.
 
-### Шаг 4.1. Спроектировать структуру profiles/
+### Шаг 4.1. Спроектировать структуру profiles/ ✅ реализовано (по пересмотренной схеме)
+Изначальный замысел (ниже) не реализован дословно: вместо
+`profiles/polyak|generic/` в репозитории `skill/profiles/local-zip/` и
+`skill/profiles/github-classroom/`, каждый из
+`lms.md` + `lab_questions.yaml` + `lms_defaults.yaml` + `README.md`.
 ```
 skill/profiles/
   polyak/
@@ -432,21 +532,50 @@ skill/profiles/
     course_defaults.yaml      # пусто / placeholders
 ```
 
-### Шаг 4.2. Добавить поле `profile:` в `CLAUDE.md`
+### Шаг 4.2. Добавить поле `profile:` в `CLAUDE.md` ✅ реализовано (поле переехало в `AGENTS.md`)
 В `COURSE_CLAUDE_TEMPLATE.md` добавить:
 ```
 ### Profile
 profile: generic   # one of: generic, polyak, ...
 ```
 
-### Шаг 4.3. Обновить init wizards для чтения профиля
+> **Состояние:** после multi-harness-рефакторинга (`c0f0ceb`, 2026-07-21)
+> курсовой контекст живёт в `AGENTS.md`, а `COURSE_CLAUDE_TEMPLATE.md` сведён к
+> `@AGENTS.md` + Claude-специфичные override'ы. Поле `Profile:` описано в
+> `COURSE_AGENTS_TEMPLATE.md` (§ Course context), дефолт — `local-zip`.
+> Чтение поля закреплено в `SKILL.md` § Inviolable rules → Process.
+
+### Шаг 4.3. Обновить init wizards для чтения профиля ✅ реализовано
 `course init` спрашивает / читает профиль; копирует профильные файлы в курсовой корень аналогично `course_conventions.md`.
 
-### Шаг 4.4. Удалить персональные хардкоды из universal-слоя
+> `course_init.md`: Phase 2a (user_defaults из `$COURSE_MAKER_HOME`/
+> `~/.course-maker/defaults.yaml`), Phase 2b (резолв профиля), Phase 2d
+> (предложение сохранить ответы как новый user_defaults).
+> `lab_course_init.md`: Phase 3a/3b (вопросы профиля из `lab_questions.yaml` +
+> `lms_defaults.yaml`), Phase 5 (копирование `profiles/<profile>/lms.md` →
+> `<course-root>/lms_adapter.md`, fallback на `local-zip` с предупреждением,
+> без перезаписи существующего).
+
+### Шаг 4.4. Удалить персональные хардкоды из universal-слоя ✅ реализовано
 - Из `lab_step2_tests.md`: убрать русскую CI-строку как invariant (теперь она в `profiles/polyak/lab_grading.yaml`).
 - Из `lab_context.md`: «Master's-level» → параметр из профиля.
 
-**Критерий готовности волны 4:** Скил работает с `profile: generic` без единого упоминания персональной CI / русской строки / GHC.
+> **Состояние:** CI-строка ушла не в профиль, а в `skill/extensions/reporters/`
+> + личный `defaults.yaml` (см. замечание 2026-06-29/07-02 выше).
+> «Master's-level» убран из `lab_context.md` (`30d0245`) — уровень читается из
+> курсового контекста; слово `Master's` осталось только как пример заполнения в
+> `COURSE_AGENTS_TEMPLATE.md`.
+
+**Критерий готовности волны 4:** Скил работает с `profile: generic` без единого упоминания персональной CI / русской строки / GHC. — **выполнен** (роль `generic` играет `local-zip`).
+
+> **Проверка 2026-08-08:** кириллицы в `skill/` нет вне `*_ru.md`-локалей;
+> GHC-специфика целиком в `profiles/github-classroom/lms.md`;
+> `lab publish` читает `lms_adapter.md`, а не встроенный GHC-workflow;
+> формула вариантов отсутствует во всех универсальных файлах.
+> Закреплено гардами: `tests/static/test_anti_personalization.py`
+> (`test_no_variant_formula_in_universal_files` — жёсткий, без `xfail`) и
+> English-only гардом, расширенным на `skill/extensions/`.
+> Прогон `pytest tests -m "not e2e"`: 98 passed, 3 deselected.
 
 ---
 
