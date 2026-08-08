@@ -314,10 +314,11 @@ Quick status:
 
 ## Contributing
 
-See [docs/contributing.md](docs/contributing.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
-The best contributions right now: examples from real courses (any discipline),
-and bug reports from the Beamer compilation step with the specific error + fix.
+The best contributions right now: examples from courses you actually taught (any
+discipline), and bug reports from the Beamer compilation step with the specific
+error + fix.
 
 ---
 

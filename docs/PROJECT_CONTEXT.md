@@ -195,6 +195,7 @@ This means the refactor in Step 1 above will be minimal when the time comes.
 course-maker/                       ← repo root
   README.md                         ← GitHub repository README
   README.ru.md                      ← Russian adaptation of the README
+  CONTRIBUTING.md                   ← contribution guide (root: GitHub links to it from issues/PRs)
   CHANGELOG.md                      ← release notes
   CLAUDE.md                         ← in-repo conventions for the skill itself
   LICENSE
@@ -254,7 +255,6 @@ course-maker/                       ← repo root
   docs/
     README.md (project)             ← repository overview (in repo root)
     getting-started.md              ← full walkthrough
-    contributing.md
     releasing.md
     EXAMPLE_COURSE_PLAN.md
     MULTI_HARNESS_PLAN.md           ← cross-tool (Codex/Cursor) support plan and status
