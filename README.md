@@ -1,19 +1,56 @@
 # course-maker
 
-A structured pipeline for preparing complete university course materials with AI assistance.
-From a course plan to finished slides, figures, speaker notes, lab assignments, and more —
-with state tracking and minimal iteration.
+*[Читать на русском](README.ru.md)*
+
+From a bare course idea to finished lecture slides, speaker notes, labs,
+quizzes, and homework — in hours or days, not weeks or months. A structured
+AI pipeline for preparing university course materials, with state tracking
+so nothing gets forgotten or re-explained between sessions.
 
 > The skill is a cross-tool [Agent Skill](https://agentskills.io) (`SKILL.md`),
-> so it runs on **Claude Code**, **OpenAI Codex CLI**, and **Cursor** — one skill,
+> so it should run on any Agent Skill–compatible tool; explicitly tested on
+> **Claude Code** and **Cowork**, **OpenAI Codex CLI**, and **Cursor** — one skill,
 > installed per tool (see [Installation](#installation)). Deeper cross-tool parity
 > is tracked in [docs/MULTI_HARNESS_PLAN.md](docs/MULTI_HARNESS_PLAN.md).
 
 ---
 
+## Why
+
+Preparing a course the usual way costs weeks: a slide plan that drifts from
+what you actually teach, Beamer files that fight you on layout, speaker notes
+written from memory the night before, lab assignments and grading built by
+hand every semester. Plain chat-based AI help doesn't fix this — every
+session starts from zero, so you re-explain your audience and re-reject the
+same bad ideas every week.
+
+course-maker is a pipeline, not a chat: it remembers your course's audience,
+style, and every decision you've made, and turns that into consistent,
+ready-to-use material.
+
+- **Speed:** one lecture — plan, figures, slides, speaker notes — in hours;
+  a whole new course's worth of lectures, labs, and quizzes in days.
+- **Fits your audience:** rigor level, language, and style are set once and
+  applied to every lecture, lab, and quiz — no re-explaining, no drift.
+- **A course that survives next semester:** every course is a predictable
+  file layout with an explicit status table and decision log, so updating one
+  lecture, or picking the whole course back up a year later, takes minutes,
+  not archaeology.
+
 ## What it does
 
-You describe your course once. Then for each lecture you run five commands:
+One pipeline, the whole course — not just slides:
+
+| For... | You get |
+|---|---|
+| **Lectures** | slide-by-slide plan → visualization list → Python figure scripts → chunked Beamer/Slidev deck → speaker notes |
+| **Seminars** | the same deck pipeline plus a practical live-coding notebook |
+| **Labs** | plan → notebook → instructor spec → pytest-based autograded tests → student validation → publish to your LMS |
+| **Quizzes / exams** | interactive plan → chunked question bank with answer key → student-facing export |
+| **Homework** | task brief + grading rubric → student handout (pdf/latex/docx) |
+| **The course itself** | `course_plan.md` as the single source of truth, a generated student syllabus, and a status dashboard across every pipeline |
+
+For one lecture, that looks like:
 
 ```
 /course-maker plan 3        # detailed slide-by-slide plan
@@ -25,20 +62,17 @@ You describe your course once. Then for each lecture you run five commands:
 ```
 
 Each step reads the outputs of previous steps and a `history.md` that logs every
-decision and rejected idea — so Claude doesn't re-propose what you already turned down,
-and each new lecture benefits from lessons learned in previous ones.
-
-For lab assignments there is a parallel pipeline (`plan → notebook → spec →
-[datasets] → tests → validate → publish`) with optional pytest autograding, and
-publishing driven by a pluggable LMS adapter (GitHub Classroom, local zip, …).
-Seminars, quizzes, and homework have their own pipelines too — see
-[Commands](#commands).
+decision and rejected idea — so the agent doesn't re-propose what you already turned down,
+and each new lecture benefits from lessons learned in previous ones. Labs,
+seminars, quizzes, and homework each have their own pipeline in the same
+style — see [Commands](#commands) for the full reference.
 
 ---
 
 ## Installation
 
-**Requirements:** one of Claude Code / OpenAI Codex CLI / Cursor, plus git. For
+**Requirements:** any [Agent Skill](https://agentskills.io)–compatible agent
+(tested on Claude Code, Cowork, OpenAI Codex CLI, and Cursor), plus git. For
 local Beamer compilation: a LaTeX distribution. For lab tests: Python 3.11+.
 
 The same skill (`SKILL.md` + `references/`) works in every tool; only how you
@@ -122,17 +156,17 @@ Full walkthrough: [docs/getting-started.md](docs/getting-started.md).
 
 The two main sources of wasted rounds in lecture prep:
 
-**Problem 1: Claude doesn't remember what you rejected.**
-Each session starts fresh. You say "compress section 3", Claude does it, next week
+**Problem 1: the agent doesn't remember what you rejected.**
+Each session starts fresh. You say "compress section 3", the agent does it, next week
 it's back. → `history.md` per lecture fixes this: every decision is logged and re-read
 at the start of each step.
 
 **Problem 2: Beamer slides time out or overflow.**
-A 20-slide `.tex` file is 600–900 lines. Generating it in one shot causes Claude Code
-to hang. → Slides and speaker notes are generated in chunks of 5, with approval between
-each chunk.
+A 20-slide `.tex` file is 600–900 lines. Generating it in one shot risks hanging or
+truncating the output, in any of the supported tools. → Slides and speaker notes are
+generated in chunks of 5, with approval between each chunk.
 
-A third source — Claude silently skipping a `references/*.md` file mentioned in
+A third source — the agent silently skipping a `references/*.md` file mentioned in
 the dispatcher — is addressed by the `## Inviolable rules` block in `SKILL.md`,
 which is always loaded and lists the critical rules that survive any skip.
 
@@ -245,10 +279,13 @@ my-course/
 
 ## Examples
 
-The `examples/` directory is reserved for example courses. It is currently
-empty — see [examples/README.md](examples/README.md) for what is planned and
-how to contribute your own. Examples must be produced by running the skill,
-not hand-assembled.
+[examples/regularization-course/](examples/regularization-course/) is a full
+example produced end to end by the skill: two lectures with every pipeline
+artifact (plan, visuals, figures, slides, speaker notes, decision history),
+plus a lab through the tests step. See
+[examples/README.md](examples/README.md) for what it covers and how to
+contribute your own — examples must come from actually running the skill,
+not be hand-assembled.
 
 ---
 
