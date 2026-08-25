@@ -23,6 +23,12 @@
      course init generates (slides_preamble.tex / slides_headmatter.md /
      slides_headmatter.qmd). Override per call: /course-maker slides N quarto.
      PowerPoint is an export target of a quarto deck, not a format of its own. -->
+**Doc export:** pandoc
+<!-- pandoc | quarto — which tool converts generated Markdown (syllabus,
+     homework handout, quiz sheets) to pdf/latex/docx. pandoc routes PDF
+     through LaTeX and needs a TeX distribution; quarto routes it through
+     Typst, which is bundled, so PDFs work with no TeX installed. Slides are
+     not affected — those follow Slides format. -->
 **Notes mode:** medium
 <!-- minimal | medium | detailed — how much of the spoken delivery
      /course-maker notes N writes out. Override per call:

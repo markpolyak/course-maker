@@ -83,7 +83,8 @@ file you did or did not read. Violating any of them is a hard error.
 ### Process
 
 - The **course-context file is `AGENTS.md`** (course name, audience, style,
-  language, `Profile:`, `Slides format:`, `## Lab context`, recurring rules).
+  language, `Profile:`, `Slides format:`, `Doc export:`, `## Lab context`,
+  recurring rules).
   Codex CLI and Cursor read it directly; Claude Code loads it via the
   `@AGENTS.md` import in `CLAUDE.md`, which otherwise holds only Claude Code-only
   overrides.
@@ -180,14 +181,14 @@ file you did or did not read. Violating any of them is a hard error.
 |---|---|
 | `/course-maker quiz plan N` | Step 1 — interactive quiz plan (blocks, types, variants) |
 | `/course-maker quiz generate N [next]` | Step 2 — generate question bank (chunked by block) |
-| `/course-maker quiz publish N [format]` | Step 3 — export student-facing version (markdown) |
+| `/course-maker quiz publish N [format]` | Step 3 — export student-facing version (markdown, then pdf/latex/docx) |
 
 **Homework commands** (manually graded take-home assignment; brief + rubric, no autograding):
 
 | Command | Description |
 |---|---|
 | `/course-maker homework plan N [dir]` | Step 1 — interactive brief + rubric; dir default homework/NN/ (may nest, e.g. seminars/<name>/homework/) |
-| `/course-maker homework publish N [format]` | Step 2 — assemble student handout; markdown default, pdf/latex/docx via pandoc |
+| `/course-maker homework publish N [format]` | Step 2 — assemble student handout; markdown default, pdf/latex/docx via doc_export |
 | `/course-maker homework status N` | Status + last 3 history entries |
 
 **If invoked with no arguments** (`/course-maker` alone): read `COURSE_STATE.md`
@@ -224,7 +225,19 @@ Read: `references/stats.md`. Read-only: progress bars across pipelines from
 
 ### `/course-maker syllabus [pdf|latex|docx]`
 Read: `references/syllabus.md`. Generates/updates student-facing `syllabus.md`
-from `course_plan.md`; with a format arg, exports it via pandoc. No state row.
+from `course_plan.md`; with a format arg, converts it via
+`references/doc_export.md`. No state row.
+
+### Document export (shared by syllabus, homework, quiz)
+Read: `references/doc_export.md` whenever a generated Markdown file must become
+pdf/latex/docx. Backend from `Doc export:` in `AGENTS.md` (`pandoc` default;
+`quarto` renders PDF through Typst and needs no LaTeX). A missing tool is an
+explicit stop, never a silent switch to the other backend.
+
+**CRITICAL — even if reference was skipped:** when the calling command has a
+leak check (homework rubric, quiz answers), convert only the file that already
+passed it. A PDF built from an unchecked file leaks exactly what the check
+exists to catch.
 
 ### `/course-maker plan N` (Step 1)
 Read: `references/step1_plan.md`.
@@ -424,7 +437,10 @@ Read: `references/quiz_generate.md`. Chunked one block per chunk; resume with
 `/course-maker quiz generate N next`.
 
 ### `/course-maker quiz publish N [format]` (Step 3)
-Read: `references/quiz_publish.md`. Only `markdown` is implemented for now.
+Read: `references/quiz_publish.md`. `markdown` is always produced first and is
+what the answer-leak check runs against; `pdf`/`latex`/`docx` convert that
+checked file via `references/doc_export.md`. LMS-native formats (Moodle, QTI)
+are not implemented.
 
 ---
 
@@ -444,7 +460,8 @@ record it, so `publish` need not re-ask.
 
 ### `/course-maker homework publish N [format]` (Step 2)
 Read: `references/homework.md`. Assembles `homework_student.md` (task + rubric
-only if opted in at plan time); markdown default, pdf/latex/docx via pandoc.
+only if opted in at plan time); markdown default, pdf/latex/docx via
+`references/doc_export.md`.
 
 **CRITICAL — even if reference was skipped:** when the rubric is NOT opted into
 the handout, after writing `homework_student.md` verify no instructor-only

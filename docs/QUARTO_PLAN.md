@@ -520,12 +520,17 @@ CRITICAL-проверка на утечку рубрики в `homework_student.
 Не сделано на этапе 1 и осознанно отложено: критерий готовности требует прогона
 полной цепочки команд на тестовом курсе — это e2e, запускает пользователь.
 
-**Этап 2 — экспорт документов**
-- [ ] 2.1 `references/doc_export.md`
-- [ ] 2.2 `references/syllabus.md`
-- [ ] 2.3 `references/homework.md`
-- [ ] 2.4 `references/quiz_publish.md` + `SKILL.md`
-- [ ] 2.5 `COURSE_AGENTS_TEMPLATE.md` — поле `Doc export:`
+**Этап 2 — экспорт документов** — выполнен 2026-08-25
+- [x] 2.1 `references/doc_export.md`
+- [x] 2.2 `references/syllabus.md`
+- [x] 2.3 `references/homework.md`
+- [x] 2.4 `references/quiz_publish.md` + `SKILL.md` (quiz получил pdf/latex/docx)
+- [x] 2.5 `COURSE_AGENTS_TEMPLATE.md` — поле `Doc export:`
+
+Проверено рендером: `quarto render <file>.md --to typst` собирает PDF из
+обычного `.md`, кириллица выводится корректно шрифтами по умолчанию, LaTeX не
+нужен. Попутно исправлено моё неверное утверждение: у `quarto render` есть `-o`
+и `--output-dir`.
 
 **Этап 3 — сайт**
 - [ ] 3.0 Проверить риск `_quarto.yml` в корне

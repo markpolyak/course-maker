@@ -48,20 +48,11 @@ syllabus: <list>." This is the instructor's cue to fill the plan and regenerate.
 
 ## Export: `syllabus.{pdf,tex,docx}`
 
-All three formats go through pandoc — one tool, three targets:
+Read `references/doc_export.md` and convert `syllabus.md` with the backend the
+course configured (`Doc export:` in `AGENTS.md`, default pandoc).
 
-```bash
-pandoc syllabus.md -o syllabus.pdf     # needs a LaTeX engine installed
-pandoc -s syllabus.md -o syllabus.tex  # standalone LaTeX source
-pandoc syllabus.md -o syllabus.docx
-```
-
-- If `syllabus.md` does not exist, generate it first (the generation step above).
-- If `pandoc` is not installed: stop, leave `syllabus.md` in place, and tell the
-  user it is ready to convert and how to install pandoc. Do not fail silently.
-- For `pdf`, if pandoc reports no LaTeX engine, say so and suggest `latex` or
-  `docx` as alternatives (or installing a TeX distribution).
-- After a successful export, list the produced file for the user.
+If `syllabus.md` does not exist, generate it first (the generation step above),
+then export.
 
 ## Protocol
 
