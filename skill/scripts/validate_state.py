@@ -30,12 +30,17 @@ maps to is encoded below — keep it in sync with repository_layout.md.
 """
 
 import argparse
+import re
 import sys
 from pathlib import Path
 
 DONE = "✅"
 NOT_STARTED = "❌"
-STATUS_MARKS = ("✅", "🔄", "❌", "⚠️")
+NOT_APPLICABLE = "n/a"
+# "n/a" is a real status, not an unparsed cell: a step this session legitimately
+# does not have (today: the figures step of a quarto lecture whose visuals are
+# all executable chunks). Listed last so an emoji in the same cell still wins.
+STATUS_MARKS = ("✅", "🔄", "❌", "⚠️", NOT_APPLICABLE)
 
 # A per-unit history.md above this many lines gets an advisory BULKY finding.
 # history.md is append-only anti-repeat memory read in full at the start of every
@@ -46,15 +51,20 @@ HISTORY_WARN_LINES = 200
 
 # Lecture step column -> path (relative to lectures/<id>/) that must exist when
 # the step is marked done. "figures" and "slides" are special-cased below
-# (figures: directory + staleness; slides: either slides.tex or slides.md).
+# (figures: directory + staleness, unless the deck renders its own; slides: any
+# one of slides.tex / slides.md / slides.qmd).
 LECTURE_FILE_STEPS = {
     "plan": "plan.md",
     "visuals": "visuals.md",
     "notes": "speaker_notes.md",
 }
 
-# A done "slides" step is satisfied by either format's deck file.
-SLIDES_FILES = ("slides.tex", "slides.md")
+# A done "slides" step is satisfied by any format's deck file.
+SLIDES_FILES = ("slides.tex", "slides.md", "slides.qmd")
+
+# An executable chunk in a Quarto deck: ```{python}, ```{r}, ... A deck with one
+# renders its own figures, so that lecture needs no PNG in figures/.
+QMD_CHUNK_RE = re.compile(r"^\s*`{3,}\s*\{[A-Za-z][A-Za-z0-9_]*[^}]*\}", re.M)
 
 # Lab step column -> list of paths (relative to <LAB_DIR>/) that must exist.
 # plan/validated/published are process states with no single artifact, so they
@@ -151,6 +161,24 @@ def cell(row, idx):
     return row[idx] if idx is not None and idx < len(row) else ""
 
 
+def renders_own_figures(lec_dir):
+    """
+    True when the lecture's deck is a Quarto source containing executable chunks.
+
+    Such a deck produces its images at render time, so an empty (or absent)
+    figures/ directory is correct, not drift. Verification for those figures is
+    a clean `quarto render`, which this script does not attempt to run.
+    """
+    deck = lec_dir / "slides.qmd"
+    if not deck.is_file():
+        return False
+    try:
+        text = deck.read_text(encoding="utf-8", errors="replace")
+    except OSError:
+        return False
+    return bool(QMD_CHUNK_RE.search(text))
+
+
 def newest_mtime(paths):
     return max((p.stat().st_mtime for p in paths), default=0.0)
 
@@ -192,7 +220,8 @@ def check_lecture_like(root, subdir, header, rows, findings, extra_steps=None):
             mark = status_of(cell(row, slides_idx))
             present = [f for f in SLIDES_FILES if (lec_dir / f).exists()]
             if mark == DONE and not present:
-                findings.append(("DRIFT", loc, "slides: marked ✅ but neither slides.tex nor slides.md exists"))
+                findings.append(("DRIFT", loc, "slides: marked ✅ but no deck file "
+                                               "(slides.tex / slides.md / slides.qmd) exists"))
             elif mark == NOT_STARTED and present:
                 findings.append(("UNTRACKED", loc, f"slides: {present[0]} exists but status is ❌"))
 
@@ -204,9 +233,9 @@ def check_lecture_like(root, subdir, header, rows, findings, extra_steps=None):
             pngs = sorted(fig_dir.glob("*.png")) if fig_dir.is_dir() else []
             script = fig_dir / "figures.py"
             if mark == DONE:
-                if not pngs:
+                if not pngs and not renders_own_figures(lec_dir):
                     findings.append(("DRIFT", loc, "figures: marked ✅ but no PNG in figures/"))
-                elif script.exists() and newest_mtime(pngs) < script.stat().st_mtime:
+                elif pngs and script.exists() and newest_mtime(pngs) < script.stat().st_mtime:
                     findings.append(("STALE", loc, "figures: PNGs are older than figures.py — re-run it"))
             elif mark == NOT_STARTED and pngs:
                 findings.append(("UNTRACKED", loc, "figures: PNGs exist but status is ❌"))

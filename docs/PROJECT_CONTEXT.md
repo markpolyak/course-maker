@@ -126,12 +126,15 @@ step-by-step status.
 5. **Syllabus auto-generation** — done (IMPROVEMENT_PLAN.md wave 5, step 5.1).
    `/course-maker syllabus [pdf|latex|docx]`, `references/syllabus.md`.
 
-6. **Non-Beamer slide output** — half done: Slidev shipped as a second slide
+6. **Non-Beamer slide output** — done: Slidev shipped as a second slide
    format (`7c18865`, `references/step4_slides_slidev.md`, format resolved
    from `AGENTS.md`/arg/existing file), plus `/course-maker slides N export`
-   for both formats (`281ca1d`). pptx is explicitly not implemented
-   (`SKILL.md`, slides dispatcher). Marked accordingly in IMPROVEMENT_PLAN.md
-   wave 7 step 7.1.
+   for both formats (`281ca1d`). Quarto followed as a third
+   (`references/step4_slides_quarto.md`, `slides.qmd`), rendering to reveal.js,
+   Beamer, and pptx from one source — so PowerPoint is covered as an export
+   target rather than a separate format. Quarto decks may also draw figures
+   from executable `{python}` chunks instead of PNGs. Plan and rationale:
+   `docs/QUARTO_PLAN.md`.
 
 ### Long-term (wave 7, pending)
 
@@ -214,7 +217,8 @@ course-maker/                       ← repo root
       course_update.md              ← /course-maker course update (git diff detection)
       step1_plan.md ... step5_notes.md   ← lecture pipeline (beamer)
       step4_slides_slidev.md        ← lecture pipeline, Slidev format variant of step4
-      slides_export.md              ← /course-maker slides N export [pdf|png]
+      step4_slides_quarto.md        ← lecture pipeline, Quarto format variant of step4
+      slides_export.md              ← /course-maker slides N export [format]
       seminar_practice.md           ← /course-maker seminar practice N (reuses step1..step5)
       lab_context.md                ← required reading for any /course-maker lab * command
       lab_course_init.md            ← /course-maker lab course-init
@@ -238,6 +242,7 @@ course-maker/                       ← repo root
       lab_templates_{en,ru}.md      ← per-language notebook header + grade labels
       slides_preamble_{pdflatex,xelatex}.tex
       slides_headmatter_slidev.md   ← Slidev deck headmatter template
+      slides_headmatter_quarto.qmd  ← Quarto deck headmatter template (3 render targets)
       conftest_base.py              ← working universal pytest conftest (no-op report() seam)
       tests_template.py             ← style reference for generated tests.py
       tests.yaml                    ← working GitHub Actions CI

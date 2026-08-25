@@ -16,10 +16,13 @@
 **Slug:** [course-slug]
 **Semester / programme:** [e.g. Master's, semester 2, Mathematical Methods for Systems Analysis]
 **Slides format:** beamer
-<!-- beamer (LaTeX/PDF) | slidev (Markdown deck, presented/exported via `npx slidev`).
+<!-- beamer (LaTeX/PDF) | slidev (Markdown deck, presented/exported via `npx slidev`)
+     | quarto (one Markdown source rendered to reveal.js, Beamer PDF, or pptx;
+     figures may be executable Python chunks instead of pre-generated PNGs).
      Picks which reference /course-maker slides N uses and which preamble file
-     course init generates (slides_preamble.tex vs slides_headmatter.md).
-     Override per call: /course-maker slides N slidev. pptx is planned. -->
+     course init generates (slides_preamble.tex / slides_headmatter.md /
+     slides_headmatter.qmd). Override per call: /course-maker slides N quarto.
+     PowerPoint is an export target of a quarto deck, not a format of its own. -->
 **Notes mode:** medium
 <!-- minimal | medium | detailed — how much of the spoken delivery
      /course-maker notes N writes out. Override per call:

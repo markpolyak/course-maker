@@ -1,5 +1,56 @@
 # Changelog
 
+## [2026-08-25] — Quarto as a third slide format
+
+### Added
+
+**Quarto slide format.** `Slides format: quarto` produces `lectures/NN/slides.qmd`,
+one source that renders to reveal.js (HTML), Beamer (PDF), and PowerPoint via
+`quarto render --to <target>`. This closes the pptx gap that wave 7.1 of
+`docs/IMPROVEMENT_PLAN.md` had left open — PowerPoint is an export target of a
+Quarto deck, not a deck format of its own. Beamer and Slidev are unchanged.
+
+- `references/step4_slides_quarto.md` — the Step 4 workflow for this format.
+- `templates/slides_headmatter_quarto.qmd` — course-level headmatter with all
+  three render targets declared, copied to the course root by `course init`.
+- `references/slides_export.md` — a Quarto branch mapping the command's
+  `pdf`/`html`/`pptx` argument onto `--to beamer|revealjs|pptx`.
+
+**Executable figures.** In a Quarto deck a figure may be a `{python}` chunk
+instead of a pre-generated PNG, including interactive output for the HTML
+target. `figures.py` becomes optional and secondary for these courses:
+`references/step2_visuals.md` gained a `Render: inline | png` column, and Step 3
+is skipped entirely (status `n/a`) when no visualization needs a file.
+
+**Speaker notes in the deck.** For Quarto decks, Step 5 now projects
+`speaker_notes.md` into `slides.qmd` as marked `::: {.notes}` blocks — reveal.js
+presenter view, the PowerPoint notes pane, and Beamer `\note{}`. The notes are
+still authored once, in `speaker_notes.md`; injection is idempotent, re-runnable
+with `/course-maker notes N inject`, and never silently overwrites a hand-edited
+block.
+
+**`n/a` status.** A step a session legitimately does not have, as distinct from
+one not started. Recognized by `scripts/validate_state.py` and documented in
+`references/repository_layout.md`.
+
+### Changed
+
+**The figures invariant is now stated in terms of verification, not artifacts.**
+The Inviolable rule in `SKILL.md` keeps its existing wording for `figures.py`
+and PNG files verbatim and adds a separate clause: a chunk-based figure in a
+`slides.qmd` deck is verified by a clean `quarto render`. Every PNG a deck
+references is still bound by the original rules, Quarto included.
+
+**`validate_state.py`** accepts `slides.qmd` as a deck file, treats a missing
+`figures/` directory as correct when the Quarto deck carries executable chunks,
+and understands `n/a`. The exemption is keyed on the deck file, so Beamer and
+Slidev lectures are unaffected.
+
+**`doctor`** now checks the slide preamble that the course's format actually
+needs (`slides_preamble.tex` / `slides_headmatter.md` / `slides_headmatter.qmd`)
+instead of always demanding the Beamer one, and reports a missing export
+toolchain (`quarto`, `node`) as advice rather than an error.
+
 ## [2026-08-08] — Russian README; sharpened pitch
 
 ### Added

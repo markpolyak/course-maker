@@ -90,7 +90,7 @@ Vue-компоненты), поэтому **Slidev не удаляется**.
 | Титульный слайд генерируется автоматически из YAML `title` / `subtitle` / `author` / `institute`; без них титульного слайда нет | Чанк 0 = headmatter + слайд «План»; `##` для титульного не пишется |
 | Две колонки: `:::: {.columns}` + вложенные `::: {.column width="40%"}` | Синтаксис Slidev (`layout: two-cols`, `::right::`) не применим |
 | Заметки докладчика: `::: {.notes}` — работает в revealjs (presenter mode по клавише S) и pptx (панель заметок) | Основание для D6 |
-| **Не проверено:** даёт ли Quarto `::: {.notes}` → `\note{}` в beamer. В самом beamer это дополнительно требует `\usepackage{pgfpages}` + `\setbeameroption{show notes on second screen}` | Проверить при реализации шага 1.5; если не работает — заметки инжектятся только для revealjs/pptx |
+| **Проверено рендером 2026-08-25 (quarto 1.10.18):** `::: {.notes}` → `\note{...}` и в beamer. Шаблон Quarto **уже подключает `pgfpages`**, поэтому для показа достаточно добавить через `include-in-header` одну строку `\setbeameroption{show notes on second screen=right}` | Инъекция заметок (D6) валидна для всех трёх таргетов; в шаблоне headmatter — закомментированная опция без лишнего `\usepackage` |
 | Опции revealjs (подтверждены справочником формата): `theme`, `css`, `logo`, `footer`, `syntax-highlighting`, `embed-resources`, `slide-number`, `slide-level`; из руководства — `incremental`, пауза `. . .` | В шаблон headmatter кладём **только** подтверждённые опции |
 | Опции beamer: `theme`, `colortheme`, `fonttheme`, `innertheme`, `outertheme`, `aspectratio`, `navigation`, `logo`, `titlegraphic`, `section-titles`, `themeoptions` | То же |
 | pptx: 7 предопределённых layout'ов (Title Slide, Title and Content, Section Header, Two Content, Comparison, Content with Caption, Blank), кастомизация только через `reference-doc` | Контроль вёрстки ограничен — честно написать в reference |
@@ -101,7 +101,8 @@ Vue-компоненты), поэтому **Slidev не удаляется**.
 
 | Факт | Следствие |
 |---|---|
-| `execute: error` по умолчанию **`false`** — упавший чанк валит рендер, а не выдаёт пустую картинку | Это и есть проверка исполнением, основание для D5 |
+| `execute: error` по умолчанию **`false`** — упавший чанк валит рендер, а не выдаёт пустую картинку. **Проверено 2026-08-25:** `quarto render` даёт `exit 1`, печатает traceback и **не создаёт выходной файл** | Это и есть проверка исполнением, основание для D5 |
+| **Проверено 2026-08-25:** inline-чанк с matplotlib даёт PNG в `<deck>_files/figure-<format>/`, ссылка подставляется автоматически; Jupyter-ядро `python3` стартует само | Отдельный `figures.py` для quarto действительно не нужен |
 | Опции исполнения: `eval`, `echo`, `output`, `warning`, `error`, `include`; глобально в `execute:`, на чанк — комментариями `#| key: value` в первых строках блока | Синтаксис для reference шага 4 |
 | `execute: cache: true` — кэш на документ (jupyter-cache), сброс флагом `--cache-refresh` | Для дорогих чанков (график из обученной модели) |
 | `execute: freeze: auto` — уровень **проекта**, результаты в `_freeze/`, коммитятся в git; при рендере одиночного документа игнорируется | Понадобится на этапе 3 (сайт), не на этапе 1 |
@@ -304,10 +305,11 @@ YAML-блок с плейсхолдерами `[Course name]`, `[Author]`, `[Ins
 Добавить финальную фазу для quarto-деков: инъекция `::: {.notes}` с маркерами
 `<!-- course-maker:notes NN -->`, идемпотентность, обработка ручных правок,
 что инжектится и что остаётся только в `speaker_notes.md`.
-**Проверить при реализации:** работает ли `::: {.notes}` в beamer-таргете; если
-нет — инжектить только для revealjs/pptx и написать об этом в reference, а в
-шаблон headmatter добавить закомментированные `\usepackage{pgfpages}` +
-`\setbeameroption{show notes on second screen}` через `include-in-header`.
+**Проверено (2026-08-25):** `::: {.notes}` работает во всех трёх таргетах, в
+beamer превращается в `\note{...}`. Инжектим для всех. Для показа заметок в
+beamer нужна одна строка `\setbeameroption{show notes on second screen=right}`
+через `include-in-header` — `pgfpages` Quarto подключает сам; идёт в шаблон
+headmatter закомментированной.
 **Критерий:** повторный `notes N inject` не плодит дубли блоков.
 
 ### Шаг 1.6. SKILL.md
@@ -500,20 +502,23 @@ CRITICAL-проверка на утечку рубрики в `homework_student.
 
 Обновлять по мере выполнения — это точка возобновления после очистки контекста.
 
-**Этап 1 — формат слайдов**
-- [ ] 1.1 `templates/slides_headmatter_quarto.qmd`
-- [ ] 1.2 `references/step4_slides_quarto.md`
-- [ ] 1.3 `references/step2_visuals.md` — поле `render:`
-- [ ] 1.4 `references/step3_figures.md` — условность для quarto
-- [ ] 1.5 `references/step5_notes.md` — инъекция заметок (+ проверка beamer)
-- [ ] 1.6 `SKILL.md` — диспетчеры, таблицы, **Inviolable rule (риск, см. § 5)**
-- [ ] 1.7 `references/course_init.md`
-- [ ] 1.8 `references/slides_export.md`
-- [ ] 1.9 `references/doctor.md`
-- [ ] 1.10 `scripts/validate_state.py` + unit-тесты
-- [ ] 1.11 `COURSE_AGENTS_TEMPLATE.md` + `references/repository_layout.md`
-- [ ] 1.12 e2e-смоук (написать; запускает пользователь)
-- [ ] 1.13 CHANGELOG, IMPROVEMENT_PLAN, PROJECT_CONTEXT, оба README
+**Этап 1 — формат слайдов** — выполнен 2026-08-25, ветка `quarto-support`
+- [x] 1.1 `templates/slides_headmatter_quarto.qmd` — проверен рендером во все три таргета
+- [x] 1.2 `references/step4_slides_quarto.md`
+- [x] 1.3 `references/step2_visuals.md` — колонка `Render`
+- [x] 1.4 `references/step3_figures.md` — условность для quarto
+- [x] 1.5 `references/step5_notes.md` — инъекция заметок
+- [x] 1.6 `SKILL.md` — диспетчеры, таблицы, Inviolable rule (диффом проверено: только добавления)
+- [x] 1.7 `references/course_init.md`
+- [x] 1.8 `references/slides_export.md`
+- [x] 1.9 `references/doctor.md`
+- [x] 1.10 `scripts/validate_state.py` + 5 unit-тестов
+- [x] 1.11 `COURSE_AGENTS_TEMPLATE.md` + `references/repository_layout.md`
+- [x] 1.12 e2e-смоук написан (`tests/e2e/test_slides_quarto_smoke.py`) — **не запускался, запускает пользователь**
+- [x] 1.13 CHANGELOG, IMPROVEMENT_PLAN, PROJECT_CONTEXT, оба README
+
+Не сделано на этапе 1 и осознанно отложено: критерий готовности требует прогона
+полной цепочки команд на тестовом курсе — это e2e, запускает пользователь.
 
 **Этап 2 — экспорт документов**
 - [ ] 2.1 `references/doc_export.md`
