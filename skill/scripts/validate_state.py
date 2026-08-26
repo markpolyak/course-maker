@@ -36,11 +36,14 @@ from pathlib import Path
 
 DONE = "✅"
 NOT_STARTED = "❌"
-NOT_APPLICABLE = "n/a"
-# "n/a" is a real status, not an unparsed cell: a step this session legitimately
-# does not have (today: the figures step of a quarto lecture whose visuals are
-# all executable chunks). Listed last so an emoji in the same cell still wins.
-STATUS_MARKS = ("✅", "🔄", "❌", "⚠️", NOT_APPLICABLE)
+NOT_APPLICABLE = "—"
+STATUS_MARKS = ("✅", "🔄", "❌", "⚠️")
+
+# A dash in a step column is a real status, not an unparsed cell: a step this
+# session legitimately does not have (today: the figures step of a quarto
+# lecture whose visuals are all executable chunks). Matched on the whole cell,
+# not as a substring, so a date like 2026-01-01 is never mistaken for one.
+NOT_APPLICABLE_TOKENS = {"—", "–", "-", "--", "n/a", "N/A"}
 
 # A per-unit history.md above this many lines gets an advisory BULKY finding.
 # history.md is append-only anti-repeat memory read in full at the start of every
@@ -106,6 +109,8 @@ def status_of(cell):
     for mark in STATUS_MARKS:
         if mark in cell:
             return mark
+    if cell.strip() in NOT_APPLICABLE_TOKENS:
+        return NOT_APPLICABLE
     return None
 
 

@@ -1,5 +1,32 @@
 # Changelog
 
+## [2026-08-26] — Course website
+
+### Added
+
+**`/course-maker site [init|render|preview|publish]`** — a student-facing course
+website built with Quarto (`references/site.md`,
+`templates/quarto_site_yml.md`).
+
+The project lives in `site/` and owns the only `_quarto.yml`. A project file in
+the course root would redirect every single-deck render into the site's output
+directory and break `slides N export` — verified, which is why the site is
+staged rather than rendered in place.
+
+Staging is what enforces the boundary: material reaches the site by being on an
+allow-list, never by being found in the course directory. Decks are staged
+already rendered, so a published deck cannot differ from the one the lecturer
+reviewed. Quiz sheets and `course_plan.md` require an explicit opt-in each time.
+
+Speaker notes are stripped before publication. Injected notes land in a deck's
+HTML as `<aside class="notes">` and would otherwise be readable by anyone who
+opens the page source; the markers written by `notes N inject` make the removal
+deterministic. An unmarked, hand-written notes block stops the publish rather
+than being guessed at.
+
+A grep guard re-checks the built site for instructor-only content before any
+publish, as a second line of defence behind the allow-list.
+
 ## [2026-08-25] — Quarto as a third slide format
 
 ### Added
@@ -20,7 +47,7 @@ Quarto deck, not a deck format of its own. Beamer and Slidev are unchanged.
 instead of a pre-generated PNG, including interactive output for the HTML
 target. `figures.py` becomes optional and secondary for these courses:
 `references/step2_visuals.md` gained a `Render: inline | png` column, and Step 3
-is skipped entirely (status `n/a`) when no visualization needs a file.
+is skipped entirely (status `—`) when no visualization needs a file.
 
 **Speaker notes in the deck.** For Quarto decks, Step 5 now projects
 `speaker_notes.md` into `slides.qmd` as marked `::: {.notes}` blocks — reveal.js
@@ -29,9 +56,9 @@ still authored once, in `speaker_notes.md`; injection is idempotent, re-runnable
 with `/course-maker notes N inject`, and never silently overwrites a hand-edited
 block.
 
-**`n/a` status.** A step a session legitimately does not have, as distinct from
-one not started. Recognized by `scripts/validate_state.py` and documented in
-`references/repository_layout.md`.
+**Not-applicable status.** A dash in a step column marks a step a session
+legitimately does not have, as distinct from one not started (❌). Recognized by
+`scripts/validate_state.py` and documented in `references/repository_layout.md`.
 
 ### Changed
 
@@ -43,8 +70,8 @@ references is still bound by the original rules, Quarto included.
 
 **`validate_state.py`** accepts `slides.qmd` as a deck file, treats a missing
 `figures/` directory as correct when the Quarto deck carries executable chunks,
-and understands `n/a`. The exemption is keyed on the deck file, so Beamer and
-Slidev lectures are unaffected.
+and understands a dash as not-applicable. The exemption is keyed on the deck
+file, so Beamer and Slidev lectures are unaffected.
 
 **`doctor`** now checks the slide preamble that the course's format actually
 needs (`slides_preamble.tex` / `slides_headmatter.md` / `slides_headmatter.qmd`)

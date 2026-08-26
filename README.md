@@ -306,6 +306,7 @@ Quick status:
 - [x] Syllabus auto-generation from `course_plan.md`
 - [x] Course health & progress tooling: `doctor`, `stats`, state drift checker, bulky-history warning
 - [x] Additional slide formats: Slidev and Quarto (reveal.js / Beamer / pptx from one source)
+- [x] Course website: `/course-maker site` builds and publishes a student-facing site (Quarto + GitHub Pages)
 - [ ] Overleaf integration (cloud LaTeX compilation)
 - [~] Cross-tool support: skill installs on Claude Code, Codex CLI, and Cursor (Agent Skills standard); full parity (declaudize wording, `AGENTS.md` course layer) tracked in [docs/MULTI_HARNESS_PLAN.md](docs/MULTI_HARNESS_PLAN.md)
 - [ ] Multi-agent harness support (similar to GSD Redux)

@@ -139,6 +139,7 @@ file you did or did not read. Violating any of them is a hard error.
 | `/course-maker doctor` | Check course for state drift, missing files, config gaps (read-only) |
 | `/course-maker stats` | Show course progress bars (lectures/labs complete, hours) |
 | `/course-maker syllabus [pdf\|latex\|docx]` | Generate/update student syllabus.md from course_plan.md; optional export |
+| `/course-maker site [init\|render\|preview\|publish]` | Build/publish the student-facing course website (Quarto) |
 | `/course-maker plan N` | Step 1 — detailed slide-by-slide plan for lecture N |
 | `/course-maker visuals N` | Step 2 — list of visualizations, TikZ feasibility |
 | `/course-maker figures N` | Step 3 — Python script to generate PNG figures |
@@ -193,7 +194,7 @@ file you did or did not read. Violating any of them is a hard error.
 
 **If invoked with no arguments** (`/course-maker` alone): read `COURSE_STATE.md`
 and print a summary of all lectures, seminars, labs, quizzes, and homework with their
-current step statuses (✅ / 🔄 / ❌ / ⚠️). End with: "Run `/course-maker help` for
+current step statuses (✅ / 🔄 / ❌ / ⚠️ / —). End with: "Run `/course-maker help` for
 available commands."
 
 **`/course-maker help`**: print the five command tables (Lecture, Seminar, Lab,
@@ -228,6 +229,25 @@ Read: `references/syllabus.md`. Generates/updates student-facing `syllabus.md`
 from `course_plan.md`; with a format arg, converts it via
 `references/doc_export.md`. No state row.
 
+### `/course-maker site [init|render|preview|publish]`
+Read: `references/site.md`. Builds a student-facing website with Quarto from a
+staged copy of the course. No state row.
+
+**CRITICAL — even if reference was skipped:**
+- The site project lives in `site/` and owns the only `_quarto.yml`. NEVER put
+  `_quarto.yml` in the course root — a single deck would then render into the
+  site's output directory instead of next to its source, breaking
+  `slides N export`.
+- Default-deny: material reaches the site only by being on the allow-list in the
+  reference. Never stage a file because it happens to be in the course.
+- Published decks are rendered from a **notes-stripped copy**. Injected
+  `::: {.notes}` blocks land in the deck's HTML and would be public.
+- Before any publish, grep the built site for instructor-only content
+  (notes markers, rubric, answer markers). Any hit blocks publication; never
+  narrow the pattern to make it pass.
+- Publishing is outward-facing and hard to undo. Confirm before a course's first
+  publish, and never launch `quarto preview` — print the command instead.
+
 ### Document export (shared by syllabus, homework, quiz)
 Read: `references/doc_export.md` whenever a generated Markdown file must become
 pdf/latex/docx. Backend from `Doc export:` in `AGENTS.md` (`pandoc` default;
@@ -250,7 +270,8 @@ Read: `references/step3_figures.md`.
 
 **Quarto courses:** this step is conditional. If no row in `visuals.md` has
 `Render: png`, every figure is an executable chunk written at Step 4 — skip the
-step, set it to `n/a`, and send the user to `/course-maker slides N`. Otherwise
+step, set it to `—` (not applicable), and send the user to
+`/course-maker slides N`. Otherwise
 generate only the `png` rows. For beamer and slidev the step is always required.
 
 **CRITICAL — even if reference was skipped:**

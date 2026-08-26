@@ -198,14 +198,17 @@ out. Homework is manually graded — there is no `starter/`, autograder, or CI.
 |---|-----|-------|------|--------|-----------|---------|
 | 01 | homework/01 | ... | ❌ | ❌ | ❌ | — |
 
-Legend: ✅ done · 🔄 in progress · ❌ not started · ⚠️ needs review · n/a not applicable
+Legend: ✅ done · 🔄 in progress · ❌ not started · ⚠️ needs review · — not applicable
 ```
 
-`n/a` marks a step this session legitimately does not have, as opposed to one
-not started yet. Today it has one use: the `figures` step of a quarto lecture
-whose visualizations are all executable chunks, so there is no `figures.py` and
-no `figures/` directory. Do not use it to record a skipped step that is still
-owed.
+A dash in a **step** column marks a step this session legitimately does not
+have, as opposed to one not started yet. Today it has one use: the `figures`
+step of a quarto lecture whose visualizations are all executable chunks, so
+there is no `figures.py` and no `figures/` directory. Do not use it to record a
+skipped step that is still owed — that is ❌.
+
+(In the `Updated` column a dash keeps its older, unrelated meaning: no date
+yet.)
 
 **Structural vocabulary is always English, regardless of course language.**
 Section headings (`## Lectures`, `## Seminars`, `## Labs`, `## Quizzes`,

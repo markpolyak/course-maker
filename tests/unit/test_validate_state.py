@@ -187,9 +187,9 @@ def test_beamer_deck_without_png_still_drifts(tmp_path):
     assert "DRIFT" in out and "figures" in out
 
 
-def test_na_figures_step_is_not_drift(tmp_path):
-    """`n/a` marks a step this lecture legitimately does not have."""
-    write_state(tmp_path, lectures_table("| 01 | Intro | ❌ | ❌ | n/a | ✅ | ❌ | 2026-01-01 |\n"))
+def test_dash_figures_step_is_not_drift(tmp_path):
+    """A dash marks a step this lecture legitimately does not have."""
+    write_state(tmp_path, lectures_table("| 01 | Intro | ❌ | ❌ | — | ✅ | ❌ | 2026-01-01 |\n"))
     lec = tmp_path / "lectures" / "01"
     lec.mkdir(parents=True)
     (lec / "slides.qmd").write_text("## deck", encoding="utf-8")

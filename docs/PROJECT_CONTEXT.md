@@ -218,6 +218,8 @@ course-maker/                       ← repo root
       step1_plan.md ... step5_notes.md   ← lecture pipeline (beamer)
       step4_slides_slidev.md        ← lecture pipeline, Slidev format variant of step4
       step4_slides_quarto.md        ← lecture pipeline, Quarto format variant of step4
+      doc_export.md                 ← markdown → pdf/latex/docx (pandoc or quarto/typst)
+      site.md                       ← /course-maker site (Quarto course website)
       slides_export.md              ← /course-maker slides N export [format]
       seminar_practice.md           ← /course-maker seminar practice N (reuses step1..step5)
       lab_context.md                ← required reading for any /course-maker lab * command
@@ -243,6 +245,7 @@ course-maker/                       ← repo root
       slides_preamble_{pdflatex,xelatex}.tex
       slides_headmatter_slidev.md   ← Slidev deck headmatter template
       slides_headmatter_quarto.qmd  ← Quarto deck headmatter template (3 render targets)
+      quarto_site_yml.md            ← course website project file (site/_quarto.yml)
       conftest_base.py              ← working universal pytest conftest (no-op report() seam)
       tests_template.py             ← style reference for generated tests.py
       tests.yaml                    ← working GitHub Actions CI
