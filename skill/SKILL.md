@@ -145,7 +145,7 @@ file you did or did not read. Violating any of them is a hard error.
 | `/course-maker figures N` | Step 3 — Python script to generate PNG figures |
 | `/course-maker slides N [format]` | Step 4 — deck chunk 0 (beamer→slides.tex / slidev→slides.md / quarto→slides.qmd); format from AGENTS.md or arg |
 | `/course-maker slides N next` | Step 4 — next block of 5 slides (format detected from the existing file) |
-| `/course-maker slides N export [fmt]` | Export the existing deck (beamer→pdf; slidev→pdf/png; quarto→pdf/html/pptx) |
+| `/course-maker slides N export [fmt]` | Export the existing deck; default in bold (beamer→**pdf**; slidev→**pdf**/png; quarto→**html**/pdf/pptx) |
 | `/course-maker notes N [mode]` | Step 5 — speaker notes, chunk 0 (slides 1–5); mode = minimal/medium/detailed, from AGENTS.md or arg |
 | `/course-maker notes N next` | Step 5 — next block of 5 slides |
 | `/course-maker notes N inject` | Step 5 — re-project speaker notes into a quarto deck as `::: {.notes}` |
@@ -240,11 +240,11 @@ staged copy of the course. No state row.
   `slides N export`.
 - Default-deny: material reaches the site only by being on the allow-list in the
   reference. Never stage a file because it happens to be in the course.
-- Published decks are rendered from a **notes-stripped copy**. Injected
-  `::: {.notes}` blocks land in the deck's HTML and would be public.
-- Before any publish, grep the built site for instructor-only content
-  (notes markers, rubric, answer markers). Any hit blocks publication; never
-  narrow the pattern to make it pass.
+- Published decks are rendered from a **notes-stripped copy** produced by
+  `scripts/site_guard.py strip-notes`. Injected `::: {.notes}` blocks land in
+  the deck's HTML and would be public.
+- Before any publish, run `scripts/site_guard.py check site/_site`. Any finding
+  blocks publication. Fix the staging, never the script's patterns.
 - Publishing is outward-facing and hard to undo. Confirm before a course's first
   publish, and never launch `quarto preview` — print the command instead.
 
@@ -319,10 +319,13 @@ only that chunk, show diff, append corrected version after approval.
 ### `/course-maker slides N export [fmt]`
 Read: `references/slides_export.md`. Mechanical export of the existing deck — no
 approval, no state change. Detect the deck format from the file present
-(`slides.tex` → beamer pdf, `slides.md` → slidev pdf/png, `slides.qmd` → quarto
-pdf/html/pptx). If the export tool (a LaTeX engine, Node for Slidev, or
-`quarto`) is missing, say how to install it — never fail silently. Presenting a
-deck live (`npx slidev`, `quarto preview`) is the user's job; never launch it.
+(`slides.tex` → beamer, `slides.md` → slidev, `slides.qmd` → quarto). With no
+format argument: beamer and slidev → `pdf`, quarto → `html` (reveal.js is the
+only target that carries interactive figures; pdf and pptx drop them). Warn
+before a lossy quarto export instead of doing it silently. If the export tool (a
+LaTeX engine, Node for Slidev, or `quarto`) is missing, say how to install it —
+never fail silently. Presenting a deck live (`npx slidev`, `quarto preview`) is
+the user's job; never launch it.
 
 ### `/course-maker notes N [mode]` (Step 5)
 Read: `references/step5_notes.md`. Mode (`minimal`/`medium`/`detailed`) = arg,

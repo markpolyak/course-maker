@@ -19,8 +19,19 @@ Detect from the existing file (do not read `AGENTS.md`):
 If none exists, stop: "No deck found in lectures/NN/. Run
 `/course-maker slides N` first."
 
-Default output format is `pdf` for every deck. `png` is slidev-only; `html` and
-`pptx` are quarto-only.
+Default output format when the command is given no argument:
+
+| Deck | Default | Also available |
+|---|---|---|
+| beamer (`slides.tex`) | `pdf` | — |
+| slidev (`slides.md`) | `pdf` | `png` |
+| quarto (`slides.qmd`) | **`html`** | `pdf`, `pptx` |
+
+A Quarto deck defaults to `html` because reveal.js is the only target that
+carries everything the deck can contain. PDF and PowerPoint are lossy: an
+interactive figure becomes a dead image or nothing at all, and the loss is
+silent. Defaulting a Quarto deck to PDF would hide the capability the format
+was chosen for.
 
 ## Beamer export (slides.tex → PDF)
 
@@ -61,13 +72,19 @@ One source, three targets. Always name the target explicitly — a bare
 
 ```bash
 cd lectures/NN
-quarto render slides.qmd --to beamer     # pdf (default)  → slides.pdf
-quarto render slides.qmd --to revealjs   # html           → slides.html
+quarto render slides.qmd --to revealjs   # html (default) → slides.html
+quarto render slides.qmd --to beamer     # pdf            → slides.pdf
 quarto render slides.qmd --to pptx       # pptx           → slides.pptx
 ```
 
-Map the command argument to the target: `pdf` → `beamer`, `html` → `revealjs`,
+Map the command argument to the target: `html` → `revealjs`, `pdf` → `beamer`,
 `pptx` → `pptx`.
+
+**Warn before a lossy export.** When the target is `pdf` or `pptx`, check the
+deck for interactive output — a chunk importing `plotly`, `altair`, `bokeh`, or
+`ipywidgets`, or a `::: {.content-visible when-format="html"}` block. If any is
+present, say which slides will lose it and offer `html` instead. Export anyway
+if the user confirms; the point is that the loss is never silent.
 
 - `png` is not supported. Say so, and suggest exporting `pdf` and converting
   with `pdftoppm`/`pdftocairo`.

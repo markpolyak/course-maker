@@ -24,8 +24,14 @@ opens the page source; the markers written by `notes N inject` make the removal
 deterministic. An unmarked, hand-written notes block stops the publish rather
 than being guessed at.
 
-A grep guard re-checks the built site for instructor-only content before any
-publish, as a second line of defence behind the allow-list.
+**`scripts/site_guard.py`** carries both mechanical safety steps —
+`strip-notes` (remove injected notes from a deck copy) and `check` (scan the
+built site for instructor-only content). They are a script rather than prose in
+the reference because protection from a leak must not depend on an agent having
+read the workflow; it also makes them testable at Level 1 instead of Level 3.
+Its patterns match machine-written markers and filenames only: a checkmark on a
+slide or the word "rubric" in a syllabus must not trip it, or the guard gets
+loosened by the first false positive and stops protecting anything.
 
 ## [2026-08-25] — Quarto as a third slide format
 

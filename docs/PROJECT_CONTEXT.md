@@ -220,6 +220,8 @@ course-maker/                       ← repo root
       step4_slides_quarto.md        ← lecture pipeline, Quarto format variant of step4
       doc_export.md                 ← markdown → pdf/latex/docx (pandoc or quarto/typst)
       site.md                       ← /course-maker site (Quarto course website)
+    scripts/
+      site_guard.py                 ← strip-notes + leak check for site publish
       slides_export.md              ← /course-maker slides N export [format]
       seminar_practice.md           ← /course-maker seminar practice N (reuses step1..step5)
       lab_context.md                ← required reading for any /course-maker lab * command

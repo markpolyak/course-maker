@@ -61,13 +61,20 @@ A rendered reveal.js deck carries injected notes in its HTML as
 `S`. They are lecturer material and do not go on the site.
 
 Because `/course-maker notes N` writes them as marked blocks, stripping is
-deterministic: copy the deck, delete every `<!-- course-maker:notes NN -->`
-marker together with its `::: {.notes}` div, render **that copy** for the site,
-and stage the result. Never strip in place — `slides.qmd` keeps its notes.
+deterministic — and it is done by a script, not by hand:
 
-If a deck contains an unmarked `::: {.notes}` block (hand-written, not
-injected), stop and tell the user: it cannot be removed automatically without
-guessing, and publishing it would leak.
+```bash
+python <skill>/scripts/site_guard.py strip-notes \
+    lectures/NN/slides.qmd /tmp/slides_public.qmd
+```
+
+Render **that copy** for the site and stage the result. Never strip in place —
+`slides.qmd` keeps its notes.
+
+The script exits 1 and writes nothing if the deck holds an unmarked
+`::: {.notes}` block (hand-written rather than injected): it cannot be removed
+without guessing. Relay the message and stop — do not hand-edit the deck to get
+past it.
 
 ## `site init`
 
@@ -103,22 +110,27 @@ Idempotent: never overwrite an existing `site/_quarto.yml` or `index.qmd`.
 
 ## CRITICAL — leak guard before publishing (do not skip)
 
-After rendering and before any publish, search the built site for
-instructor-only content:
+After rendering and before any publish, scan the built site:
 
 ```bash
-grep -rlE "course-maker:notes|rubric|Answer/criteria|✓|<!-- instructor" site/_site/
+python <skill>/scripts/site_guard.py check site/_site
 ```
 
-Also confirm no deny-listed filename appears under `site/_site/`.
+It reports deny-listed filenames and machine-written markers (speaker-notes
+markers, rendered `<aside class="notes">`, instructor asides, rubric metadata),
+and exits 1 on any finding.
 
-Any hit blocks publication. Show the offending files, fix the staging, re-render,
-and re-check until clean. Do not publish "just this once" with a known hit, and
-do not narrow the pattern to make it pass — a narrowed guard is how the leak
-ships next time.
+Any finding blocks publication. Show the output, fix the **staging** so the
+content never reaches the site, re-render, and re-check until clean. Do not
+publish "just this once" with a known finding, and never edit the script's
+patterns to make a run pass — a loosened guard is how the leak ships next time.
 
-The grep is a second line of defence, not the first. The first is that nothing
-outside the allow-list is ever staged.
+Two limits to state plainly rather than paper over:
+
+- The check matches markers and filenames, not meaning. It cannot tell whether a
+  page's prose should be student-facing. That judgement stays with the user.
+- It is the second line of defence. The first is that nothing outside the
+  allow-list is ever staged.
 
 ## `site preview`
 
