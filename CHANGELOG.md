@@ -1,5 +1,29 @@
 # Changelog
 
+## [2026-09-01] — Fixes from the first run on a real course
+
+### Fixed
+
+**Beamer PDF silently dropped non-Latin text.** The Quarto headmatter template
+left `mainfont` commented out, so xelatex typeset in Latin Modern — which has no
+Cyrillic, Greek, or CJK glyphs. The export succeeded, produced a PDF, and simply
+omitted the text, with no error anywhere. Only the beamer target was affected;
+revealjs and pptx were always fine.
+
+Four layers, because a failure this quiet needs more than a comment: `course init`
+now sets `mainfont` when the course language is non-Latin; the template says what
+happens without it instead of mentioning it in passing; `slides N export pdf`
+verifies the text survived before reporting success; and `doctor` flags a
+quarto + non-Latin course whose headmatter has no `mainfont`.
+
+Found by the first manual run on a real course — the automated checks missed it
+because the Cyrillic render test covered the Typst path and the beamer test used
+English text.
+
+**`step4_slides_quarto.md` miscounted its own delimiters**, claiming `---`
+appears exactly once in a finished deck. YAML front matter is fenced by a pair,
+so a correct deck has two; the rule is that none may follow the headmatter.
+
 ## [2026-08-26] — Course website
 
 ### Added

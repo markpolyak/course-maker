@@ -63,8 +63,8 @@ A slide is a level-2 heading. A level-1 heading is a section divider slide.
 
 - **Never use `---` as a slide separator.** In Quarto a horizontal rule creates
   an *untitled* slide, so the Slidev habit silently produces a deck full of
-  blank-headed slides. `---` appears exactly once in the file: closing the
-  headmatter.
+  blank-headed slides. The only two `---` lines in a finished deck are the pair
+  that opens and closes the YAML headmatter; there must be none after it.
 - **The title slide is generated from the headmatter** (`title`, `subtitle`,
   `author`, `institute`). Do not write a `##` heading for it.
 - Precede every slide with an HTML comment marker `<!-- Slide NN -->`. The

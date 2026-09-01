@@ -29,8 +29,18 @@ format:
   beamer:
     aspectratio: 169
     pdf-engine: xelatex
-    # xelatex and lualatex handle Unicode fonts natively; pdflatex does not.
-    # mainfont: "..."   # a font covering the course language's script
+    # REQUIRED for any course not written in the Latin alphabet:
+    #     mainfont: "DejaVu Serif"
+    # xelatex reads Unicode source happily, but with no mainfont it typesets in
+    # Latin Modern, which has no Cyrillic/Greek/CJK glyphs. The PDF then builds
+    # WITHOUT ERROR and simply has no text where those characters were. Nothing
+    # warns you. This affects the beamer target only — revealjs and pptx are
+    # fine either way.
+    # Pick a font that covers the script and exists on this machine:
+    #     fc-list :lang=ru family        # substitute the course's language code
+    # DejaVu Serif is a good default where available: it ships with TeX Live and
+    # covers Latin, Cyrillic, and Greek. `course init` fills this in for a
+    # non-Latin course; set it by hand if you change the course language later.
     # theme: Madrid     # any Beamer theme installed in your TeX distribution
     # colortheme: seahorse
     #

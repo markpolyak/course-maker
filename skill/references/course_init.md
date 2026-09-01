@@ -189,12 +189,27 @@ For each file, act only if it is `missing` (skip if it already exists):
     created. Edit theme/colors before generating slides. Present/export locally
     with `npx slidev` (no paid services)."
   - **`quarto`** → copy `templates/slides_headmatter_quarto.qmd` →
-    `slides_headmatter.qmd` in the course root. Confirm: "slides_headmatter.qmd
-    created with three render targets (revealjs / beamer / pptx). Edit
-    theme/fonts before generating slides. Preview locally with
-    `quarto preview`." If `quarto` is not on PATH, add: "quarto is not
-    installed — the deck can be written but not rendered. Install it from
-    https://quarto.org/docs/get-started/."
+    `slides_headmatter.qmd` in the course root.
+
+    **If the course language is not written in the Latin alphabet, set
+    `mainfont` in the `beamer:` block before confirming.** Without it, xelatex
+    typesets in Latin Modern, which has no Cyrillic/Greek/CJK glyphs, and the
+    PDF export builds successfully with the text simply missing — no error, no
+    warning. Find a font that covers the script and exists on this machine:
+
+    ```bash
+    fc-list :lang=ru family | tr ',' '\n' | sort -u | head    # course's language code
+    ```
+
+    Prefer a font that ships with TeX Live so the course stays portable —
+    `DejaVu Serif` covers Latin, Cyrillic, and Greek. Uncomment the line and
+    write the chosen family name. Tell the user which font you set and why.
+
+    Confirm: "slides_headmatter.qmd created with three render targets
+    (revealjs / beamer / pptx). Edit theme/fonts before generating slides.
+    Preview locally with `quarto preview`." If `quarto` is not on PATH, add:
+    "quarto is not installed — the deck can be written but not rendered.
+    Install it from https://quarto.org/docs/get-started/."
 
 - **`COURSE_STATE.md`** — create empty state file (header + empty Lectures table).
   Use English structural headings and column names regardless of course language

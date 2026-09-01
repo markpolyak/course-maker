@@ -96,6 +96,21 @@ if the user confirms; the point is that the loss is never silent.
 - If the render fails on a Python traceback, an executable figure chunk is
   broken. Show the traceback and fix the chunk. Never make the error go away
   with `error: true` or by deleting the chunk.
+- **`pdf` only — verify non-Latin text survived.** A beamer export with no
+  `mainfont` in `slides_headmatter.qmd` succeeds and produces a PDF whose
+  Cyrillic/Greek/CJK text is simply absent: xelatex falls back to Latin Modern,
+  which has no such glyphs, and nothing warns. If the deck contains non-Latin
+  characters, check the output before reporting success:
+
+  ```bash
+  pdftotext slides.pdf - | grep -c '<a word from the deck>'   # must be > 0
+  ```
+
+  If it is zero (or `pdftotext` is unavailable, so you cannot tell — say so),
+  the fix is `mainfont` in the `beamer:` block of `slides_headmatter.qmd`, set
+  to a font covering the script (`fc-list :lang=<code> family`; `DejaVu Serif`
+  ships with TeX Live and covers Latin, Cyrillic, and Greek). Do not report a
+  successful export until the text is confirmed present.
 - The `revealjs` target writes a `slides_files/` directory next to the HTML. It
   is part of the output — mention it, and note that `embed-resources: true` in
   the headmatter produces a single portable file instead.
