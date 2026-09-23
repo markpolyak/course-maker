@@ -235,6 +235,7 @@ course-maker/                       ← repo root
       lab_step2_tests.md            ← /course-maker lab tests
       lab_step3_validate.md         ← /course-maker lab validate
       lab_triage.md                 ← /course-maker lab triage N (read-only, post-failed-validation)
+      lab_defense.md                ← /course-maker lab defense N (instructor-only oral-defense bank)
       lab_publish.md                ← /course-maker lab publish
       quiz_plan.md, quiz_generate.md, quiz_publish.md  ← /course-maker quiz pipeline
       homework.md                   ← /course-maker homework pipeline

@@ -87,6 +87,7 @@ labs/
     tests.yaml          ← GitHub Actions CI (never modify)
   lab1/                 ← or labs/lab1-backprop/ if a slug was provided
     lab_spec.md         ← Stage 1 output, instructor-only (not in starter repo)
+    defense_questions.md ← oral defense bank with answer criteria, instructor-only
     history.md          ← decision log, same role as lectures/NN/history.md
     starter/            ← git subtree → public starter repo (LMS-bound; see lms_adapter.md)
       exercises.ipynb
@@ -106,8 +107,8 @@ column. That value is `<LAB_DIR>` — use it as `labs/<Dir>/`. If the `Dir`
 column is absent or empty, fall back to `labs/labN/`.
 
 **Instructor-only vs student-facing.** Files in `labs/labN/` (`lab_spec.md`,
-`history.md`) are NOT published to students. Only `labs/labN/starter/` contents
-are published according to the LMS workflow in `<course-root>/lms_adapter.md`.
+`defense_questions.md`, `history.md`) are NOT published to students. Only
+`labs/labN/starter/` contents are published according to the LMS workflow in `<course-root>/lms_adapter.md`.
 
 ---
 
@@ -182,9 +183,9 @@ out. Homework is manually graded — there is no `starter/`, autograder, or CI.
 
 ## Labs
 
-| # | Dir | Title | plan | notebook | spec | tests | validated | published | Updated |
-|---|-----|-------|------|----------|------|-------|-----------|-----------|---------|
-| 01 | lab1-backprop | Backpropagation | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | — |
+| # | Dir | Title | plan | notebook | spec | tests | validated | published | defense | Updated |
+|---|-----|-------|------|----------|------|-------|-----------|-----------|---------|---------|
+| 01 | lab1-backprop | Backpropagation | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | — |
 
 ## Quizzes
 
@@ -213,7 +214,7 @@ yet.)
 **Structural vocabulary is always English, regardless of course language.**
 Section headings (`## Lectures`, `## Seminars`, `## Labs`, `## Quizzes`,
 `## Homework`), column names (`plan`, `visuals`, `figures`, `slides`, `notes`,
-`notebook`, `spec`, `tests`, `questions`, `practice`, `task`, `rubric`,
+`notebook`, `spec`, `tests`, `defense`, `questions`, `practice`, `task`, `rubric`,
 `validated`, `published`, `#`, `Dir`, `Title`, `Updated`),
 and the status legend
 are language-neutral keys. Only cell *content* (titles) is in the course

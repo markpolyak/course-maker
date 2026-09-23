@@ -32,6 +32,7 @@ from pathlib import Path
 DENY_FILENAMES = {
     "rubric.md",
     "quiz_questions.md",
+    "defense_questions.md",
     "lab_spec.md",
     "tests.py",
     "conftest.py",

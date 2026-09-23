@@ -1,5 +1,34 @@
 # Changelog
 
+## [Unreleased] — Lab defense questions
+
+### Added
+
+**`/course-maker lab defense N [next]`** (`references/lab_defense.md`) — an
+instructor-only question bank for the oral defense of a lab,
+`<LAB_DIR>defense_questions.md`. At the defense the instructor picks a
+question, asks it, judges the answer against the criteria, and uses the
+follow-ups to probe deeper.
+
+Students may do the lab with an AI assistant, so passing tests say little about
+understanding. The bank covers four areas — theory, the task, the student's own
+solution (the largest), and the problem domain — and favours questions a
+student cannot answer without having done and understood the work: anchored to
+their code, predict-then-verify, counterfactuals, hand traces. Every question
+has follow-ups and `**Answer/criteria:**` with red flags, the same encoding as
+open quiz questions.
+
+The bank is sized from the number of students and a reuse limit per question,
+so students defending one after another do not get the same questions; question
+families (variants needing different answers) reach that size without padding.
+Generated in chunks of at most 8 questions.
+
+The file never goes into `starter/`, and its first line is an
+`<!-- instructor-only -->` marker. The Labs table gains an optional `defense`
+column; `validate_state.py` flags `defense ✅` without the file. For the course
+site, `site_guard.py check` blocks the file both by name and by that marker. A
+shorter student-facing self-study list is not part of this change.
+
 ## [2026-09-01] — Fixes from the first run on a real course
 
 ### Fixed

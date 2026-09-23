@@ -45,7 +45,7 @@ One pipeline, the whole course — not just slides:
 |---|---|
 | **Lectures** | slide-by-slide plan → visualization list → Python figure scripts → chunked Beamer/Slidev/Quarto deck → speaker notes |
 | **Seminars** | the same deck pipeline plus a practical live-coding notebook |
-| **Labs** | plan → notebook → instructor spec → pytest-based autograded tests → student validation → publish to your LMS |
+| **Labs** | plan → notebook → instructor spec → pytest-based autograded tests → student validation → publish to your LMS → oral-defense question bank |
 | **Quizzes / exams** | interactive plan → chunked question bank with answer key → student-facing export |
 | **Homework** | task brief + grading rubric → student handout (pdf/latex/docx) |
 | **The course itself** | `course_plan.md` as the single source of truth, a generated student syllabus, and a status dashboard across every pipeline |
@@ -257,9 +257,10 @@ my-course/
 | `/course-maker lab validate N <id>` | Step 3: validate as student (new session required) |
 | `/course-maker lab publish N` | Run the publish workflow from lms_adapter.md (LMS-specific) |
 | `/course-maker lab update N` | Re-publish after post-release fix |
+| `/course-maker lab defense N [next]` | Instructor-only oral-defense question bank: theory, task, own solution, domain; sized so questions don't repeat across students |
 | `/course-maker lab status N` | Status + last 3 history entries |
 
-**Quiz pipeline** (quizzes / tests / exams):
+**Quiz pipeline** (written quizzes / tests / exams; for questions at the oral defense of a lab, use `/course-maker lab defense N` from the lab pipeline):
 
 | Command | Description |
 |---|---|
