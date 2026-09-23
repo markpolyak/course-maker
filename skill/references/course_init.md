@@ -32,7 +32,8 @@ Run these checks silently before asking anything:
 
 4. **Check the slide preamble/headmatter.**
    - Beamer courses use `slides_preamble.tex`; Slidev courses use
-     `slides_headmatter.md`. Note which exists; `missing` = neither is present.
+     `slides_headmatter.md`; Quarto courses use `slides_headmatter.qmd`. Note
+     which exists; `missing` = none of the three is present.
    - `exists` — do not overwrite.
 
 5. **Check directory structure** (`lectures/`, `labs/`).
@@ -98,15 +99,24 @@ Questions (ask only if not already known):
    *(default: `default_style` from user_defaults)*
 6. Language for slides and speaker notes?
    *(default: `default_language` from user_defaults)*
-7. Slides format? (`beamer` / `slidev`) *(default: `default_slides_format`
-   from user_defaults, else `beamer`)*
-   Note: `beamer` → LaTeX/PDF; `slidev` → Markdown deck presented/exported via
-   Node (`npx slidev`, local, no paid services). `pptx` is planned, not yet
-   implemented. Question 8 is only relevant for `beamer`.
+7. Slides format? (`beamer` / `slidev` / `quarto`) *(default:
+   `default_slides_format` from user_defaults, else `beamer`)*
+   Note:
+   - `beamer` → LaTeX/PDF.
+   - `slidev` → Markdown deck presented/exported via Node (`npx slidev`, local,
+     no paid services).
+   - `quarto` → one Markdown source rendered to reveal.js (HTML), Beamer (PDF),
+     or PowerPoint; figures may be executable Python chunks instead of
+     pre-generated PNGs. Needs `quarto` installed
+     (https://quarto.org/docs/get-started/).
+
+   Question 8 is only relevant for `beamer`.
 8. LaTeX engine for slide compilation? (`pdflatex` / `xelatex` / `lualatex`)
    *(default: `default_latex_engine` from user_defaults)* — ask only when the
    slides format is `beamer`. Note: xelatex and lualatex support Unicode fonts
-   natively; pdflatex requires T2A/inputenc for Cyrillic.
+   natively; pdflatex requires T2A/inputenc for Cyrillic. For `quarto` the
+   engine is set in the headmatter (`xelatex` by default) and the TeX
+   distribution can be installed with `quarto install tinytex`, so do not ask.
 9. Speech rate, for sizing speaker notes against the planned timing?
    *(default: `default_speech_rate` from user_defaults)* — with no default,
    offer: `[1]` typical academic pace, ~110 wpm; `[2]` measure it from a past
@@ -178,6 +188,28 @@ For each file, act only if it is `missing` (skip if it already exists):
     `slides_headmatter.md` in the course root. Confirm: "slides_headmatter.md
     created. Edit theme/colors before generating slides. Present/export locally
     with `npx slidev` (no paid services)."
+  - **`quarto`** → copy `templates/slides_headmatter_quarto.qmd` →
+    `slides_headmatter.qmd` in the course root.
+
+    **If the course language is not written in the Latin alphabet, set
+    `mainfont` in the `beamer:` block before confirming.** Without it, xelatex
+    typesets in Latin Modern, which has no Cyrillic/Greek/CJK glyphs, and the
+    PDF export builds successfully with the text simply missing — no error, no
+    warning. Find a font that covers the script and exists on this machine:
+
+    ```bash
+    fc-list :lang=ru family | tr ',' '\n' | sort -u | head    # course's language code
+    ```
+
+    Prefer a font that ships with TeX Live so the course stays portable —
+    `DejaVu Serif` covers Latin, Cyrillic, and Greek. Uncomment the line and
+    write the chosen family name. Tell the user which font you set and why.
+
+    Confirm: "slides_headmatter.qmd created with three render targets
+    (revealjs / beamer / pptx). Edit theme/fonts before generating slides.
+    Preview locally with `quarto preview`." If `quarto` is not on PATH, add:
+    "quarto is not installed — the deck can be written but not rendered.
+    Install it from https://quarto.org/docs/get-started/."
 
 - **`COURSE_STATE.md`** — create empty state file (header + empty Lectures table).
   Use English structural headings and column names regardless of course language

@@ -7,8 +7,9 @@
 ## Context to gather before writing
 
 1. `lectures/NN/plan.md` — content and timing per slide
-2. `lectures/NN/slides.tex` — exact slide order and titles
-   (if it exists; if not, use plan.md order)
+2. The deck — exact slide order and titles: `slides.tex` (beamer), `slides.md`
+   (slidev), or `slides.qmd` (quarto), whichever exists. If none does, use
+   `plan.md` order.
 3. `AGENTS.md` → `## Course context` — audience, tone, language
 4. `lectures/NN/history.md` — any tone or pacing feedback from previous rounds
 5. `course_conventions.md` (course root) — terminology dictionary and language rules
@@ -161,6 +162,71 @@ Name the mode and the speech rate used, so the numbers can be judged. Flag
 every slide outside its band and offer to expand or trim those — do not rewrite
 them unasked. If most slides land short, say so plainly: that is the summary
 drift this step is prone to, and the fix is regeneration, not patching.
+
+## Injecting notes into a Quarto deck
+
+Applies only when the deck is `lectures/NN/slides.qmd`. Beamer and Slidev decks
+keep their notes in `speaker_notes.md` alone — stop reading this section.
+
+Quarto shows `::: {.notes}` blocks in the reveal.js presenter view (press `S`),
+in the PowerPoint notes pane, and as `\note{}` in Beamer. So the notes are
+written once, here, and then **projected** into the deck.
+
+`speaker_notes.md` stays the source of truth. The deck holds a copy.
+
+**When it runs.** At the end of Step 5, after the last chunk and the self-check,
+as part of this step's single approval — not as a separate step, and never
+before the notes are complete. Re-run on its own with
+`/course-maker notes N inject` (for example after editing `speaker_notes.md` by
+hand).
+
+**What is injected.** The per-slide delivery text: prose, stage directions, and
+checkpoint markers, exactly as written. The `Timing table` and
+`What can be cut` sections are not per-slide and stay out of the deck.
+
+**Where each block goes.**
+- Slide 1 (the title slide, generated from the headmatter and carrying no `##`):
+  immediately after the headmatter's closing `---`, before the first
+  `<!-- Slide NN -->` marker.
+- Every other slide: at the end of that slide's content, immediately before the
+  next `<!-- Slide NN -->` marker (or end of file for the last slide).
+
+**Block format** — the marker comment is required; it is what makes re-injection
+safe:
+
+````markdown
+<!-- course-maker:notes 03 -->
+::: {.notes}
+Delivery text for slide 3, copied from speaker_notes.md.
+:::
+````
+
+**Idempotency.** Before injecting, remove every existing
+`<!-- course-maker:notes NN -->` block together with its `::: {.notes}` div,
+then write all blocks fresh. Running inject twice must leave the deck
+byte-identical, not doubled.
+
+**Manual edits are not overwritten silently.** If an existing marked block
+differs from what `speaker_notes.md` would produce now, stop: show the
+difference, ask whether to keep the deck version or replace it, and log the
+decision in `history.md`. This is the same rule as checking `git diff` on a
+prerequisite file before a subsequent step.
+
+**After injecting**, re-render the deck to confirm it still builds:
+
+```bash
+cd lectures/NN && quarto render slides.qmd --to revealjs
+```
+
+Report how many blocks were written, and whether any slide in the deck had no
+matching notes section (or vice versa) — a mismatch means the deck and the notes
+have drifted apart, usually because slides were added after the notes were
+written.
+
+**Showing notes in the PDF.** Beamer receives the notes but does not display
+them unless the deck asks for the two-screen layout. The course headmatter
+carries that option commented out; point the user at it rather than enabling it
+for them, since it doubles the page count of every exported PDF.
 
 ## Formatting conventions
 

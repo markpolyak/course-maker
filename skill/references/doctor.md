@@ -82,8 +82,29 @@ These need reading intent and cannot be done by the scripts. Check each:
      adapter does not match the named profile → `/course-maker lab course-init`.
 2. **Generated config files present.** These are referenced by later steps;
    flag any that are missing:
-   - `course_conventions.md`, `slides_preamble.tex` → `/course-maker course init`
+   - `course_conventions.md` → `/course-maker course init`
+   - The slide preamble, which one depends on `AGENTS.md` → `Slides format:`
+     (default `beamer`): `beamer` → `slides_preamble.tex`, `slidev` →
+     `slides_headmatter.md`, `quarto` → `slides_headmatter.qmd`. Flag only the
+     one the course's format actually needs → `/course-maker course init`.
+     Finding a preamble for a *different* format is worth reporting too: it
+     usually means the course switched formats and the field and the file
+     disagree.
    - `lab_templates.md` → `/course-maker lab course-init`
+3. **Export toolchain reachable.** Advisory, not an error — report what is
+   missing and how to install it, since a deck can be written without it:
+   - `Slides format: quarto` → is `quarto` on PATH?
+     (`brew install quarto`, or https://quarto.org/docs/get-started/)
+   - `Slides format: slidev` → is `node`/`npx` available?
+4. **Quarto + non-Latin course language needs `mainfont`.** If
+   `Slides format: quarto` and the course language is not written in the Latin
+   alphabet, `slides_headmatter.qmd` must set `mainfont` in its `beamer:` block.
+   Without it a PDF export succeeds and silently drops every non-Latin
+   character — the worst kind of failure, because it looks like it worked.
+   Report a missing `mainfont` as ✗, with the fix: pick a covering font
+   (`fc-list :lang=<code> family`; `DejaVu Serif` ships with TeX Live) and set
+   it in the `beamer:` block. Only the beamer target is affected; revealjs and
+   pptx render non-Latin text correctly with no font setting.
 
 ## Step 3 — remediation report
 
@@ -105,8 +126,9 @@ Plan (from lint_plan.py):
   ⚠ unfilled TODO sections: Grading, Instructors     → /course-maker course plan
 
 Config:
-  ✓ course_conventions.md, slides_preamble.tex, lab_templates.md present
+  ✓ course_conventions.md, slides_headmatter.qmd, lab_templates.md present
   ✓ Profile 'github-classroom' matches lms_adapter.md
+  ℹ Slides format 'quarto': quarto 1.10.18 on PATH
 
 Summary: 1 drift, 1 stale, 1 untracked, 1 plan gap. No config issues.
 ```

@@ -4,10 +4,27 @@
 > `/course-maker seminar figures N`, substitute `seminars/NN/` for `lectures/NN/`
 > throughout (including the `cd` to run the script) — the structure is identical.
 
+## Is this step needed? (Quarto courses only)
+
+For **beamer** and **slidev** courses this step is always required — those
+formats can only show a pre-generated image. Skip this section.
+
+For a **quarto** course, read the `Render` column of `lectures/NN/visuals.md`:
+
+- **No row with `png`** — every figure is an executable chunk written at Step 4.
+  There is nothing to generate. Do not create an empty `figures.py` and do not
+  create a `figures/` directory. Set the figures step to `—` (not applicable) in
+  `COURSE_STATE.md`, tell the user Step 3 was skipped and why, and point them at
+  `/course-maker slides N`.
+- **At least one row with `png`** — proceed, but generate **only** those rows.
+  Rows marked `inline` are Step 4's job; a figure generated here and also
+  written as a chunk there would appear twice.
+
 ## Context to gather before writing
 
 From `lectures/NN/visuals.md`:
-- All rows where TikZ = "No" or "Hard"
+- Beamer / Slidev: all rows where TikZ = "No" or "Hard"
+- Quarto: all rows where Render = `png`
 - Figure ID, slide number, description
 
 From `history.md`:

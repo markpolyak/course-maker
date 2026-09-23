@@ -1,0 +1,71 @@
+---
+# Quarto slide headmatter — https://quarto.org/docs/presentations/
+# Copied to the course root as slides_headmatter.qmd by /course-maker course init
+# (when the course's slide format is quarto). This is the course-level config;
+# the per-lecture title fields are filled in when the first chunk of a lecture's
+# slides.qmd is generated. Edit themes, fonts, and format options here.
+#
+# The title slide is generated from the four fields below — do not write a `##`
+# heading for it. Slide 1 is this title slide, slide 2 is the outline.
+title: "[Lecture] N. [Title]"
+subtitle: "[Course name]"
+author: "[Author]"
+institute: "[Institution]"
+lang: en
+# ^ course language as a BCP 47 tag; drives hyphenation and generated labels.
+
+# Three render targets from one source. The export command always names one
+# (`quarto render slides.qmd --to revealjs|beamer|pptx`); a bare `quarto render`
+# would build all three.
+format:
+  revealjs:
+    theme: default
+    # theme accepts a built-in name, a custom .scss, or a list of both.
+    slide-number: c/t
+    incremental: false
+    embed-resources: false
+    # embed-resources: true produces a single self-contained .html (larger file,
+    # no sidecar directory) — useful for handing the deck to students.
+  beamer:
+    aspectratio: 169
+    pdf-engine: xelatex
+    # REQUIRED for any course not written in the Latin alphabet:
+    #     mainfont: "DejaVu Serif"
+    # xelatex reads Unicode source happily, but with no mainfont it typesets in
+    # Latin Modern, which has no Cyrillic/Greek/CJK glyphs. The PDF then builds
+    # WITHOUT ERROR and simply has no text where those characters were. Nothing
+    # warns you. This affects the beamer target only — revealjs and pptx are
+    # fine either way.
+    # Pick a font that covers the script and exists on this machine:
+    #     fc-list :lang=ru family        # substitute the course's language code
+    # DejaVu Serif is a good default where available: it ships with TeX Live and
+    # covers Latin, Cyrillic, and Greek. `course init` fills this in for a
+    # non-Latin course; set it by hand if you change the course language later.
+    # theme: Madrid     # any Beamer theme installed in your TeX distribution
+    # colortheme: seahorse
+    #
+    # Speaker notes injected by /course-maker notes N reach Beamer as \note{}.
+    # They are not shown unless you ask for the two-screen layout. Quarto
+    # already loads pgfpages, so this one line is all that is needed:
+    # include-in-header:
+    #   text: |
+    #     \setbeameroption{show notes on second screen=right}
+  # To use your institution's template deck, replace `pptx: default` with:
+  #   pptx:
+  #     reference-doc: template.pptx
+  # The template must define the layouts Quarto writes into: Title Slide,
+  # Title and Content, Section Header, Two Content, Comparison,
+  # Content with Caption, Blank.
+  # A format key with only comments under it parses as null and fails the
+  # render for every target — keep a value here.
+  pptx: default
+
+execute:
+  echo: false
+  # Figure chunks are illustrations, not content — the plot is shown, the code
+  # is not. Override per chunk with `#| echo: true` when the code IS the point.
+  # cache: true
+  # ^ uncomment when a chunk is expensive (plots from a trained model). Results
+  #   are reused until the chunk changes; force recomputation with
+  #   `quarto render slides.qmd --cache-refresh`.
+---

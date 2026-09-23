@@ -68,6 +68,11 @@ file you did or did not read. Violating any of them is a hard error.
   List the directory before generating slides.
 - NEVER mark `figures → ✅` without running `figures.py` and verifying that the
   expected PNG files were created.
+- A `slides.qmd` deck (quarto) may draw a figure from an executable chunk
+  instead of a PNG. Chunk-based figures are verified by a clean
+  `quarto render` — NEVER finish `slides` without one, and never silence a
+  failing chunk with `error: true`. The two rules above still bind every PNG
+  that any deck references, quarto included.
 - NEVER cite another slide by number or position, either direction — name the
   content instead. At most one next-lecture mention, on the closing slide only.
 - Output for `slides`, `notes`, `quiz generate`, and `seminar practice` is ALWAYS
@@ -78,7 +83,8 @@ file you did or did not read. Violating any of them is a hard error.
 ### Process
 
 - The **course-context file is `AGENTS.md`** (course name, audience, style,
-  language, `Profile:`, `Slides format:`, `## Lab context`, recurring rules).
+  language, `Profile:`, `Slides format:`, `Doc export:`, `## Lab context`,
+  recurring rules).
   Codex CLI and Cursor read it directly; Claude Code loads it via the
   `@AGENTS.md` import in `CLAUDE.md`, which otherwise holds only Claude Code-only
   overrides.
@@ -133,14 +139,16 @@ file you did or did not read. Violating any of them is a hard error.
 | `/course-maker doctor` | Check course for state drift, missing files, config gaps (read-only) |
 | `/course-maker stats` | Show course progress bars (lectures/labs complete, hours) |
 | `/course-maker syllabus [pdf\|latex\|docx]` | Generate/update student syllabus.md from course_plan.md; optional export |
+| `/course-maker site [init\|render\|preview\|publish]` | Build/publish the student-facing course website (Quarto) |
 | `/course-maker plan N` | Step 1 — detailed slide-by-slide plan for lecture N |
 | `/course-maker visuals N` | Step 2 — list of visualizations, TikZ feasibility |
 | `/course-maker figures N` | Step 3 — Python script to generate PNG figures |
-| `/course-maker slides N [format]` | Step 4 — deck chunk 0 (beamer→slides.tex / slidev→slides.md); format from AGENTS.md or arg |
+| `/course-maker slides N [format]` | Step 4 — deck chunk 0 (beamer→slides.tex / slidev→slides.md / quarto→slides.qmd); format from AGENTS.md or arg |
 | `/course-maker slides N next` | Step 4 — next block of 5 slides (format detected from the existing file) |
-| `/course-maker slides N export [pdf\|png]` | Export the existing deck to a file (beamer→PDF, slidev→pdf/png) |
+| `/course-maker slides N export [fmt]` | Export the existing deck; default in bold (beamer→**pdf**; slidev→**pdf**/png; quarto→**html**/pdf/pptx) |
 | `/course-maker notes N [mode]` | Step 5 — speaker notes, chunk 0 (slides 1–5); mode = minimal/medium/detailed, from AGENTS.md or arg |
 | `/course-maker notes N next` | Step 5 — next block of 5 slides |
+| `/course-maker notes N inject` | Step 5 — re-project speaker notes into a quarto deck as `::: {.notes}` |
 | `/course-maker status N` | Show state + history summary for lecture N |
 
 **Seminar commands** (seminar = lecture deck + practical part, in seminars/NN/):
@@ -174,19 +182,19 @@ file you did or did not read. Violating any of them is a hard error.
 |---|---|
 | `/course-maker quiz plan N` | Step 1 — interactive quiz plan (blocks, types, variants) |
 | `/course-maker quiz generate N [next]` | Step 2 — generate question bank (chunked by block) |
-| `/course-maker quiz publish N [format]` | Step 3 — export student-facing version (markdown) |
+| `/course-maker quiz publish N [format]` | Step 3 — export student-facing version (markdown, then pdf/latex/docx) |
 
 **Homework commands** (manually graded take-home assignment; brief + rubric, no autograding):
 
 | Command | Description |
 |---|---|
 | `/course-maker homework plan N [dir]` | Step 1 — interactive brief + rubric; dir default homework/NN/ (may nest, e.g. seminars/<name>/homework/) |
-| `/course-maker homework publish N [format]` | Step 2 — assemble student handout; markdown default, pdf/latex/docx via pandoc |
+| `/course-maker homework publish N [format]` | Step 2 — assemble student handout; markdown default, pdf/latex/docx via doc_export |
 | `/course-maker homework status N` | Status + last 3 history entries |
 
 **If invoked with no arguments** (`/course-maker` alone): read `COURSE_STATE.md`
 and print a summary of all lectures, seminars, labs, quizzes, and homework with their
-current step statuses (✅ / 🔄 / ❌ / ⚠️). End with: "Run `/course-maker help` for
+current step statuses (✅ / 🔄 / ❌ / ⚠️ / —). End with: "Run `/course-maker help` for
 available commands."
 
 **`/course-maker help`**: print the five command tables (Lecture, Seminar, Lab,
@@ -218,7 +226,38 @@ Read: `references/stats.md`. Read-only: progress bars across pipelines from
 
 ### `/course-maker syllabus [pdf|latex|docx]`
 Read: `references/syllabus.md`. Generates/updates student-facing `syllabus.md`
-from `course_plan.md`; with a format arg, exports it via pandoc. No state row.
+from `course_plan.md`; with a format arg, converts it via
+`references/doc_export.md`. No state row.
+
+### `/course-maker site [init|render|preview|publish]`
+Read: `references/site.md`. Builds a student-facing website with Quarto from a
+staged copy of the course. No state row.
+
+**CRITICAL — even if reference was skipped:**
+- The site project lives in `site/` and owns the only `_quarto.yml`. NEVER put
+  `_quarto.yml` in the course root — a single deck would then render into the
+  site's output directory instead of next to its source, breaking
+  `slides N export`.
+- Default-deny: material reaches the site only by being on the allow-list in the
+  reference. Never stage a file because it happens to be in the course.
+- Published decks are rendered from a **notes-stripped copy** produced by
+  `scripts/site_guard.py strip-notes`. Injected `::: {.notes}` blocks land in
+  the deck's HTML and would be public.
+- Before any publish, run `scripts/site_guard.py check site/_site`. Any finding
+  blocks publication. Fix the staging, never the script's patterns.
+- Publishing is outward-facing and hard to undo. Confirm before a course's first
+  publish, and never launch `quarto preview` — print the command instead.
+
+### Document export (shared by syllabus, homework, quiz)
+Read: `references/doc_export.md` whenever a generated Markdown file must become
+pdf/latex/docx. Backend from `Doc export:` in `AGENTS.md` (`pandoc` default;
+`quarto` renders PDF through Typst and needs no LaTeX). A missing tool is an
+explicit stop, never a silent switch to the other backend.
+
+**CRITICAL — even if reference was skipped:** when the calling command has a
+leak check (homework rubric, quiz answers), convert only the file that already
+passed it. A PDF built from an unchecked file leaks exactly what the check
+exists to catch.
 
 ### `/course-maker plan N` (Step 1)
 Read: `references/step1_plan.md`.
@@ -228,6 +267,12 @@ Read: `references/step2_visuals.md`.
 
 ### `/course-maker figures N` (Step 3)
 Read: `references/step3_figures.md`.
+
+**Quarto courses:** this step is conditional. If no row in `visuals.md` has
+`Render: png`, every figure is an executable chunk written at Step 4 — skip the
+step, set it to `—` (not applicable), and send the user to
+`/course-maker slides N`. Otherwise
+generate only the `png` rows. For beamer and slidev the step is always required.
 
 **CRITICAL — even if reference was skipped:**
 - After saving `figures.py`, run it: `cd lectures/NN && python figures/figures.py`.
@@ -239,26 +284,31 @@ Read: `references/step3_figures.md`.
 Resolve the slide format, then read the matching reference:
 - `beamer` → `references/step4_slides.md` (produces `slides.tex`).
 - `slidev` → `references/step4_slides_slidev.md` (produces `slides.md`).
+- `quarto` → `references/step4_slides_quarto.md` (produces `slides.qmd`).
 
-Format resolution: an explicit `format` arg (`beamer`|`slidev`) wins; else the
-`Slides format:` field in `AGENTS.md` → `## Course context` (default `beamer`).
-When resuming (`slides N next`), ignore the field and detect from the existing
-file: `slides.tex` → beamer, `slides.md` → slidev. (`pptx` is not implemented;
-if requested, say so and stop.)
+Format resolution: an explicit `format` arg (`beamer`|`slidev`|`quarto`) wins;
+else the `Slides format:` field in `AGENTS.md` → `## Course context` (default
+`beamer`). When resuming (`slides N next`), ignore the field and detect from the
+existing file: `slides.tex` → beamer, `slides.md` → slidev, `slides.qmd` →
+quarto. PowerPoint is not a deck format of its own — it is an export target of a
+quarto deck (`slides N export pptx`).
 
 **CRITICAL — even if reference was skipped:**
-- Output is ALWAYS chunked, for either format. A full deck is 600–900 lines;
+- Output is ALWAYS chunked, for every format. A full deck is 600–900 lines;
   one-shot generation exceeds a single generation/context budget and stalls the agent.
 - Chunk 0 = preamble/headmatter + title. Chunk K (K≥1) = slides [5K-4 … 5K].
-  Chunk last = closing slide (beamer also appends `\end{document}`).
-- Append each chunk to the deck file (`slides.tex` or `slides.md`) immediately;
-  do not pause between chunks.
-- Use the course's preamble verbatim: `slides_preamble.tex` (beamer) or
-  `slides_headmatter.md` (slidev). If missing, stop and tell the user to run
-  `/course-maker course init`.
+  Chunk last = closing slide (beamer also appends `\end{document}`). For quarto,
+  the title slide comes from the headmatter — chunk 0 is headmatter + outline.
+- Append each chunk to the deck file (`slides.tex`, `slides.md`, or
+  `slides.qmd`) immediately; do not pause between chunks.
+- Use the course's preamble verbatim: `slides_preamble.tex` (beamer),
+  `slides_headmatter.md` (slidev), or `slides_headmatter.qmd` (quarto). If
+  missing, stop and tell the user to run `/course-maker course init`.
 - Only reference PNG files that actually exist in `lectures/NN/figures/`.
 - If any PNG is older than `figures.py`, warn that figures may be stale and
   offer to re-run `/course-maker figures N` first. Warning, not a hard block.
+- quarto only: after the last chunk, run `quarto render slides.qmd --to revealjs`
+  and fix until it exits clean. A deck that has not rendered is not finished.
 
 **Resuming:** `/course-maker slides N next` reads the existing deck file, finds
 the last completed slide, continues from there (auto-chains remaining chunks).
@@ -266,13 +316,16 @@ the last completed slide, continues from there (auto-chains remaining chunks).
 **Revising:** "fix slide 7" → identify which chunk it belongs to, regenerate
 only that chunk, show diff, append corrected version after approval.
 
-### `/course-maker slides N export [pdf|png]`
+### `/course-maker slides N export [fmt]`
 Read: `references/slides_export.md`. Mechanical export of the existing deck — no
 approval, no state change. Detect the deck format from the file present
-(`slides.tex` → beamer PDF, `slides.md` → slidev pdf/png). If the export tool (a
-LaTeX engine, or Node for Slidev) is missing, say how to install it — never fail
-silently. Presenting a Slidev deck live (`npx slidev`) is the user's job; never
-launch it.
+(`slides.tex` → beamer, `slides.md` → slidev, `slides.qmd` → quarto). With no
+format argument: beamer and slidev → `pdf`, quarto → `html` (reveal.js is the
+only target that carries interactive figures; pdf and pptx drop them). Warn
+before a lossy quarto export instead of doing it silently. If the export tool (a
+LaTeX engine, Node for Slidev, or `quarto`) is missing, say how to install it —
+never fail silently. Presenting a deck live (`npx slidev`, `quarto preview`) is
+the user's job; never launch it.
 
 ### `/course-maker notes N [mode]` (Step 5)
 Read: `references/step5_notes.md`. Mode (`minimal`/`medium`/`detailed`) = arg,
@@ -289,6 +342,12 @@ delivery is written out.
 **Resuming:** `/course-maker notes N next` reads the file, continues from the
 last completed slide (auto-chains remaining chunks).
 
+**Quarto decks:** after the last chunk, project the notes into `slides.qmd` as
+marked `::: {.notes}` blocks — part of this step, inside its single approval.
+Re-run alone with `/course-maker notes N inject`. Injection is idempotent and
+never silently overwrites a hand-edited block. Beamer and slidev decks keep
+notes in `speaker_notes.md` only.
+
 ### `/course-maker status N`
 
 Print: row from `COURSE_STATE.md` for lecture N, last 3 entries from
@@ -304,8 +363,10 @@ A seminar = a lecture deck + a practical part, in `seminars/NN/`.
 Use the matching lecture step reference (`step1_plan.md` … `step5_notes.md`),
 applied to `seminars/NN/`. For `slides`, resolve the format exactly as the
 lecture slides dispatcher does (beamer → `step4_slides.md`, slidev →
-`step4_slides_slidev.md`). All lecture CRITICAL rules apply with paths under
-`seminars/NN/` (chunking for slides/notes; run `figures.py` before figures ✅).
+`step4_slides_slidev.md`, quarto → `step4_slides_quarto.md`). All lecture
+CRITICAL rules apply with paths under `seminars/NN/` (chunking for slides/notes;
+run `figures.py` before figures ✅, or a clean `quarto render` for a
+chunk-based figure).
 
 ### `/course-maker seminar practice N`
 Read: `references/seminar_practice.md`.
@@ -400,7 +461,10 @@ Read: `references/quiz_generate.md`. Chunked one block per chunk; resume with
 `/course-maker quiz generate N next`.
 
 ### `/course-maker quiz publish N [format]` (Step 3)
-Read: `references/quiz_publish.md`. Only `markdown` is implemented for now.
+Read: `references/quiz_publish.md`. `markdown` is always produced first and is
+what the answer-leak check runs against; `pdf`/`latex`/`docx` convert that
+checked file via `references/doc_export.md`. LMS-native formats (Moodle, QTI)
+are not implemented.
 
 ---
 
@@ -420,7 +484,8 @@ record it, so `publish` need not re-ask.
 
 ### `/course-maker homework publish N [format]` (Step 2)
 Read: `references/homework.md`. Assembles `homework_student.md` (task + rubric
-only if opted in at plan time); markdown default, pdf/latex/docx via pandoc.
+only if opted in at plan time); markdown default, pdf/latex/docx via
+`references/doc_export.md`.
 
 **CRITICAL — even if reference was skipped:** when the rubric is NOT opted into
 the handout, after writing `homework_student.md` verify no instructor-only

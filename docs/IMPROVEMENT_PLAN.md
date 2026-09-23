@@ -272,7 +272,7 @@ profiles/                     ← новое: профили преподава�
 | 4. Профили | ✅ выполнена в пересмотренной архитектуре (LMS-профили + user_defaults + extensions) | — |
 | 5. Пайплайны | ✅ шаги 5.1–5.5 отмечены выполненными | — |
 | 6. QoL | ✅ выполнена (6.3 отложен осознанно, 6.6 отклонён) | — |
-| 7. Форматы | ⏳ частично: Slidev есть, pptx / LMS-адаптеры сверх двух / доп. языки / R-MATLAB — нет | 7.1 (pptx), 7.2, 7.3, 7.4 |
+| 7. Форматы | ⏳ частично: 7.1 закрыт (Slidev + Quarto, pptx как таргет экспорта Quarto); LMS-адаптеры сверх двух / доп. языки / R-MATLAB — нет | 7.2, 7.3, 7.4 |
 
 ## Волна 1. Архитектура SKILL.md (P1) — ✅ выполнена (проверено 2026-08-08)
 
@@ -679,8 +679,15 @@ Reference: `references/stats.md`.
 > a second slide format (Step 4)`) — `references/step4_slides_slidev.md`,
 > `templates/slides_headmatter_slidev.md`, формат резолвится из
 > `AGENTS.md`/аргумента/существующего файла (`slides.tex` → beamer, `slides.md`
-> → slidev). PowerPoint по-прежнему не реализован — `SKILL.md` явно
-> документирует `pptx` как нереализованный.
+> → slidev).
+>
+> **Шаг закрыт (2026-08-25).** Третьим форматом добавлен Quarto —
+> `references/step4_slides_quarto.md`, `templates/slides_headmatter_quarto.qmd`,
+> `slides.qmd`. Из одного источника рендерится reveal.js, Beamer-PDF и pptx
+> (`quarto render --to <target>`), поэтому PowerPoint закрыт **не** через
+> python-pptx или Marp, как предполагалось выше, а как таргет экспорта
+> quarto-дека. Отдельным форматом слайдов pptx не является. План и обоснование:
+> `docs/QUARTO_PLAN.md`.
 
 ### Шаг 7.2. LMS-адаптеры
 `profiles/<X>/lms_adapter.md` как первоклассный концепт: GitHub Classroom, Moodle, Canvas, OpenEdX, local zip.

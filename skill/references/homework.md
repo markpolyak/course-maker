@@ -168,18 +168,14 @@ re-check until clean.
 
 ### Export (pdf / latex / docx)
 
-```bash
-pandoc HW_DIR/homework_student.md -o HW_DIR/homework_student.pdf     # needs a LaTeX engine
-pandoc -s HW_DIR/homework_student.md -o HW_DIR/homework_student.tex  # standalone LaTeX
-pandoc HW_DIR/homework_student.md -o HW_DIR/homework_student.docx
-```
+Read `references/doc_export.md` and convert `HW_DIR/homework_student.md` with
+the backend the course configured (`Doc export:` in `AGENTS.md`, default
+pandoc).
 
 - If `homework_student.md` is missing, assemble it first.
-- If `pandoc` is not installed: stop, leave the markdown in place, and tell the
-  user how to install pandoc. Do not fail silently.
-- For `pdf`, if pandoc reports no LaTeX engine, say so and suggest `latex` or
-  `docx` (or installing a TeX distribution).
-- After a successful export, list the produced file.
+- **Export only after the rubric-leak check above has passed.** The check
+  protects the Markdown; a PDF built from an unchecked handout carries whatever
+  leaked into it.
 
 ### After publish
 

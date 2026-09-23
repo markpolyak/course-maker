@@ -125,13 +125,77 @@ def test_slides_slidev_md_counts_as_done(tmp_path):
     assert "DRIFT" not in out
 
 
+def test_slides_quarto_qmd_counts_as_done(tmp_path):
+    """slides ✅ is satisfied by slides.qmd (Quarto)."""
+    write_state(tmp_path, lectures_table("| 01 | Intro | ❌ | ❌ | ❌ | ✅ | ❌ | 2026-01-01 |\n"))
+    lec = tmp_path / "lectures" / "01"
+    lec.mkdir(parents=True)
+    (lec / "slides.qmd").write_text("## deck", encoding="utf-8")
+    code, out = run(tmp_path)
+    assert code == 0, out
+    assert "DRIFT" not in out
+
+
 def test_slides_done_without_any_deck_drifts(tmp_path):
-    """slides ✅ but neither slides.tex nor slides.md present -> DRIFT."""
+    """slides ✅ but no deck file of any format present -> DRIFT."""
     write_state(tmp_path, lectures_table("| 01 | Intro | ❌ | ❌ | ❌ | ✅ | ❌ | 2026-01-01 |\n"))
     (tmp_path / "lectures" / "01").mkdir(parents=True)
     code, out = run(tmp_path)
     assert code == 1
     assert "DRIFT" in out and "slides" in out
+
+
+def test_quarto_chunk_deck_needs_no_png(tmp_path):
+    """
+    figures ✅ with no figures/ at all is correct when the Quarto deck renders
+    its own images from executable chunks — that is the inline mode, not drift.
+    """
+    write_state(tmp_path, lectures_table("| 01 | Intro | ❌ | ❌ | ✅ | ✅ | ❌ | 2026-01-01 |\n"))
+    lec = tmp_path / "lectures" / "01"
+    lec.mkdir(parents=True)
+    (lec / "slides.qmd").write_text(
+        "## Figure\n\n```{python}\nimport matplotlib.pyplot as plt\nplt.plot([1,2])\n```\n",
+        encoding="utf-8",
+    )
+    code, out = run(tmp_path)
+    assert code == 0, out
+    assert "DRIFT" not in out
+
+
+def test_quarto_deck_without_chunks_still_needs_png(tmp_path):
+    """A Quarto deck with no executable chunk gets no exemption: figures ✅ needs PNGs."""
+    write_state(tmp_path, lectures_table("| 01 | Intro | ❌ | ❌ | ✅ | ✅ | ❌ | 2026-01-01 |\n"))
+    lec = tmp_path / "lectures" / "01"
+    lec.mkdir(parents=True)
+    (lec / "slides.qmd").write_text(
+        "## Figure\n\n![](figures/fig01.png){width=\"70%\"}\n",
+        encoding="utf-8",
+    )
+    code, out = run(tmp_path)
+    assert code == 1
+    assert "DRIFT" in out and "figures" in out
+
+
+def test_beamer_deck_without_png_still_drifts(tmp_path):
+    """The exemption is keyed on slides.qmd — a beamer lecture is unaffected."""
+    write_state(tmp_path, lectures_table("| 01 | Intro | ❌ | ❌ | ✅ | ✅ | ❌ | 2026-01-01 |\n"))
+    lec = tmp_path / "lectures" / "01"
+    lec.mkdir(parents=True)
+    (lec / "slides.tex").write_text(r"\begin{document}\end{document}", encoding="utf-8")
+    code, out = run(tmp_path)
+    assert code == 1
+    assert "DRIFT" in out and "figures" in out
+
+
+def test_dash_figures_step_is_not_drift(tmp_path):
+    """A dash marks a step this lecture legitimately does not have."""
+    write_state(tmp_path, lectures_table("| 01 | Intro | ❌ | ❌ | — | ✅ | ❌ | 2026-01-01 |\n"))
+    lec = tmp_path / "lectures" / "01"
+    lec.mkdir(parents=True)
+    (lec / "slides.qmd").write_text("## deck", encoding="utf-8")
+    code, out = run(tmp_path)
+    assert code == 0, out
+    assert "DRIFT" not in out
 
 
 def test_quiz_published_without_export_drifts(tmp_path):

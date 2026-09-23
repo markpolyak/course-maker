@@ -1,5 +1,113 @@
 # Changelog
 
+## [2026-09-01] — Fixes from the first run on a real course
+
+### Fixed
+
+**Beamer PDF silently dropped non-Latin text.** The Quarto headmatter template
+left `mainfont` commented out, so xelatex typeset in Latin Modern — which has no
+Cyrillic, Greek, or CJK glyphs. The export succeeded, produced a PDF, and simply
+omitted the text, with no error anywhere. Only the beamer target was affected;
+revealjs and pptx were always fine.
+
+Four layers, because a failure this quiet needs more than a comment: `course init`
+now sets `mainfont` when the course language is non-Latin; the template says what
+happens without it instead of mentioning it in passing; `slides N export pdf`
+verifies the text survived before reporting success; and `doctor` flags a
+quarto + non-Latin course whose headmatter has no `mainfont`.
+
+Found by the first manual run on a real course — the automated checks missed it
+because the Cyrillic render test covered the Typst path and the beamer test used
+English text.
+
+**`step4_slides_quarto.md` miscounted its own delimiters**, claiming `---`
+appears exactly once in a finished deck. YAML front matter is fenced by a pair,
+so a correct deck has two; the rule is that none may follow the headmatter.
+
+## [2026-08-26] — Course website
+
+### Added
+
+**`/course-maker site [init|render|preview|publish]`** — a student-facing course
+website built with Quarto (`references/site.md`,
+`templates/quarto_site_yml.md`).
+
+The project lives in `site/` and owns the only `_quarto.yml`. A project file in
+the course root would redirect every single-deck render into the site's output
+directory and break `slides N export` — verified, which is why the site is
+staged rather than rendered in place.
+
+Staging is what enforces the boundary: material reaches the site by being on an
+allow-list, never by being found in the course directory. Decks are staged
+already rendered, so a published deck cannot differ from the one the lecturer
+reviewed. Quiz sheets and `course_plan.md` require an explicit opt-in each time.
+
+Speaker notes are stripped before publication. Injected notes land in a deck's
+HTML as `<aside class="notes">` and would otherwise be readable by anyone who
+opens the page source; the markers written by `notes N inject` make the removal
+deterministic. An unmarked, hand-written notes block stops the publish rather
+than being guessed at.
+
+**`scripts/site_guard.py`** carries both mechanical safety steps —
+`strip-notes` (remove injected notes from a deck copy) and `check` (scan the
+built site for instructor-only content). They are a script rather than prose in
+the reference because protection from a leak must not depend on an agent having
+read the workflow; it also makes them testable at Level 1 instead of Level 3.
+Its patterns match machine-written markers and filenames only: a checkmark on a
+slide or the word "rubric" in a syllabus must not trip it, or the guard gets
+loosened by the first false positive and stops protecting anything.
+
+## [2026-08-25] — Quarto as a third slide format
+
+### Added
+
+**Quarto slide format.** `Slides format: quarto` produces `lectures/NN/slides.qmd`,
+one source that renders to reveal.js (HTML), Beamer (PDF), and PowerPoint via
+`quarto render --to <target>`. This closes the pptx gap that wave 7.1 of
+`docs/IMPROVEMENT_PLAN.md` had left open — PowerPoint is an export target of a
+Quarto deck, not a deck format of its own. Beamer and Slidev are unchanged.
+
+- `references/step4_slides_quarto.md` — the Step 4 workflow for this format.
+- `templates/slides_headmatter_quarto.qmd` — course-level headmatter with all
+  three render targets declared, copied to the course root by `course init`.
+- `references/slides_export.md` — a Quarto branch mapping the command's
+  `pdf`/`html`/`pptx` argument onto `--to beamer|revealjs|pptx`.
+
+**Executable figures.** In a Quarto deck a figure may be a `{python}` chunk
+instead of a pre-generated PNG, including interactive output for the HTML
+target. `figures.py` becomes optional and secondary for these courses:
+`references/step2_visuals.md` gained a `Render: inline | png` column, and Step 3
+is skipped entirely (status `—`) when no visualization needs a file.
+
+**Speaker notes in the deck.** For Quarto decks, Step 5 now projects
+`speaker_notes.md` into `slides.qmd` as marked `::: {.notes}` blocks — reveal.js
+presenter view, the PowerPoint notes pane, and Beamer `\note{}`. The notes are
+still authored once, in `speaker_notes.md`; injection is idempotent, re-runnable
+with `/course-maker notes N inject`, and never silently overwrites a hand-edited
+block.
+
+**Not-applicable status.** A dash in a step column marks a step a session
+legitimately does not have, as distinct from one not started (❌). Recognized by
+`scripts/validate_state.py` and documented in `references/repository_layout.md`.
+
+### Changed
+
+**The figures invariant is now stated in terms of verification, not artifacts.**
+The Inviolable rule in `SKILL.md` keeps its existing wording for `figures.py`
+and PNG files verbatim and adds a separate clause: a chunk-based figure in a
+`slides.qmd` deck is verified by a clean `quarto render`. Every PNG a deck
+references is still bound by the original rules, Quarto included.
+
+**`validate_state.py`** accepts `slides.qmd` as a deck file, treats a missing
+`figures/` directory as correct when the Quarto deck carries executable chunks,
+and understands a dash as not-applicable. The exemption is keyed on the deck
+file, so Beamer and Slidev lectures are unaffected.
+
+**`doctor`** now checks the slide preamble that the course's format actually
+needs (`slides_preamble.tex` / `slides_headmatter.md` / `slides_headmatter.qmd`)
+instead of always demanding the Beamer one, and reports a missing export
+toolchain (`quarto`, `node`) as advice rather than an error.
+
 ## [2026-08-08] — Russian README; sharpened pitch
 
 ### Added
