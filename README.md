@@ -260,7 +260,7 @@ my-course/
 | `/course-maker lab defense N [next]` | Instructor-only oral-defense question bank: theory, task, own solution, domain; sized so questions don't repeat across students |
 | `/course-maker lab status N` | Status + last 3 history entries |
 
-**Quiz pipeline** (quizzes / tests / exams):
+**Quiz pipeline** (written quizzes / tests / exams; for questions at the oral defense of a lab, use `/course-maker lab defense N` from the lab pipeline):
 
 | Command | Description |
 |---|---|

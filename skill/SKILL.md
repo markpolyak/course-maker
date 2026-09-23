@@ -180,7 +180,8 @@ file you did or did not read. Violating any of them is a hard error.
 | `/course-maker lab defense N [next]` | Instructor-only question bank for the oral defense (chunked) |
 | `/course-maker lab status N` | Status + last 3 history entries |
 
-**Quiz commands** (quizzes / tests / exams):
+**Quiz commands** (written quizzes / tests / exams; questions for the oral
+defense of a lab are `/course-maker lab defense N`):
 
 | Command | Description |
 |---|---|
@@ -202,7 +203,7 @@ current step statuses (✅ / 🔄 / ❌ / ⚠️ / —). End with: "Run `/course
 available commands."
 
 **`/course-maker help`**: print the five command tables (Lecture, Seminar, Lab,
-Quiz, Homework) into the chat — the user cannot see `SKILL.md` — then stop.
+Quiz, Homework), each with its heading line, into the chat — the user cannot see `SKILL.md` — then stop.
 
 ---
 
@@ -472,6 +473,9 @@ last 3 entries from `<LAB_DIR>history.md`, any ⚠️ warnings.
 A quiz/test/exam pipeline. The bank `quizzes/NN/quiz_questions.md` holds questions
 with answers inline (it is also the key); `quiz publish` exports a student copy
 with answers stripped. Artifacts in `quizzes/NN/`; state in the `## Quizzes` section.
+Not for the oral defense of a lab: if the user asks for questions to ask a
+student about their lab, use `/course-maker lab defense N` (instructor-only bank
+in the lab's directory, no student export) and say so.
 See also the Inviolable rules on chunking and answer-leak.
 
 ### `/course-maker quiz plan N` (Step 1)
