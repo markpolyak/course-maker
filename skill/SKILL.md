@@ -45,6 +45,8 @@ file you did or did not read. Violating any of them is a hard error.
   grade-output `print()` layout fixed — an external CI may grep it. Only the
   labels (course/language) and the numerator (bonus) change. See
   `extensions/reporters/README.md`.
+- NEVER give students `<LAB_DIR>defense_questions.md` (lab defense bank) and
+  never write it into `<LAB_DIR>starter/` — it holds answer criteria.
 - NEVER give students `quizzes/NN/quiz_questions.md` — it holds answers. Before
   marking a quiz `published`, verify the exported student file has no answer
   markers (`grep` for `✓`/answer lines returns nothing).
@@ -75,8 +77,9 @@ file you did or did not read. Violating any of them is a hard error.
   that any deck references, quarto included.
 - NEVER cite another slide by number or position, either direction — name the
   content instead. At most one next-lecture mention, on the closing slide only.
-- Output for `slides`, `notes`, `quiz generate`, and `seminar practice` is ALWAYS
-  chunked (blocks of 5 slides, or one quiz block / notebook section per chunk).
+- Output for `slides`, `notes`, `quiz generate`, `lab defense`, and
+  `seminar practice` is ALWAYS chunked (blocks of 5 slides, one quiz block,
+  up to 8 defense questions, or one notebook section per chunk).
   Never generate the entire file in one shot — a full file exceeds a single
   generation/context budget and stalls the agent.
 
@@ -174,6 +177,7 @@ file you did or did not read. Violating any of them is a hard error.
 | `/course-maker lab triage N` | After a ⚠️ validation: diagnose which step to revisit (read-only) |
 | `/course-maker lab publish N` | Run the LMS publish workflow from `lms_adapter.md` |
 | `/course-maker lab update N` | Re-publish after post-release fix |
+| `/course-maker lab defense N [next]` | Instructor-only question bank for the oral defense (chunked) |
 | `/course-maker lab status N` | Status + last 3 history entries |
 
 **Quiz commands** (quizzes / tests / exams):
@@ -438,6 +442,23 @@ Read: `references/lab_publish.md`.
 
 ### `/course-maker lab update N`
 Read: `references/lab_update.md`.
+
+### `/course-maker lab defense N [next]`
+Read: `references/lab_context.md` AND `references/lab_defense.md`. Builds
+`<LAB_DIR>defense_questions.md`: questions on theory, the task, the student's
+own solution, and the domain, each with follow-ups and answer criteria; sized
+from the number of students so questions are not repeated along the queue.
+
+**CRITICAL — even if reference was skipped:**
+- Write only `<LAB_DIR>defense_questions.md`, never anything under
+  `<LAB_DIR>starter/` (published to students). First line of the file:
+  `<!-- instructor-only: lab defense questions -->`.
+- Output is chunked, at most 8 main questions per chunk; append each chunk
+  immediately and auto-chain to the end.
+- Prefer questions a student cannot answer without having done and understood
+  the work (anchored to their code, predict/verify, counterfactuals, hand
+  traces); every main question has follow-ups. Never phrase criteria as an
+  accusation of AI use.
 
 ### `/course-maker lab status N`
 

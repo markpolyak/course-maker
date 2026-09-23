@@ -76,6 +76,7 @@ LAB_FILE_STEPS = {
     "spec": ["lab_spec.md"],
     "notebook": ["starter/exercises.ipynb"],
     "tests": ["starter/tests.py", "starter/conftest.py"],
+    "defense": ["defense_questions.md"],
 }
 
 # Quiz step column -> path (relative to quizzes/<id>/) that must exist when done.

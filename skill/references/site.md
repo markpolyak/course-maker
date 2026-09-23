@@ -49,7 +49,8 @@ time — never by default:
 Instructor-only by construction. These are never staged, and the guard below
 re-checks the built site for them:
 
-`rubric.md` · `quizzes/NN/quiz_questions.md` · `lab_spec.md` · `tests.py` ·
+`rubric.md` · `quizzes/NN/quiz_questions.md` · `lab_spec.md` ·
+`defense_questions.md` · `tests.py` ·
 `conftest.py` · `grade_report.py` · `speaker_notes.md` · `history.md` ·
 `COURSE_STATE.md` · `lms_adapter.md` · `AGENTS.md` · `CLAUDE.md` ·
 `datasets_info.md` · everything under `labs/*/starter/` except `README.md`

@@ -134,6 +134,23 @@ def test_check_catches_deny_listed_file(tmp_path):
     assert "rubric.md" in log
 
 
+def test_check_catches_lab_defense_bank(tmp_path):
+    """The bank is blocked by name, and its first-line marker is caught even
+    if the file was renamed on the way into the site."""
+    site = tmp_path / "_site"
+    (site / "labs").mkdir(parents=True)
+    marker = "<!-- instructor-only: lab defense questions -->\n# Lab 1\n"
+    (site / "labs" / "defense_questions.md").write_text(marker, encoding="utf-8")
+    code, log = run("check", site)
+    assert code == 1
+    assert "defense_questions.md" in log
+
+    (site / "labs" / "defense_questions.md").rename(site / "labs" / "lab1.md")
+    code, log = run("check", site)
+    assert code == 1
+    assert "instructor aside" in log
+
+
 def test_check_catches_instructor_aside(tmp_path):
     site = tmp_path / "_site"
     site.mkdir()

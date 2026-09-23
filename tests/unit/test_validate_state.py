@@ -283,3 +283,30 @@ def test_homework_dir_may_nest_under_seminar(tmp_path):
     code, out = run(tmp_path)
     assert code == 1
     assert "DRIFT" in out and "seminars/03-arima/homework" in out and "task" in out
+
+
+def labs_table(rows):
+    return (
+        "# Course State\n\n## Labs\n\n"
+        "| # | Dir | Title | plan | notebook | spec | tests | validated | published | defense | Updated |\n"
+        "|---|-----|-------|------|----------|------|-------|-----------|-----------|---------|---------|\n"
+        + rows
+    )
+
+
+def test_lab_defense_done_without_bank_drifts(tmp_path):
+    write_state(tmp_path, labs_table(
+        "| 01 | lab1 | Intro | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | 2026-01-01 |\n"))
+    (tmp_path / "labs" / "lab1").mkdir(parents=True)
+    code, out = run(tmp_path)
+    assert code == 1
+    assert "DRIFT" in out and "defense_questions.md" in out
+
+
+def test_lab_defense_done_with_bank_passes(tmp_path):
+    write_state(tmp_path, labs_table(
+        "| 01 | lab1 | Intro | ❌ | ❌ | ❌ | ❌ | ❌ | ❌ | ✅ | 2026-01-01 |\n"))
+    (tmp_path / "labs" / "lab1").mkdir(parents=True)
+    (tmp_path / "labs" / "lab1" / "defense_questions.md").write_text("bank", encoding="utf-8")
+    code, out = run(tmp_path)
+    assert code == 0, out
